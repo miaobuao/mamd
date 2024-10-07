@@ -29,3 +29,6 @@ CREATE TABLE "File" (
     PRIMARY KEY ("config_id", "path"),
     CONSTRAINT "File_config_id_fkey" FOREIGN KEY ("config_id") REFERENCES "Config" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_username_key" ON "User"("username");

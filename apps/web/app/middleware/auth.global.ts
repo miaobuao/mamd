@@ -1,7 +1,8 @@
 const LOGIN_ROUTE = '/user/login'
+const REGISTER_ROUTE = '/user/register'
 
 export default defineNuxtRouteMiddleware(async (to) => {
-	const { $pinia } = useNuxtApp()
+	const { $pinia, $trpc } = useNuxtApp()
 	const auth = useAuthStore($pinia)
 
 	if (auth.isAuth) {
@@ -17,12 +18,19 @@ export default defineNuxtRouteMiddleware(async (to) => {
 		return navigateTo('/')
 	}
 
-	if (!auth.isAuth) {
-		if (to.path === '/user/register') {
+	if (auth.isAuth) {
+		return
+	}
+
+	const { data: hasAdminAccount } = await $trpc.user.hasAdminAccount.useQuery()
+
+	if (hasAdminAccount.value) {
+		if (to.path === LOGIN_ROUTE) {
 			return
 		}
-		if (to.path !== LOGIN_ROUTE) {
-			return navigateTo({ path: LOGIN_ROUTE, query: { from: to.fullPath } })
-		}
+		return navigateTo({ path: LOGIN_ROUTE, query: { from: to.fullPath } })
+	}
+	else if (to.path !== REGISTER_ROUTE) {
+		return navigateTo({ path: REGISTER_ROUTE, query: { from: to.fullPath } })
 	}
 })

@@ -11,7 +11,8 @@
 		"dev": "dotenv -e .env.devel -- turbo dev --env-mode loose",
 		"lint": "turbo lint",
 		"lint-staged": "lint-staged",
-		"prepare": "husky"
+		"prepare": "husky",
+		"prisma:migrate-all": "dotenv -e .env.devel -- turbo prisma:migrate-all --env-mode loose"
 	},
 	"dependencies": {
 		"@types/lodash-es": "^4.17.12",
