@@ -1,6 +1,8 @@
 import { protectedProcedure, publicProcedure, router } from '../trpc'
 import { UserLoginSubmitFormValidator, UserRegisterSubmitDataValidator } from '~/utils/validator'
 
+const config = useRuntimeConfig()
+
 export const UserRouter = router({
 	auth: protectedProcedure.mutation(async ({ ctx: { userInfo } }) => {
 		return userInfo
@@ -34,7 +36,7 @@ export const UserRouter = router({
 				remember: input.remember,
 			})
 			if (input.remember) {
-				const maxAge = secs(config.OAUTH_EXPIRES_IN)
+				const maxAge = secs(config.OAUTH_JWT_EXPIRES_INd)
 				setCookie(event, 'auth-token', token, {
 					httpOnly: true,
 					maxAge,

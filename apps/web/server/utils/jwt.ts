@@ -17,7 +17,7 @@ export async function signToken(
 	return await new SignJWT({ data: payload })
 		.setProtectedHeader({ alg: 'HS256' })
 		.setIssuer(issuer ?? config.JWT_ISSUER)
-		.setExpirationTime(exp ?? config.OAUTH_EXPIRES_IN)
+		.setExpirationTime(exp ?? config.OAUTH_JWT_EXPIRES_IN)
 		.sign(secret)
 }
 

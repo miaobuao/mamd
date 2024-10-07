@@ -1,3 +1,5 @@
+import process from 'node:process'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
 	future: {
@@ -37,4 +39,10 @@ export default defineNuxtConfig({
 	devtools: { enabled: true },
 
 	compatibilityDate: '2024-09-21',
+
+	runtimeConfig: {
+		OAUTH_JWT_EXPIRES_IN: process.env.OAUTH_JWT_EXPIRES_IN,
+		JWT_SECRET: process.env.JWT_SECRET,
+		JWT_ISSUER: process.env.JWT_ISSUER,
+	},
 })
