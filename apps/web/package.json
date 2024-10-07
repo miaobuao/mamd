@@ -9,7 +9,8 @@
 		"preview": "nuxt preview",
 		"postinstall": "nuxt prepare && npm-run-all prisma:generate:*",
 		"prisma:generate:basic": "prisma generate --schema=./prisma/basic/schema.prisma",
-		"prisma:migrate:basic": "prisma migrate dev --schema=./prisma/basic/schema.prisma -n init"
+		"prisma:migrate:basic": "prisma migrate dev --schema=./prisma/basic/schema.prisma -n init",
+		"prisma:migrate-all": "npm-run-all prisma:migrate:*"
 	},
 	"devDependencies": {
 		"@formkit/auto-animate": "^0.8.2",

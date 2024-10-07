@@ -60,7 +60,16 @@ export const UserRouter = router({
 		})
 	}),
 
-	register: publicProcedure
+	hasAdminAccount: publicProcedure.query(async ({ ctx: { db } }) => {
+		return db.basic.user.findFirst({
+			where: { isAdmin: true },
+			select: { id: true },
+		}).then((user) => {
+			return !!user
+		})
+	}),
+
+	register: protectedProcedure
 		.input(UserRegisterSubmitDataValidator)
 		.mutation(async ({ input, ctx: { db } }) => {
 			const hashPassword = await bcryptEncrypt(input.password)
