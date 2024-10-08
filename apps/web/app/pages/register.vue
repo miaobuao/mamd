@@ -2,11 +2,10 @@
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
+import { Loader2 } from 'lucide-vue-next'
 
-const props = defineProps<{
-	onSuccess: () => void
-}>()
 const { $text, $trpc } = useNuxtApp()
+const route = useRoute()
 const loading = ref(false)
 
 const registerFormSchema = toTypedSchema(UserRegisterInputFormValidator)
@@ -20,16 +19,16 @@ const onSubmit = form.handleSubmit(async ({ confirmPassword, password, username 
 		return
 	}
 	loading.value = true
-	$trpc.user.register
+	$trpc.user.createAdminUser
 		.mutate({
 			username,
 			password,
 		})
 		.then(() => {
 			toast($text.successfullyRegistered(), {
-				description: $text.pleaseLogInWithYourAccountAndPassword(),
+				description: $text.pleaseLogInWithYourUsernameAndPassword(),
 			})
-			props.onSuccess()
+			navigateTo({ path: '/user/login', query: route.query })
 		})
 		.finally(() => {
 			loading.value = false
@@ -74,7 +73,8 @@ const onSubmit = form.handleSubmit(async ({ confirmPassword, password, username 
 					</FormField>
 				</CardContent>
 				<CardFooter>
-					<Button type="submit" :loading="loading">
+					<Button type="submit" :disabled="loading">
+						<Loader2 v-show="loading" class="w-4 h-4 mr-2 animate-spin" />
 						{{ $text.signUp() }}
 					</Button>
 				</CardFooter>

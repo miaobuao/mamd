@@ -14,5 +14,6 @@ export default antfu({
 		'no-console': 'error',
 		'ts/no-unsafe-function-type': 'off',
 		'symbol-description': 'off',
+		'unused-imports/no-unused-imports': 'error',
 	},
 })

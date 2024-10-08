@@ -2,7 +2,7 @@ import { initTRPC } from '@trpc/server'
 import { isNil } from 'lodash-es'
 import type { Context } from '~~/server/trpc/context'
 
-const t = initTRPC.context<Context>().create()
+export const t = initTRPC.context<Context>().create()
 
 export const router = t.router
 
@@ -22,6 +22,7 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
 			},
 			select: {
 				id: true,
+				isAdmin: true,
 				username: true,
 			},
 		})
