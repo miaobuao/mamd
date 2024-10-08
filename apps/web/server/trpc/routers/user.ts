@@ -15,7 +15,7 @@ export const UserRouter = router({
 			const user = await db.basic.user
 				.findUniqueOrThrow({
 					where: { username: input.username },
-					select: { id: true, username: true, password: true },
+					select: { id: true, username: true, password: true, isAdmin: true },
 				})
 				.catch(() => {
 					throw new ForbiddenErrorWithI18n(i18n.error.loginFailed)
@@ -42,6 +42,7 @@ export const UserRouter = router({
 			return {
 				id: user.id,
 				username: user.username,
+				isAdmin: user.isAdmin,
 			}
 		}),
 

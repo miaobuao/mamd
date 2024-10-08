@@ -1,6 +1,7 @@
 export interface UserInfo {
 	id: number
 	username: string
+	isAdmin: boolean
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -21,6 +22,10 @@ export const useAuthStore = defineStore('auth', () => {
 			.catch(() => null)
 	}
 
+	function logout() {
+		return $trpc.user.logout.mutate()
+	}
+
 	const isAuth = computed(() => !!userInfo.value)
 
 	return {
@@ -28,5 +33,6 @@ export const useAuthStore = defineStore('auth', () => {
 		updateUserInfo,
 		isAuth,
 		auth,
+		logout,
 	}
 })
