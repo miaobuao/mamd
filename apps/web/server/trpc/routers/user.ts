@@ -1,4 +1,5 @@
 import { protectedProcedure, publicProcedure, router } from '../trpc'
+import { checkAdminAccountExists } from '../middleware/check-admin-user'
 import { UserLoginSubmitFormValidator, UserRegisterSubmitDataValidator } from '~/utils/validator'
 
 const config = useRuntimeConfig()
@@ -16,27 +17,18 @@ export const UserRouter = router({
 					where: { username: input.username },
 					select: { id: true, username: true, password: true },
 				})
-				.catch(
-					createPrismaErrorHandler({
-						OperationFailedError() {
-							throw new ForbiddenErrorWithI18n(
-								i18n.error.invalidEmailOrPassword,
-							)
-						},
-						default() {
-							throw new ForbiddenErrorWithI18n(i18n.error.loginFailed)
-						},
-					}),
-				)
+				.catch(() => {
+					throw new ForbiddenErrorWithI18n(i18n.error.loginFailed)
+				})
 			if (!user || !bcryptVerify(input.password, user.password))
-				throw new ForbiddenErrorWithI18n(i18n.error.invalidEmailOrPassword)
+				throw new ForbiddenErrorWithI18n(i18n.error.invalidUsernameOrPassword)
 
 			const token = await signToken({
 				userId: user.id,
 				remember: input.remember,
 			})
 			if (input.remember) {
-				const maxAge = secs(config.OAUTH_JWT_EXPIRES_INd)
+				const maxAge = secs(config.OAUTH_JWT_EXPIRES_IN)
 				setCookie(event, 'auth-token', token, {
 					httpOnly: true,
 					maxAge,
@@ -60,18 +52,46 @@ export const UserRouter = router({
 		})
 	}),
 
-	hasAdminAccount: publicProcedure.query(async ({ ctx: { db } }) => {
-		return db.basic.user.findFirst({
-			where: { isAdmin: true },
-			select: { id: true },
-		}).then((user) => {
-			return !!user
-		})
+	hasAdminAccount: publicProcedure.use(checkAdminAccountExists).query(async ({ ctx: { hasAdmin } }) => {
+		return hasAdmin
 	}),
 
-	register: protectedProcedure
+	createAdminUser: publicProcedure
+		.use(checkAdminAccountExists)
 		.input(UserRegisterSubmitDataValidator)
-		.mutation(async ({ input, ctx: { db } }) => {
+		.mutation(async ({ input, ctx: { db, hasAdmin } }) => {
+			if (hasAdmin) {
+				throw new ForbiddenErrorWithI18n(i18n.error.adminAccountExists)
+			}
+			const hashPassword = await bcryptEncrypt(input.password)
+			await db.basic.user
+				.create({
+					data: {
+						username: input.username,
+						password: hashPassword,
+						isAdmin: true,
+					},
+				})
+				.catch(
+					createPrismaErrorHandler({
+						UniqueConstraintError() {
+							throw new ForbiddenErrorWithI18n(
+								i18n.error.usernameHasBeenRegistered,
+							)
+						},
+						default() {
+							throw new ForbiddenErrorWithI18n(i18n.error.registerFailed)
+						},
+					}),
+				)
+		}),
+
+	createCommonUser: protectedProcedure
+		.input(UserRegisterSubmitDataValidator)
+		.mutation(async ({ input, ctx: { db, userInfo } }) => {
+			if (!userInfo.isAdmin) {
+				throw new ForbiddenErrorWithI18n(i18n.error.permissionDenied)
+			}
 			const hashPassword = await bcryptEncrypt(input.password)
 			await db.basic.user
 				.create({
@@ -84,7 +104,7 @@ export const UserRouter = router({
 					createPrismaErrorHandler({
 						UniqueConstraintError() {
 							throw new ForbiddenErrorWithI18n(
-								i18n.error.emailHasBeenRegistered,
+								i18n.error.usernameHasBeenRegistered,
 							)
 						},
 						default() {

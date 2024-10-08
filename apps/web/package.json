@@ -12,7 +12,7 @@
 		"prisma:migrate:basic": "prisma migrate dev --schema=./prisma/basic/schema.prisma -n init",
 		"prisma:migrate-all": "npm-run-all prisma:migrate:*"
 	},
-	"devDependencies": {
+	"dependencies": {
 		"@formkit/auto-animate": "^0.8.2",
 		"@nuxtjs/i18n": "^8.5.5",
 		"@nuxtjs/tailwindcss": "^6.12.1",

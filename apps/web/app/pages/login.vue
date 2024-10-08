@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod'
-import { isArray } from 'lodash-es'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 
@@ -18,11 +17,10 @@ const onSubmit = form.handleSubmit(async (values) => {
 	try {
 		const userInfo = await $trpc.user.login.mutate(values)
 		auth.updateUserInfo(userInfo)
-		let redirect = route.query.from
-		if (isArray(redirect) && redirect[0])
-			redirect = redirect[0]
-
-		$router.replace((redirect as string) || '/')
+		$router.replace(typeof route.query.from === 'string' ? route.query.from : '/')
+		nextTick(() => {
+			toast($text.successfullyLoggedIn())
+		})
 	}
 	catch {
 		toast($text.error.loginFailed())
