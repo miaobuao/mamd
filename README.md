@@ -2,7 +2,20 @@
 
 ## Dev
 
-```bash
+1. install deps
+
+```sh
 pnpm i
-pnpm run dev
+```
+
+2. migrate db
+
+```sh
+pnpm prisma:migrate-all
+```
+
+3. run dev
+
+```sh
+pnpm dev
 ```
