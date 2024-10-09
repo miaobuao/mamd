@@ -1,0 +1,48 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/javascript-node-postgres
+{
+	"name": "Dev Container",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"features": {
+		"ghcr.io/meaningful-ooo/devcontainer-features/fish:1": {
+			"fisher": false
+		},
+		"ghcr.io/itsmechlark/features/redis-server:1": {
+			"version": "latest"
+		},
+		"ghcr.io/larsnieuwenhuizen/features/neovim:0": {}
+	},
+
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"Prisma.prisma",
+				"dbaeumer.vscode-eslint",
+				"bradlc.vscode-tailwindcss",
+				"Vue.volar",
+				"formulahendry.auto-rename-tag",
+				"Vue.vscode-typescript-vue-plugin",
+				"eamodio.gitlens"
+			]
+		}
+	},
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// This can be used to network with other containers or with the host.
+	// "forwardPorts": [3000, 5432],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "yarn install",
+
+	// Configure tool-specific properties.
+	// "customizations": {},
+
+	"mounts": [
+		"type=bind,source=${localEnv:HOME}/.ssh,target=/home/node/.ssh,readonly"
+	]
+}

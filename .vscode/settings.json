@@ -50,5 +50,6 @@
 		"scss",
 		"pcss",
 		"postcss"
-	]
+	],
+	"vue.autoInsert.dotValue": false
 }

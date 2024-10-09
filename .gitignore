@@ -40,3 +40,4 @@ yarn-error.log*
 .data
 .pnpm-store
 .devcontainer/data
+.db
