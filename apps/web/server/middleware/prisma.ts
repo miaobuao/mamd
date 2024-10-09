@@ -1,4 +1,4 @@
-import { PrismaClient as PrismaClientBasic } from '@prisma-client/basic'
+import { PrismaClientBasic } from 'prisma-client-js'
 
 declare module 'h3' {
 	interface H3EventContext {

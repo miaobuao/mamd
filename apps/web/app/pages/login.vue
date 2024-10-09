@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Loader2 } from 'lucide-vue-next'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
@@ -68,7 +69,8 @@ const onSubmit = form.handleSubmit(async (values) => {
 					</FormField>
 				</CardContent>
 				<CardFooter>
-					<Button type="submit" :loading="loading">
+					<Button type="submit" :disabled="loading">
+						<Loader2 v-show="loading" class="w-4 h-4 mr-2 animate-spin" />
 						{{ $text.login() }}
 					</Button>
 				</CardFooter>
