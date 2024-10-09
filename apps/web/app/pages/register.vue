@@ -28,7 +28,7 @@ const onSubmit = form.handleSubmit(async ({ confirmPassword, password, username 
 			toast($text.successfullyRegistered(), {
 				description: $text.pleaseLogInWithYourUsernameAndPassword(),
 			})
-			navigateTo({ path: '/user/login', query: route.query })
+			navigateTo({ path: '/login', query: route.query })
 		})
 		.finally(() => {
 			loading.value = false
