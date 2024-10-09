@@ -16,6 +16,7 @@ export default defineNuxtConfig({
 		'@pinia/nuxt',
 		'shadcn-nuxt',
 		'@nuxtjs/tailwindcss',
+		'@nuxtjs/color-mode',
 	],
 
 	nitro: {
@@ -34,6 +35,10 @@ export default defineNuxtConfig({
 	shadcn: {
 		prefix: '',
 		componentDir: './app/components/ui',
+	},
+
+	colorMode: {
+		classSuffix: '',
 	},
 
 	devtools: { enabled: true },
