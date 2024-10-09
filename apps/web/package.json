@@ -7,10 +7,7 @@
 		"dev": "nuxt dev",
 		"generate": "nuxt generate",
 		"preview": "nuxt preview",
-		"postinstall": "nuxt prepare && npm-run-all prisma:generate:*",
-		"prisma:generate:basic": "prisma generate --schema=./prisma/basic/schema.prisma",
-		"prisma:migrate:basic": "prisma migrate dev --schema=./prisma/basic/schema.prisma -n init",
-		"prisma:migrate-all": "npm-run-all prisma:migrate:*"
+		"postinstall": "nuxt prepare"
 	},
 	"dependencies": {
 		"@formkit/auto-animate": "^0.8.2",
@@ -18,8 +15,6 @@
 		"@nuxtjs/i18n": "^8.5.5",
 		"@nuxtjs/tailwindcss": "^6.12.1",
 		"@pinia/nuxt": "^0.5.4",
-		"@prisma/adapter-d1": "^5.19.1",
-		"@prisma/client": "5.19.1",
 		"@trpc/client": "11.0.0-rc.563",
 		"@trpc/server": "11.0.0-rc.563",
 		"@types/bcryptjs": "^2.4.6",
@@ -34,7 +29,7 @@
 		"jose": "^5.9.3",
 		"lucide-vue-next": "^0.445.0",
 		"nuxt": "^3.13.0",
-		"prisma": "^5.19.1",
+		"prisma-client-js": "workspace:*",
 		"radix-vue": "^1.9.6",
 		"shadcn-nuxt": "^0.10.4",
 		"tailwind-merge": "^2.5.3",

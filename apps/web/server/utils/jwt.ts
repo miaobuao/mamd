@@ -37,6 +37,6 @@ export interface JwtPayload extends BaseJwtPayload {
 }
 
 export interface JwtPayloadData {
-	userId: number
+	userId: string
 	remember?: boolean
 }

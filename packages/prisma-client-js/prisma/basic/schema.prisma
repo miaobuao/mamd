@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../../node_modules/@prisma-client/basic"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String   @id @default(cuid())
+  username String   @unique
+  password String
+  isAdmin  Boolean  @default(false) @map("is_admin")
+  ctime    DateTime @default(now()) @map("created_at")
+  mtime    DateTime @updatedAt @map("modified_at")
+
+  createdLibraries Library[]
+  visibleLibraries VisibleLibrary[]
+
+  @@index([username])
+  @@map("user")
+}
+
+model VisibleLibrary {
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id])
+  libraryId String   @map("library_id")
+  library   Library  @relation(fields: [libraryId], references: [id])
+  ctime     DateTime @default(now()) @map("created_at")
+  mtime     DateTime @updatedAt @map("modified_at")
+
+  @@id([userId, libraryId])
+  @@index([libraryId, userId])
+  @@map("visible_library")
+}
+
+model Library {
+  id          String    @id @default(cuid())
+  creatorId   String    @map("creator_id")
+  creator     User      @relation(fields: [creatorId], references: [id])
+  root        String
+  ctime       DateTime  @default(now()) @map("created_at")
+  mtime       DateTime  @updatedAt @map("modified_at")
+  linkedDirId String    @unique @map("linked_dir_id")
+  linkedDir   Directory @relation("linked_dir", fields: [linkedDirId], references: [id])
+
+  visibleLibraries VisibleLibrary[]
+  dirs             Directory[]
+  files            File[]           @relation("library")
+
+  @@map("library")
+}
+
+model Directory {
+  id            String     @id @default(cuid())
+  libraryId     String     @map("library_id")
+  library       Library    @relation(fields: [libraryId], references: [id])
+  parentId      String?    @map("parent_id")
+  parent        Directory? @relation("parent", fields: [parentId], references: [id])
+  linkedLibrary Library?   @relation("linked_dir")
+
+  name  String
+  ctime DateTime @default(now()) @map("created_at")
+  mtime DateTime @updatedAt @map("modified_at")
+
+  subdirs Directory[] @relation("parent")
+  files   File[]      @relation("parent")
+
+  @@index([libraryId, parentId])
+  @@map("directory")
+}
+
+model File {
+  id        String     @id @default(cuid())
+  libraryId String     @map("library_id")
+  library   Library    @relation("library", fields: [libraryId], references: [id])
+  parentId  String     @map("parent_id")
+  parent    Directory? @relation("parent", fields: [parentId], references: [id])
+  name      String
+  sha256    String
+  ctime     DateTime
+  mtime     DateTime
+
+  tags FileTagOnFile[] @relation("file-on-tag")
+
+  @@index([sha256, libraryId, parentId])
+  @@map("file")
+}
+
+model FileTag {
+  id    Int      @id @default(autoincrement())
+  name  String
+  ctime DateTime @default(now()) @map("created_at")
+  mtime DateTime @updatedAt @map("modified_at")
+
+  files FileTagOnFile[]
+
+  @@index([name])
+  @@map("file_tag")
+}
+
+model FileTagOnFile {
+  tagId Int     @map("tag_id")
+  tag   FileTag @relation(fields: [tagId], references: [id])
+
+  fileId String
+  file   File   @relation("file-on-tag", fields: [fileId], references: [id])
+
+  ctime DateTime @default(now()) @map("created_at")
+
+  @@id([tagId, fileId])
+  @@map("file_tag_on_file")
+}
