@@ -22,7 +22,7 @@ services:
     image: postgres:latest
     restart: unless-stopped
     volumes:
-      - .db/postgres-data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres

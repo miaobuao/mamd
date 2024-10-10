@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../../../../node_modules/@prisma-client/basic"
 }
 
 datasource db {
@@ -18,6 +17,7 @@ model User {
 
   createdLibraries Library[]
   visibleLibraries VisibleLibrary[]
+  comments         FileComment[]    @relation("user-on-comment")
 
   @@index([username])
   @@map("user")
@@ -37,56 +37,68 @@ model VisibleLibrary {
 }
 
 model Library {
-  id          String    @id @default(cuid())
-  creatorId   String    @map("creator_id")
-  creator     User      @relation(fields: [creatorId], references: [id])
-  root        String
-  ctime       DateTime  @default(now()) @map("created_at")
-  mtime       DateTime  @updatedAt @map("modified_at")
-  linkedDirId String    @unique @map("linked_dir_id")
-  linkedDir   Directory @relation("linked_dir", fields: [linkedDirId], references: [id])
+  id             String   @id @default(cuid())
+  creatorId      String   @map("creator_id")
+  creator        User     @relation(fields: [creatorId], references: [id])
+  root           String
+  ctime          DateTime @default(now()) @map("created_at")
+  mtime          DateTime @updatedAt @map("modified_at")
+  linkedFolderId String   @unique @map("linked_folder_id")
+  linkedFolder   Folder   @relation("linked_folder", fields: [linkedFolderId], references: [id])
 
   visibleLibraries VisibleLibrary[]
-  dirs             Directory[]
+  folders          Folder[]
   files            File[]           @relation("library")
 
   @@map("library")
 }
 
-model Directory {
-  id            String     @id @default(cuid())
-  libraryId     String     @map("library_id")
-  library       Library    @relation(fields: [libraryId], references: [id])
-  parentId      String?    @map("parent_id")
-  parent        Directory? @relation("parent", fields: [parentId], references: [id])
-  linkedLibrary Library?   @relation("linked_dir")
+model Folder {
+  id            String   @id @default(cuid())
+  libraryId     String   @map("library_id")
+  library       Library  @relation(fields: [libraryId], references: [id])
+  parentId      String?  @map("parent_id")
+  parent        Folder?  @relation("parent", fields: [parentId], references: [id])
+  linkedLibrary Library? @relation("linked_folder")
 
   name  String
   ctime DateTime @default(now()) @map("created_at")
   mtime DateTime @updatedAt @map("modified_at")
 
-  subdirs Directory[] @relation("parent")
-  files   File[]      @relation("parent")
+  subFolders Folder[] @relation("parent")
+  files      File[]   @relation("parent")
 
   @@index([libraryId, parentId])
-  @@map("directory")
+  @@map("folder")
 }
 
 model File {
-  id        String     @id @default(cuid())
-  libraryId String     @map("library_id")
-  library   Library    @relation("library", fields: [libraryId], references: [id])
-  parentId  String     @map("parent_id")
-  parent    Directory? @relation("parent", fields: [parentId], references: [id])
+  id        String   @id @default(cuid())
+  libraryId String   @map("library_id")
+  library   Library  @relation("library", fields: [libraryId], references: [id])
+  parentId  String   @map("parent_id")
+  parent    Folder?  @relation("parent", fields: [parentId], references: [id])
   name      String
   sha256    String
   ctime     DateTime
   mtime     DateTime
 
-  tags FileTagOnFile[] @relation("file-on-tag")
+  comments FileComment[]   @relation("file-on-comment")
+  tags     FileTagOnFile[] @relation("file-on-tag")
 
   @@index([sha256, libraryId, parentId])
   @@map("file")
+}
+
+model FileComment {
+  id      Int      @id @default(autoincrement())
+  fileId  String
+  file    File     @relation("file-on-comment", fields: [fileId], references: [id])
+  userId  String   @map("user_id")
+  user    User     @relation("user-on-comment", fields: [userId], references: [id])
+  content String
+  ctime   DateTime @default(now()) @map("created_at")
+  mtime   DateTime @updatedAt @map("modified_at")
 }
 
 model FileTag {

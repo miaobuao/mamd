@@ -2,10 +2,9 @@
 	"name": "prisma-client-js",
 	"main": "./index.ts",
 	"scripts": {
-		"postinstall": "npm-run-all prisma:generate:*",
-		"prisma:generate:basic": "prisma generate --schema=./prisma/basic/schema.prisma",
-		"prisma:migrate:basic": "prisma migrate dev --schema=./prisma/basic/schema.prisma -n init",
-		"prisma:migrate-all": "npm-run-all prisma:migrate:*"
+		"postinstall": "pnpm generate",
+		"generate": "prisma generate",
+		"migrate": "prisma migrate dev -n init"
 	},
 	"dependencies": {
 		"@prisma/client": "5.20.0",
