@@ -15,7 +15,7 @@
 			"cache": false,
 			"persistent": true
 		},
-		"prisma-client-js#prisma:migrate-all": {
+		"prisma-client-js#migrate": {
 			"cache": false
 		}
 	}
