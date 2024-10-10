@@ -37,6 +37,7 @@ CREATE TABLE "folder" (
     "id" TEXT NOT NULL,
     "library_id" TEXT NOT NULL,
     "parent_id" TEXT,
+    "creator_id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "modified_at" TIMESTAMP(3) NOT NULL,
@@ -49,6 +50,7 @@ CREATE TABLE "file" (
     "id" TEXT NOT NULL,
     "library_id" TEXT NOT NULL,
     "parent_id" TEXT NOT NULL,
+    "creator_id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "sha256" TEXT NOT NULL,
     "ctime" TIMESTAMP(3) NOT NULL,
@@ -128,10 +130,16 @@ ALTER TABLE "folder" ADD CONSTRAINT "folder_library_id_fkey" FOREIGN KEY ("libra
 ALTER TABLE "folder" ADD CONSTRAINT "folder_parent_id_fkey" FOREIGN KEY ("parent_id") REFERENCES "folder"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "folder" ADD CONSTRAINT "folder_creator_id_fkey" FOREIGN KEY ("creator_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "file" ADD CONSTRAINT "file_library_id_fkey" FOREIGN KEY ("library_id") REFERENCES "library"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "file" ADD CONSTRAINT "file_parent_id_fkey" FOREIGN KEY ("parent_id") REFERENCES "folder"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "file" ADD CONSTRAINT "file_creator_id_fkey" FOREIGN KEY ("creator_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "FileComment" ADD CONSTRAINT "FileComment_fileId_fkey" FOREIGN KEY ("fileId") REFERENCES "file"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
