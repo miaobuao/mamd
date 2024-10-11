@@ -69,8 +69,8 @@ importers:
         specifier: ^0.5.4
         version: 0.5.5(rollup@4.24.0)(typescript@5.6.3)(vue@3.5.11(typescript@5.6.3))(webpack-sources@3.2.3)
       '@trpc/client':
-        specifier: 11.0.0-rc.563
-        version: 11.0.0-rc.563(@trpc/server@11.0.0-rc.563)
+        specifier: 11.0.0-rc.567
+        version: 11.0.0-rc.567(@trpc/server@11.0.0-rc.563)
       '@trpc/server':
         specifier: 11.0.0-rc.563
         version: 11.0.0-rc.563
@@ -127,7 +127,7 @@ importers:
         version: 1.0.7(tailwindcss@3.4.13(ts-node@10.9.2(@types/node@22.7.5)(typescript@5.6.3)))
       trpc-nuxt:
         specifier: 0.11.0-beta.1
-        version: 0.11.0-beta.1(@trpc/client@11.0.0-rc.563(@trpc/server@11.0.0-rc.563))(@trpc/server@11.0.0-rc.563)
+        version: 0.11.0-beta.1(@trpc/client@11.0.0-rc.567(@trpc/server@11.0.0-rc.563))(@trpc/server@11.0.0-rc.563)
       vee-validate:
         specifier: ^4.13.2
         version: 4.13.2(vue@3.5.11(typescript@5.6.3))
@@ -1572,10 +1572,10 @@ packages:
   '@tootallnate/quickjs-emscripten@0.23.0':
     resolution: {integrity: sha512-C5Mc6rdnsaJDjO3UpGW/CQTHtCKaYlScZTly4JIu97Jxo/odCiH0ITnDXSJPTOrEKk/ycSZ0AOgTmkDtkOsvIA==}
 
-  '@trpc/client@11.0.0-rc.563':
-    resolution: {integrity: sha512-N1ldp7NGduuWoj/cuAQXvKkp/2MM3eVteRGLxuOgD5HzCKoDaJRSR/7EUm0qz8o51TW1LMbdoiYsM5Ip1lmXdA==}
+  '@trpc/client@11.0.0-rc.567':
+    resolution: {integrity: sha512-eE8uhur+xAawv24GzZAIr6I6OtZs+5o5EKPXAEAdTksnAhmxax8y+xQvHt5bmK9sjOrErw4EiTjMEFLmbh/ilw==}
     peerDependencies:
-      '@trpc/server': 11.0.0-rc.563+e5ae464b2
+      '@trpc/server': 11.0.0-rc.567+6a4d42917
 
   '@trpc/server@11.0.0-rc.563':
     resolution: {integrity: sha512-yB7oNWIIrZTavlETrQeijo+JUh6CTeQTrqlMCJ7qHfqyadrfxa7O4JJ5pk9J5nur0sxiACwFi0RiQxSlrOVb2A==}
@@ -7425,7 +7425,7 @@ snapshots:
 
   '@tootallnate/quickjs-emscripten@0.23.0': {}
 
-  '@trpc/client@11.0.0-rc.563(@trpc/server@11.0.0-rc.563)':
+  '@trpc/client@11.0.0-rc.567(@trpc/server@11.0.0-rc.563)':
     dependencies:
       '@trpc/server': 11.0.0-rc.563
 
@@ -11691,9 +11691,9 @@ snapshots:
 
   tr46@0.0.3: {}
 
-  trpc-nuxt@0.11.0-beta.1(@trpc/client@11.0.0-rc.563(@trpc/server@11.0.0-rc.563))(@trpc/server@11.0.0-rc.563):
+  trpc-nuxt@0.11.0-beta.1(@trpc/client@11.0.0-rc.567(@trpc/server@11.0.0-rc.563))(@trpc/server@11.0.0-rc.563):
     dependencies:
-      '@trpc/client': 11.0.0-rc.563(@trpc/server@11.0.0-rc.563)
+      '@trpc/client': 11.0.0-rc.567(@trpc/server@11.0.0-rc.563)
       '@trpc/server': 11.0.0-rc.563
       h3: 1.11.1
       ofetch: 1.3.4
