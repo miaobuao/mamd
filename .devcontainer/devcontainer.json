@@ -23,7 +23,6 @@
 				"bradlc.vscode-tailwindcss",
 				"Vue.volar",
 				"formulahendry.auto-rename-tag",
-				"Vue.vscode-typescript-vue-plugin",
 				"eamodio.gitlens"
 			]
 		}
