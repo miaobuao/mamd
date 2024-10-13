@@ -26,8 +26,6 @@
 		"lint-staged": "^15.2.2",
 		"lodash-es": "^4.17.21",
 		"npm-run-all2": "^6.2.3",
-		"prettier": "^3.2.5",
-		"prettier-eslint": "^16.3.0",
 		"turbo": "latest"
 	}
 }
