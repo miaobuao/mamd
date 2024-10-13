@@ -57,8 +57,8 @@ importers:
         specifier: ^0.5.4
         version: 0.5.5(rollup@4.24.0)(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))(webpack-sources@3.2.3)
       '@trpc/client':
-        specifier: 11.0.0-rc.563
-        version: 11.0.0-rc.563(@trpc/server@11.0.0-rc.571)
+        specifier: 11.0.0-rc.571
+        version: 11.0.0-rc.571(@trpc/server@11.0.0-rc.571)
       '@trpc/server':
         specifier: 11.0.0-rc.571
         version: 11.0.0-rc.571
@@ -115,7 +115,7 @@ importers:
         version: 1.0.7(tailwindcss@3.4.13(ts-node@10.9.2(@types/node@22.7.5)(typescript@5.6.3)))
       trpc-nuxt:
         specifier: 0.11.0-beta.1
-        version: 0.11.0-beta.1(@trpc/client@11.0.0-rc.563(@trpc/server@11.0.0-rc.571))(@trpc/server@11.0.0-rc.571)
+        version: 0.11.0-beta.1(@trpc/client@11.0.0-rc.571(@trpc/server@11.0.0-rc.571))(@trpc/server@11.0.0-rc.571)
       vee-validate:
         specifier: ^4.13.2
         version: 4.13.2(vue@3.5.12(typescript@5.6.3))
@@ -1523,10 +1523,10 @@ packages:
     peerDependencies:
       vue: ^2.7.0 || ^3.0.0
 
-  '@trpc/client@11.0.0-rc.563':
-    resolution: {integrity: sha512-N1ldp7NGduuWoj/cuAQXvKkp/2MM3eVteRGLxuOgD5HzCKoDaJRSR/7EUm0qz8o51TW1LMbdoiYsM5Ip1lmXdA==}
+  '@trpc/client@11.0.0-rc.571':
+    resolution: {integrity: sha512-mUX47avAwgkirC91rtnde7B8QVbvd+121wgud3q22gYBI1hrGFn8isFwXdPquVneXNL5p1JjfhpZzDwzHmUJ4Q==}
     peerDependencies:
-      '@trpc/server': 11.0.0-rc.563+e5ae464b2
+      '@trpc/server': 11.0.0-rc.571+a70e169ce
 
   '@trpc/server@11.0.0-rc.571':
     resolution: {integrity: sha512-CISo9BoXSArTPt3MfxbOTPUcEdtKOl5Qgp8P+udiaA/nRmjndvVeZWQSmy1elRv0mQ/vvUI1VLsYm9Dn1/bysw==}
@@ -6879,7 +6879,7 @@ snapshots:
       '@tanstack/virtual-core': 3.10.8
       vue: 3.5.12(typescript@5.6.3)
 
-  '@trpc/client@11.0.0-rc.563(@trpc/server@11.0.0-rc.571)':
+  '@trpc/client@11.0.0-rc.571(@trpc/server@11.0.0-rc.571)':
     dependencies:
       '@trpc/server': 11.0.0-rc.571
 
@@ -10676,9 +10676,9 @@ snapshots:
 
   tr46@0.0.3: {}
 
-  trpc-nuxt@0.11.0-beta.1(@trpc/client@11.0.0-rc.563(@trpc/server@11.0.0-rc.571))(@trpc/server@11.0.0-rc.571):
+  trpc-nuxt@0.11.0-beta.1(@trpc/client@11.0.0-rc.571(@trpc/server@11.0.0-rc.571))(@trpc/server@11.0.0-rc.571):
     dependencies:
-      '@trpc/client': 11.0.0-rc.563(@trpc/server@11.0.0-rc.571)
+      '@trpc/client': 11.0.0-rc.571(@trpc/server@11.0.0-rc.571)
       '@trpc/server': 11.0.0-rc.571
       h3: 1.11.1
       ofetch: 1.3.4
