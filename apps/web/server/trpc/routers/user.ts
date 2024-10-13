@@ -12,7 +12,7 @@ export const UserRouter = router({
 	login: publicProcedure
 		.input(UserLoginSubmitFormValidator)
 		.mutation(async ({ input, ctx: { db, event } }) => {
-			const user = await db.basic.user
+			const user = await db.user
 				.findUniqueOrThrow({
 					where: { username: input.username },
 					select: { id: true, username: true, password: true, isAdmin: true },
@@ -65,7 +65,7 @@ export const UserRouter = router({
 				throw new ForbiddenErrorWithI18n(i18n.error.adminAccountExists)
 			}
 			const hashPassword = await bcryptEncrypt(input.password)
-			await db.basic.user
+			await db.user
 				.create({
 					data: {
 						username: input.username,
@@ -94,7 +94,7 @@ export const UserRouter = router({
 				throw new ForbiddenErrorWithI18n(i18n.error.permissionDenied)
 			}
 			const hashPassword = await bcryptEncrypt(input.password)
-			await db.basic.user
+			await db.user
 				.create({
 					data: {
 						username: input.username,

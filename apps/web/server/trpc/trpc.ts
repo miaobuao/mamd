@@ -15,7 +15,7 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
 	if (isNil(userId))
 		throw new UnauthorizedErrorWithI18n(i18n.pleaseLogIn)
 
-	const userInfo = await ctx.db.basic.user
+	const userInfo = await ctx.db.user
 		.findUniqueOrThrow({
 			where: {
 				id: userId,

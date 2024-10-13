@@ -1,4 +1,4 @@
-import type { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
+import type { PrismaClientKnownRequestError } from '@prisma/client/runtime/repository'
 
 const errorCodeToName = {
 	P1000: 'AuthenticationFailedError',

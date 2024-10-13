@@ -27,6 +27,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
 		if (to.path === LOGIN_ROUTE) {
 			return
 		}
+		else if (to.path === REGISTER_ROUTE) {
+			return navigateTo({ path: LOGIN_ROUTE, query: { from: to.query.from } })
+		}
 		return navigateTo({ path: LOGIN_ROUTE, query: { from: to.fullPath } })
 	}
 	else if (to.path !== REGISTER_ROUTE) {
