@@ -22,7 +22,7 @@
 		"dotenv-cli": "^7.4.2",
 		"eslint": "9.5.0",
 		"eslint-plugin-format": "^0.1.1",
-		"husky": "^9.0.11",
+		"husky": "^9.1.6",
 		"lint-staged": "^15.2.2",
 		"lodash-es": "^4.17.21",
 		"npm-run-all2": "^6.2.3",
