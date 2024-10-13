@@ -12,7 +12,9 @@
 		"lint": "turbo lint",
 		"lint-staged": "lint-staged",
 		"prepare": "husky",
-		"prisma:migrate": "dotenv -e .env.devel -- turbo migrate --env-mode loose"
+		"prisma:migrate": "dotenv -e .env.devel -- turbo migrate --env-mode loose",
+		"prisma:studio": "dotenv -e .env.devel -- turbo studio --env-mode loose",
+		"prisma:reset": "dotenv -e .env.devel -- turbo reset --env-mode loose -- --force"
 	},
 	"dependencies": {
 		"@antfu/eslint-config": "^2.26.0",

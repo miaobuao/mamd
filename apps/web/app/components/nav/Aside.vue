@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Home, Settings, Users2 } from 'lucide-vue-next'
+import { CircleUser, Home, LogOut, Settings, Users2 } from 'lucide-vue-next'
 
 const auth = useAuthStore()
 </script>
@@ -27,6 +27,24 @@ const auth = useAuthStore()
 			</template>
 		</nav>
 		<nav class="mt-auto flex flex-col items-center gap-2 px-2 sm:py-5">
+			<DropdownMenu>
+				<DropdownMenuTrigger as-child>
+					<Button variant="secondary" size="icon" class="rounded-full">
+						<CircleUser class="h-5 w-5" />
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent align="end">
+					<DropdownMenuLabel>{{ auth.userInfo?.username }}</DropdownMenuLabel>
+					<DropdownMenuSeparator />
+					<a class="w-full" @click="auth.logout">
+						<DropdownMenuItem>
+							<LogOut class="mr-2 h-4 w-4" />
+							{{ $text.logout() }}
+						</DropdownMenuItem>
+					</a>
+				</DropdownMenuContent>
+			</DropdownMenu>
+
 			<NavRouteButton path="/settings">
 				<template #icon>
 					<Settings class="h-5 w-5" />

@@ -1,1 +1,1 @@
-export { PrismaClient as PrismaClientBasic } from '@prisma-client/basic'
+export { PrismaClient } from '@prisma/client'

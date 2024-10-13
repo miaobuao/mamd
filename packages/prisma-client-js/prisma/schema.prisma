@@ -15,87 +15,102 @@ model User {
   ctime    DateTime @default(now()) @map("created_at")
   mtime    DateTime @updatedAt @map("modified_at")
 
-  createdLibraries Library[]
-  visibleLibraries VisibleLibrary[]
-  comments         FileComment[]    @relation("user-on-comment")
+  createdRepositories Repository[]
+  visibleRepositories VisibleRepository[]
+  comments            FileComment[]       @relation("user-on-comment")
+  createdFolders      Folder[]            @relation("folder_creator")
+  createdFiles        File[]              @relation("file_creator")
 
   @@index([username])
   @@map("user")
 }
 
-model VisibleLibrary {
-  userId    String   @map("user_id")
-  user      User     @relation(fields: [userId], references: [id])
-  libraryId String   @map("library_id")
-  library   Library  @relation(fields: [libraryId], references: [id])
-  ctime     DateTime @default(now()) @map("created_at")
-  mtime     DateTime @updatedAt @map("modified_at")
+model VisibleRepository {
+  userId String @map("user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@id([userId, libraryId])
-  @@index([libraryId, userId])
-  @@map("visible_library")
+  repositoryId String     @map("repository_id")
+  repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+
+  ctime DateTime @default(now()) @map("created_at")
+  mtime DateTime @updatedAt @map("modified_at")
+
+  @@id([userId, repositoryId])
+  @@index([repositoryId, userId])
+  @@map("visible_repository")
 }
 
-model Library {
-  id             String   @id @default(cuid())
-  creatorId      String   @map("creator_id")
-  creator        User     @relation(fields: [creatorId], references: [id])
-  root           String
-  ctime          DateTime @default(now()) @map("created_at")
-  mtime          DateTime @updatedAt @map("modified_at")
-  linkedFolderId String   @unique @map("linked_folder_id")
-  linkedFolder   Folder   @relation("linked_folder", fields: [linkedFolderId], references: [id])
+model Repository {
+  id    String   @id @default(cuid())
+  path  String   @unique
+  ctime DateTime @default(now()) @map("created_at")
+  mtime DateTime @updatedAt @map("modified_at")
 
-  visibleLibraries VisibleLibrary[]
-  folders          Folder[]
-  files            File[]           @relation("library")
+  creatorId String @map("creator_id")
+  creator   User   @relation(fields: [creatorId], references: [id], onDelete: NoAction)
 
-  @@map("library")
+  linkedFolderId String? @unique @map("linked_folder_id")
+  linkedFolder   Folder? @relation("linked_folder", fields: [linkedFolderId], references: [id], onDelete: SetNull)
+
+  visibleRepositories VisibleRepository[]
+  folders             Folder[]
+  files               File[]              @relation("repository")
+
+  @@map("repository")
 }
 
 model Folder {
-  id            String   @id @default(cuid())
-  libraryId     String   @map("library_id")
-  library       Library  @relation(fields: [libraryId], references: [id])
-  parentId      String?  @map("parent_id")
-  parent        Folder?  @relation("parent", fields: [parentId], references: [id])
-  linkedLibrary Library? @relation("linked_folder")
-
+  id    String   @id @default(cuid())
   name  String
   ctime DateTime @default(now()) @map("created_at")
   mtime DateTime @updatedAt @map("modified_at")
 
-  subFolders Folder[] @relation("parent")
-  files      File[]   @relation("parent")
+  repositoryId String?     @map("repository_id")
+  repository   Repository? @relation(fields: [repositoryId], references: [id])
 
-  @@index([libraryId, parentId])
+  parentId String? @map("parent_id")
+  parent   Folder? @relation("parent", fields: [parentId], references: [id], onDelete: Cascade)
+
+  creatorId String @map("creator_id")
+  creator   User   @relation("folder_creator", fields: [creatorId], references: [id])
+
+  linkedRepository Repository? @relation("linked_folder")
+  subFolders       Folder[]    @relation("parent")
+  files            File[]      @relation("parent")
+
+  @@index([repositoryId, parentId])
   @@map("folder")
 }
 
 model File {
-  id        String   @id @default(cuid())
-  libraryId String   @map("library_id")
-  library   Library  @relation("library", fields: [libraryId], references: [id])
-  parentId  String   @map("parent_id")
-  parent    Folder?  @relation("parent", fields: [parentId], references: [id])
-  name      String
-  sha256    String
-  ctime     DateTime
-  mtime     DateTime
+  id     String   @id @default(cuid())
+  name   String
+  sha256 String
+  ctime  DateTime
+  mtime  DateTime
+
+  repositoryId String?     @map("repository_id")
+  repository   Repository? @relation("repository", fields: [repositoryId], references: [id])
+
+  parentId String? @map("parent_id")
+  parent   Folder? @relation("parent", fields: [parentId], references: [id], onDelete: Cascade)
+
+  creatorId String @map("creator_id")
+  creator   User   @relation("file_creator", fields: [creatorId], references: [id])
 
   comments FileComment[]   @relation("file-on-comment")
   tags     FileTagOnFile[] @relation("file-on-tag")
 
-  @@index([sha256, libraryId, parentId])
+  @@index([sha256, repositoryId, parentId])
   @@map("file")
 }
 
 model FileComment {
   id      Int      @id @default(autoincrement())
   fileId  String
-  file    File     @relation("file-on-comment", fields: [fileId], references: [id])
+  file    File     @relation("file-on-comment", fields: [fileId], references: [id], onDelete: Cascade)
   userId  String   @map("user_id")
-  user    User     @relation("user-on-comment", fields: [userId], references: [id])
+  user    User     @relation("user-on-comment", fields: [userId], references: [id], onDelete: NoAction)
   content String
   ctime   DateTime @default(now()) @map("created_at")
   mtime   DateTime @updatedAt @map("modified_at")
@@ -115,10 +130,10 @@ model FileTag {
 
 model FileTagOnFile {
   tagId Int     @map("tag_id")
-  tag   FileTag @relation(fields: [tagId], references: [id])
+  tag   FileTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   fileId String
-  file   File   @relation("file-on-tag", fields: [fileId], references: [id])
+  file   File   @relation("file-on-tag", fields: [fileId], references: [id], onDelete: Cascade)
 
   ctime DateTime @default(now()) @map("created_at")
 

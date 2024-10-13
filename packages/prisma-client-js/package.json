@@ -4,7 +4,9 @@
 	"scripts": {
 		"postinstall": "pnpm generate",
 		"generate": "prisma generate",
-		"migrate": "prisma migrate dev -n init"
+		"migrate": "prisma migrate dev",
+		"reset": "prisma migrate reset",
+		"studio": "prisma studio"
 	},
 	"dependencies": {
 		"@prisma/client": "5.20.0",

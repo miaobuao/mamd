@@ -2,8 +2,10 @@
 </script>
 
 <template>
-	<div class="flex min-h-screen w-full flex-col bg-muted/40">
+	<div class="min-h-screen w-full bg-muted/40">
 		<NavAside />
-		<slot />
+		<div class="sm:pl-14">
+			<slot />
+		</div>
 	</div>
 </template>
