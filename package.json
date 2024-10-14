@@ -17,7 +17,7 @@
 		"prisma:reset": "dotenv -e .env.devel -- turbo reset --env-mode loose -- --force"
 	},
 	"dependencies": {
-		"@antfu/eslint-config": "^2.26.0",
+		"@antfu/eslint-config": "^3.7.3",
 		"@types/lodash-es": "^4.17.12",
 		"dotenv-cli": "^7.4.2",
 		"eslint": "9.12.0",
