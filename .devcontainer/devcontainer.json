@@ -12,7 +12,10 @@
 		"ghcr.io/itsmechlark/features/redis-server:1": {
 			"version": "latest"
 		},
-		"ghcr.io/larsnieuwenhuizen/features/neovim:0": {}
+		"ghcr.io/larsnieuwenhuizen/features/neovim:0": {},
+		"ghcr.io/itsmechlark/features/rabbitmq-server:1": {
+			"version": "latest"
+		}
 	},
 
 	"customizations": {
@@ -27,9 +30,6 @@
 			]
 		}
 	},
-
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// This can be used to network with other containers or with the host.
