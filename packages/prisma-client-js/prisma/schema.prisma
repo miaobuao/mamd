@@ -43,6 +43,7 @@ model VisibleRepository {
 model Repository {
   id    String   @id @default(cuid())
   path  String   @unique
+  name  String   @unique
   ctime DateTime @default(now()) @map("created_at")
   mtime DateTime @updatedAt @map("modified_at")
 
@@ -86,8 +87,8 @@ model File {
   id     String   @id @default(cuid())
   name   String
   sha256 String
-  ctime  DateTime
-  mtime  DateTime
+  ctime  DateTime @default(now()) @map("created_at")
+  mtime  DateTime @updatedAt @map("modified_at")
 
   repositoryId String?     @map("repository_id")
   repository   Repository? @relation("repository", fields: [repositoryId], references: [id])

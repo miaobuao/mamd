@@ -1,5 +1,14 @@
 {
 	"name": "@repo/workers",
+	"type": "module",
 	"scripts": {
+		"dev": "pm2 start ./ecosystem.config.cjs --watch"
+	},
+	"dependencies": {
+		"@types/amqplib": "^0.10.5",
+		"amqplib": "^0.10.4",
+		"bun": "^1.1.30",
+		"prisma-client-js": "workspace:*",
+		"superjson": "^2.2.1"
 	}
 }

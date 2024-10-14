@@ -1,4 +1,5 @@
 import * as fs from 'node:fs/promises'
+import { basename } from 'node:path'
 import type { PrismaClient } from '@prisma/client'
 import { protectedProcedure, router } from '../trpc'
 import { CreateRepositoryFormValidator } from '~/utils/validator'
@@ -52,6 +53,7 @@ export const RepositoryRouter = router({
 			})
 			const linkedFolder = await tx.folder.create({
 				data: {
+					name: basename(input.name),
 					repository: {
 						connect: {
 							id: repository.id,
@@ -62,7 +64,6 @@ export const RepositoryRouter = router({
 							id: repository.id,
 						},
 					},
-					name: input.name,
 					creator: {
 						connect: {
 							id: userInfo.id,
