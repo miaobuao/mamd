@@ -93,8 +93,8 @@ importers:
         specifier: ^2.3.0
         version: 2.3.0
       jose:
-        specifier: ^5.9.3
-        version: 5.9.3
+        specifier: ^5.9.4
+        version: 5.9.4
       lucide-vue-next:
         specifier: ^0.445.0
         version: 0.445.0(vue@3.5.12(typescript@5.6.3))
@@ -3565,8 +3565,8 @@ packages:
     resolution: {integrity: sha512-2yTgeWTWzMWkHu6Jp9NKgePDaYHbntiwvYuuJLbbN9vl7DC9DvXKOB2BC3ZZ92D3cvV/aflH0osDfwpHepQ53w==}
     hasBin: true
 
-  jose@5.9.3:
-    resolution: {integrity: sha512-egLIoYSpcd+QUF+UHgobt5YzI2Pkw/H39ou9suW687MY6PmCwPmkNV/4TNjn1p2tX5xO3j0d0sq5hiYE24bSlg==}
+  jose@5.9.4:
+    resolution: {integrity: sha512-WBBl6au1qg6OHj67yCffCgFR3BADJBXN8MdRvCgJDuMv3driV2nHr7jdGvaKX9IolosAsn+M0XRArqLXUhyJHQ==}
 
   js-git@0.7.8:
     resolution: {integrity: sha512-+E5ZH/HeRnoc/LW0AmAyhU+mNcWBzAKE+30+IDMLSLbbK+Tdt02AdkOKq9u15rlJsDEGFqtgckc8ZM59LhhiUA==}
@@ -9639,7 +9639,7 @@ snapshots:
 
   jiti@1.21.6: {}
 
-  jose@5.9.3: {}
+  jose@5.9.4: {}
 
   js-git@0.7.8:
     dependencies:
