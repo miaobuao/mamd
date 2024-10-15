@@ -8,7 +8,8 @@ datasource db {
 }
 
 model User {
-  id       String   @id @default(cuid())
+  id       Int      @id @default(autoincrement())
+  uuid     String   @default(cuid())
   username String   @unique
   password String
   isAdmin  Boolean  @default(false) @map("is_admin")
@@ -21,13 +22,13 @@ model User {
   createdFolders      Folder[]            @relation("folder_creator")
   createdFiles        File[]              @relation("file_creator")
 
-  @@index([username])
+  @@index([username, uuid])
   @@map("user")
 }
 
 model VisibleRepository {
-  userId String @map("user_id")
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   repositoryId String     @map("repository_id")
   repository   Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
@@ -47,8 +48,8 @@ model Repository {
   ctime DateTime @default(now()) @map("created_at")
   mtime DateTime @updatedAt @map("modified_at")
 
-  creatorId String @map("creator_id")
-  creator   User   @relation(fields: [creatorId], references: [id], onDelete: NoAction)
+  creatorId Int  @map("creator_id")
+  creator   User @relation(fields: [creatorId], references: [id], onDelete: NoAction)
 
   linkedFolderId String? @unique @map("linked_folder_id")
   linkedFolder   Folder? @relation("linked_folder", fields: [linkedFolderId], references: [id], onDelete: SetNull)
@@ -62,7 +63,6 @@ model Repository {
 
 model Folder {
   id    String   @id @default(cuid())
-  name  String
   ctime DateTime @default(now()) @map("created_at")
   mtime DateTime @updatedAt @map("modified_at")
 
@@ -72,23 +72,33 @@ model Folder {
   parentId String? @map("parent_id")
   parent   Folder? @relation("parent", fields: [parentId], references: [id], onDelete: Cascade)
 
-  creatorId String @map("creator_id")
-  creator   User   @relation("folder_creator", fields: [creatorId], references: [id])
+  creatorId Int  @map("creator_id")
+  creator   User @relation("folder_creator", fields: [creatorId], references: [id])
 
-  linkedRepository Repository? @relation("linked_folder")
-  subFolders       Folder[]    @relation("parent")
-  files            File[]      @relation("parent")
+  metadata         FolderMetadata? @relation("folder-metadata")
+  linkedRepository Repository?     @relation("linked_folder")
+  subFolders       Folder[]        @relation("parent")
+  files            File[]          @relation("parent")
 
   @@index([repositoryId, parentId])
   @@map("folder")
 }
 
+model FolderMetadata {
+  id          Int      @id @default(autoincrement())
+  folderId    String   @unique
+  folder      Folder   @relation("folder-metadata", fields: [folderId], references: [id], onDelete: Cascade)
+  name        String
+  fileCount   Int      @default(0)
+  folderCount Int      @default(0)
+  ctime       DateTime @default(now()) @map("created_at")
+  mtime       DateTime @updatedAt @map("modified_at")
+}
+
 model File {
-  id     String   @id @default(cuid())
-  name   String
-  sha256 String
-  ctime  DateTime @default(now()) @map("created_at")
-  mtime  DateTime @updatedAt @map("modified_at")
+  id    String   @id @default(cuid())
+  ctime DateTime @default(now()) @map("created_at")
+  mtime DateTime @updatedAt @map("modified_at")
 
   repositoryId String?     @map("repository_id")
   repository   Repository? @relation("repository", fields: [repositoryId], references: [id])
@@ -96,21 +106,35 @@ model File {
   parentId String? @map("parent_id")
   parent   Folder? @relation("parent", fields: [parentId], references: [id], onDelete: Cascade)
 
-  creatorId String @map("creator_id")
-  creator   User   @relation("file_creator", fields: [creatorId], references: [id])
+  creatorId Int  @map("creator_id")
+  creator   User @relation("file_creator", fields: [creatorId], references: [id])
 
+  metadata FileMetadata?   @relation("file-metadata")
   comments FileComment[]   @relation("file-on-comment")
   tags     FileTagOnFile[] @relation("file-on-tag")
 
-  @@index([sha256, repositoryId, parentId])
+  @@index([repositoryId, parentId])
   @@map("file")
+}
+
+model FileMetadata {
+  id     Int      @id @default(autoincrement())
+  fileId String   @unique
+  file   File     @relation("file-metadata", fields: [fileId], references: [id], onDelete: Cascade)
+  name   String
+  sha256 String?
+  ctime  DateTime @default(now()) @map("created_at")
+  mtime  DateTime @updatedAt @map("modified_at")
+
+  @@index([fileId, sha256])
+  @@map("file_meta")
 }
 
 model FileComment {
   id      Int      @id @default(autoincrement())
   fileId  String
   file    File     @relation("file-on-comment", fields: [fileId], references: [id], onDelete: Cascade)
-  userId  String   @map("user_id")
+  userId  Int      @map("user_id")
   user    User     @relation("user-on-comment", fields: [userId], references: [id], onDelete: NoAction)
   content String
   ctime   DateTime @default(now()) @map("created_at")

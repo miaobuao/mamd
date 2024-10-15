@@ -5,16 +5,20 @@ export async function* directoryIterator(dir: string) {
 	const stack: string[] = [ dir ]
 	while (stack.length > 0) {
 		const currentDir = stack.pop()!
-		const entries = await fs.readdir(currentDir, { withFileTypes: true })
+		let entries
+		try {
+			entries = await fs.readdir(currentDir, { withFileTypes: true })
+		}
+		catch {
+			continue
+		}
 		for (const entry of entries) {
 			const fullPath = path.join(currentDir, entry.name)
-			if (entry.isDirectory()) {
+			const isDir = entry.isDirectory()
+			if (isDir) {
 				stack.push(fullPath)
-				yield entry
 			}
-			else {
-				yield entry
-			}
+			yield { fullPath, isDir }
 		}
 	}
 }

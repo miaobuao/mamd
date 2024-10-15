@@ -12,10 +12,7 @@
 		"ghcr.io/itsmechlark/features/redis-server:1": {
 			"version": "latest"
 		},
-		"ghcr.io/larsnieuwenhuizen/features/neovim:0": {},
-		"ghcr.io/itsmechlark/features/rabbitmq-server:1": {
-			"version": "latest"
-		}
+		"ghcr.io/larsnieuwenhuizen/features/neovim:0": {}
 	},
 
 	"customizations": {
