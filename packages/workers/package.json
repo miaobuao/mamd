@@ -1,9 +1,7 @@
 {
 	"name": "@repo/workers",
 	"type": "module",
-	"exports": {
-		"repo-scanner": "./modules/repo-scanner/index.ts"
-	},
+	"main": "./index.ts",
 	"scripts": {
 		"dev": "pm2 start ./ecosystem.config.cjs --watch"
 	},

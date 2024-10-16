@@ -20,7 +20,7 @@ useNatsConnection()
 const db = usePrismaClient()
 
 export interface ScannerConsumeContent {
-	repositoryId: string
+	repositoryId: number
 	repositoryPath: string
 }
 
@@ -51,7 +51,7 @@ async function handler({ repositoryId, repositoryPath }: ScannerConsumeContent) 
 		})
 		linkedFolderId = folder.id
 	}
-	let parentFolderId: string | null = null
+	let parentFolderId: number | null = null
 	let parentFolderPath: string | null = null
 	for await (const entry of directoryIterator(repositoryPath)) {
 		const relativePath = path.relative(repositoryPath, path.dirname(entry.fullPath))
@@ -117,13 +117,13 @@ async function handler({ repositoryId, repositoryPath }: ScannerConsumeContent) 
 	}
 }
 
-export async function queryFolder(rootId: string, parts: string[]) {
+export async function queryFolder(rootFolderId: number, parts: string[]) {
 	parts = [ ...parts ]
 	while (parts.length > 0) {
 		const part = parts.shift()!
 		const root = await db.folder.findFirst({
 			where: {
-				parentId: rootId,
+				parentId: rootFolderId,
 				metadata: {
 					name: part,
 				},
@@ -132,7 +132,7 @@ export async function queryFolder(rootId: string, parts: string[]) {
 				id: true,
 			},
 		})
-		rootId = root!.id
+		rootFolderId = root!.id
 	}
-	return rootId
+	return rootFolderId
 }

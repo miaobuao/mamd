@@ -1,28 +1,17 @@
-import { debounce } from 'lodash-es'
+import type { inferProcedureOutput } from '@trpc/server'
+import type { AppRouter } from '~~/server/trpc/routers'
 import type { TypeOf } from 'zod'
+import { debounce } from 'lodash-es'
 import type { CreateRepositoryFormValidator } from '~/utils/validator'
 
-export interface Folder {
-	id: string
-	name: string
-	ctime: string
-	mtime: string
-	repositoryId: string | null
-	creatorId: string
-	parentId: string | null
-}
-
-export interface Repository {
-	id: string
-	folder: Folder | null
-}
+type Repository = inferProcedureOutput<AppRouter['repository']['listVisible']>[number]
 
 export const useRepositoryStore = defineStore('repository', () => {
 	const { $trpc } = useNuxtApp()
 	const repositories = reactive<Repository[]>([])
 
-	function removeRepository(id: string) {
-		const idx = repositories.findIndex(v => v.id === id)
+	function removeRepository(uuid: string) {
+		const idx = repositories.findIndex(v => v.repository.uuid === uuid)
 		if (idx === -1) {
 			return
 		}
@@ -34,26 +23,27 @@ export const useRepositoryStore = defineStore('repository', () => {
 	}
 
 	async function createRepository(repo: TypeOf<typeof CreateRepositoryFormValidator>) {
-		const res = await $trpc.repository.create.mutate(repo)
-		appendRepository({
-			id: res.repositoryId,
-			folder: res.linkedFolder,
-		})
+		const { repository, linkedFolder } = await $trpc.repository.create.mutate(repo)
+		const res = {
+			repository: {
+				uuid: repository.uuid,
+				name: repository.name,
+				linkedFolder,
+			},
+		}
+		appendRepository(res)
 		return res
 	}
 
 	const pullRepositories = debounce(() => {
 		return $trpc.repository.listVisible.query().then((res) => {
-			repositories.splice(0, repositories.length, ...res.map(v => ({
-				id: v.repository.id,
-				folder: v.repository.linkedFolder,
-			})))
+			repositories.splice(0, repositories.length, ...res)
 			return Array.from(repositories)
 		})
 	}, 500, { leading: true })
 
 	return {
-		repositories: computed(() => Array.from(repositories)),
+		repositories: computed(() => repositories.map(r => r.repository)),
 		removeRepository,
 		appendRepository,
 		createRepository,

@@ -1,6 +1,7 @@
 import type { PrismaClient } from '@prisma/client'
 import * as fs from 'node:fs/promises'
 import { basename } from 'node:path'
+import { dispatchFolderScannerTask } from '@repo/workers'
 import { BadRequestErrorWithI18n } from '~~/server/utils/error'
 import { CreateRepositoryFormValidator } from '~/utils/validator'
 import { protectedProcedure, router } from '../trpc'
@@ -14,8 +15,13 @@ export const RepositoryRouter = router({
 			select: {
 				repository: {
 					select: {
-						id: true,
-						linkedFolder: true,
+						uuid: true,
+						name: true,
+						linkedFolder: {
+							select: {
+								uuid: true,
+							},
+						},
 					},
 				},
 			},
@@ -71,7 +77,7 @@ export const RepositoryRouter = router({
 					},
 				},
 			})
-			const _linkedFolderMetadata = await tx.folderMetadata.create({
+			await tx.folderMetadata.create({
 				data: {
 					name: basename(input.path),
 					folder: { connect: { id: linkedFolder.id } },
@@ -85,9 +91,18 @@ export const RepositoryRouter = router({
 					id: repository.id,
 				},
 			})
-			return {
+			await dispatchFolderScannerTask({
 				repositoryId: repository.id,
-				linkedFolder,
+				repositoryPath: input.path,
+			})
+			return {
+				repository: {
+					uuid: repository.uuid,
+					name: repository.name,
+				},
+				linkedFolder: {
+					uuid: linkedFolder.uuid,
+				},
 			}
 		})
 	}),

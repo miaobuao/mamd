@@ -6,7 +6,11 @@ const config = useRuntimeConfig()
 
 export const UserRouter = router({
 	auth: protectedProcedure.mutation(async ({ ctx: { userInfo } }) => {
-		return userInfo
+		return {
+			uuid: userInfo.uuid,
+			username: userInfo.username,
+			isAdmin: userInfo.isAdmin,
+		}
 	}),
 
 	login: publicProcedure

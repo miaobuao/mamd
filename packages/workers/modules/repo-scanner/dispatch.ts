@@ -1,15 +1,12 @@
+import type { ScannerConsumeContent } from './scanner.worker'
 import { StringCodec } from 'nats'
 import { useNatsConnection } from '../nats'
 import { SCANNER_SUBJECT } from './vars'
 
 const sc = StringCodec()
 
-export async function dispatchScannerTask(repositoryId: string, repositoryPath: string) {
+export async function dispatchFolderScannerTask(payload: ScannerConsumeContent) {
 	const conn = await useNatsConnection()
-	const payload = {
-		repositoryId,
-		repositoryPath,
-	}
 	await conn.publish(SCANNER_SUBJECT, sc.encode(
 		JSON.stringify(payload),
 	))

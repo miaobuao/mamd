@@ -59,6 +59,7 @@ model Repository {
   folders             Folder[]
   files               File[]              @relation("repository")
 
+  @@index([uuid])
   @@map("repository")
 }
 
@@ -82,7 +83,7 @@ model Folder {
   subFolders       Folder[]        @relation("parent")
   files            File[]          @relation("parent")
 
-  @@index([repositoryId, parentId])
+  @@index([uuid])
   @@map("folder")
 }
 
@@ -95,6 +96,9 @@ model FolderMetadata {
   folderCount Int      @default(0)
   ctime       DateTime
   mtime       DateTime
+
+  @@index([name])
+  @@map("folder_metadata")
 }
 
 model File {
@@ -116,7 +120,7 @@ model File {
   comments FileComment[]   @relation("file-on-comment")
   tags     FileTagOnFile[] @relation("file-on-tag")
 
-  @@index([repositoryId, parentId])
+  @@index([uuid])
   @@map("file")
 }
 
@@ -129,8 +133,8 @@ model FileMetadata {
   ctime  DateTime
   mtime  DateTime
 
-  @@index([fileId, sha256])
-  @@map("file_meta")
+  @@index([name, sha256])
+  @@map("file_metadata")
 }
 
 model FileComment {
@@ -142,6 +146,8 @@ model FileComment {
   content String
   ctime   DateTime @default(now()) @map("created_at")
   mtime   DateTime @updatedAt @map("modified_at")
+
+  @@map("file_comment")
 }
 
 model FileTag {

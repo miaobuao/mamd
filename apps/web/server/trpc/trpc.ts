@@ -22,6 +22,7 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
 			},
 			select: {
 				id: true,
+				uuid: true,
 				isAdmin: true,
 				username: true,
 			},
