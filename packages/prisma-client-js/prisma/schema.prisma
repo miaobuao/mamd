@@ -93,8 +93,8 @@ model FolderMetadata {
   name        String
   fileCount   Int      @default(0)
   folderCount Int      @default(0)
-  ctime       DateTime @default(now()) @map("created_at")
-  mtime       DateTime @updatedAt @map("modified_at")
+  ctime       DateTime
+  mtime       DateTime
 }
 
 model File {
@@ -126,8 +126,8 @@ model FileMetadata {
   file   File     @relation("file-metadata", fields: [fileId], references: [id], onDelete: Cascade)
   name   String
   sha256 String?
-  ctime  DateTime @default(now()) @map("created_at")
-  mtime  DateTime @updatedAt @map("modified_at")
+  ctime  DateTime
+  mtime  DateTime
 
   @@index([fileId, sha256])
   @@map("file_meta")

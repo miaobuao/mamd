@@ -37,12 +37,13 @@ export const RepositoryRouter = router({
 		return db.$transaction(async (tx) => {
 			const repository = await tx.repository.create({
 				data: {
+					name: input.name,
+					path: input.path,
 					creator: {
 						connect: {
 							id: userInfo.id,
 						},
 					},
-					path: input.path,
 				},
 			})
 			await tx.visibleRepository.create({
@@ -53,7 +54,6 @@ export const RepositoryRouter = router({
 			})
 			const linkedFolder = await tx.folder.create({
 				data: {
-					name: basename(input.name),
 					repository: {
 						connect: {
 							id: repository.id,
@@ -69,6 +69,12 @@ export const RepositoryRouter = router({
 							id: userInfo.id,
 						},
 					},
+				},
+			})
+			const _linkedFolderMetadata = await tx.folderMetadata.create({
+				data: {
+					name: basename(input.path),
+					folder: { connect: { id: linkedFolder.id } },
 				},
 			})
 			await tx.repository.update({
