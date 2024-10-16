@@ -4,7 +4,7 @@
 	"name": "Dev Container",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
-	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"workspaceFolder": "/workspaces",
 	"features": {
 		"ghcr.io/meaningful-ooo/devcontainer-features/fish:1": {
 			"fisher": false

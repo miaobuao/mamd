@@ -7,8 +7,8 @@ services:
       dockerfile: Dockerfile
 
     volumes:
-      - ../..:/workspaces:cached
-      - ./AppData:/mnt/data
+      - ..:/workspaces:cached
+      - mamd-volumes:/mnt/data
 
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
@@ -22,6 +22,9 @@ services:
 
     networks:
       - internal
+
+    ports:
+      - 3000:3000
 
     # Use "forwardPorts" in **devcontainer.json** to forward an app port locally. 
     # (Adding the "ports" property to this file will not forward from a Codespace.)
@@ -49,6 +52,7 @@ services:
 
 volumes:
   postgres-data:
+  mamd-volumes:
 
 networks:
   internal:
