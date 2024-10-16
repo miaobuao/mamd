@@ -8,6 +8,9 @@ module.exports = {
 			name: 'file-scanner',
 			script: './modules/repo-scanner/scanner.worker.ts',
 			interpreter: 'bun',
+			env: {
+				NATS_URL: process.env.NATS_URL,
+			},
 			watch: isDev,
 		},
 	],

@@ -6,6 +6,7 @@ export default {
 	confirmPassword: '确认密码',
 	create: '创建',
 	createRepository: '创建存储库',
+	editRepository: '编辑存储库',
 	createRepositoryDescription: '创建一个存储库来存储您的文件',
 	email: '邮箱',
 	forgotPassword: '忘记密码',

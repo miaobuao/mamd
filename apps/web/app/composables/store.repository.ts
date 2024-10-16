@@ -4,14 +4,21 @@ import type { TypeOf } from 'zod'
 import { debounce } from 'lodash-es'
 import type { CreateRepositoryFormValidator } from '~/utils/validator'
 
-type Repository = inferProcedureOutput<AppRouter['repository']['listVisible']>[number]
+export type Repository = inferProcedureOutput<AppRouter['repository']['listVisible']>[number]
 
 export const useRepositoryStore = defineStore('repository', () => {
 	const { $trpc } = useNuxtApp()
+
 	const repositories = reactive<Repository[]>([])
 
+	$trpc.repository.listVisible.useQuery().then(({ data }) => {
+		if (data.value) {
+			repositories.splice(0, repositories.length, ...data.value)
+		}
+	})
+
 	function removeRepository(uuid: string) {
-		const idx = repositories.findIndex(v => v.repository.uuid === uuid)
+		const idx = repositories.findIndex(v => v.uuid === uuid)
 		if (idx === -1) {
 			return
 		}
@@ -23,14 +30,7 @@ export const useRepositoryStore = defineStore('repository', () => {
 	}
 
 	async function createRepository(repo: TypeOf<typeof CreateRepositoryFormValidator>) {
-		const { repository, linkedFolder } = await $trpc.repository.create.mutate(repo)
-		const res = {
-			repository: {
-				uuid: repository.uuid,
-				name: repository.name,
-				linkedFolder,
-			},
-		}
+		const res = await $trpc.repository.create.mutate(repo)
 		appendRepository(res)
 		return res
 	}
@@ -43,7 +43,7 @@ export const useRepositoryStore = defineStore('repository', () => {
 	}, 500, { leading: true })
 
 	return {
-		repositories: computed(() => repositories.map(r => r.repository)),
+		repositories: computed(() => [ ...repositories ]),
 		removeRepository,
 		appendRepository,
 		createRepository,

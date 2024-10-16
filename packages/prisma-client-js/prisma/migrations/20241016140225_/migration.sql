@@ -1,7 +1,7 @@
 -- CreateTable
 CREATE TABLE "user" (
     "id" SERIAL NOT NULL,
-    "uuid" TEXT NOT NULL,
+    "uuid" UUID NOT NULL,
     "username" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "is_admin" BOOLEAN NOT NULL DEFAULT false,
@@ -24,7 +24,7 @@ CREATE TABLE "visible_repository" (
 -- CreateTable
 CREATE TABLE "repository" (
     "id" SERIAL NOT NULL,
-    "uuid" TEXT NOT NULL,
+    "uuid" UUID NOT NULL,
     "path" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -38,9 +38,8 @@ CREATE TABLE "repository" (
 -- CreateTable
 CREATE TABLE "folder" (
     "id" SERIAL NOT NULL,
-    "uuid" TEXT NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modified_at" TIMESTAMP(3) NOT NULL,
+    "uuid" UUID NOT NULL,
+    "name" TEXT NOT NULL,
     "repository_id" INTEGER,
     "parent_id" INTEGER,
     "creator_id" INTEGER NOT NULL,
@@ -49,24 +48,22 @@ CREATE TABLE "folder" (
 );
 
 -- CreateTable
-CREATE TABLE "FolderMetadata" (
+CREATE TABLE "folder_metadata" (
     "id" SERIAL NOT NULL,
     "folderId" INTEGER NOT NULL,
-    "name" TEXT NOT NULL,
     "fileCount" INTEGER NOT NULL DEFAULT 0,
     "folderCount" INTEGER NOT NULL DEFAULT 0,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modified_at" TIMESTAMP(3) NOT NULL,
+    "ctime" TIMESTAMP(3) NOT NULL,
+    "mtime" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "FolderMetadata_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "folder_metadata_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "file" (
     "id" SERIAL NOT NULL,
-    "uuid" TEXT NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modified_at" TIMESTAMP(3) NOT NULL,
+    "uuid" UUID NOT NULL,
+    "name" TEXT NOT NULL,
     "repository_id" INTEGER,
     "parent_id" INTEGER,
     "creator_id" INTEGER NOT NULL,
@@ -75,19 +72,18 @@ CREATE TABLE "file" (
 );
 
 -- CreateTable
-CREATE TABLE "file_meta" (
+CREATE TABLE "file_metadata" (
     "id" SERIAL NOT NULL,
     "fileId" INTEGER NOT NULL,
-    "name" TEXT NOT NULL,
     "sha256" TEXT,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "modified_at" TIMESTAMP(3) NOT NULL,
+    "ctime" TIMESTAMP(3) NOT NULL,
+    "mtime" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "file_meta_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "file_metadata_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "FileComment" (
+CREATE TABLE "file_comment" (
     "id" SERIAL NOT NULL,
     "fileId" INTEGER NOT NULL,
     "user_id" INTEGER NOT NULL,
@@ -95,7 +91,7 @@ CREATE TABLE "FileComment" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "modified_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "FileComment_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "file_comment_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -142,25 +138,28 @@ CREATE UNIQUE INDEX "repository_name_key" ON "repository"("name");
 CREATE UNIQUE INDEX "repository_linked_folder_id_key" ON "repository"("linked_folder_id");
 
 -- CreateIndex
+CREATE INDEX "repository_uuid_idx" ON "repository"("uuid");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "folder_uuid_key" ON "folder"("uuid");
 
 -- CreateIndex
-CREATE INDEX "folder_repository_id_parent_id_idx" ON "folder"("repository_id", "parent_id");
+CREATE INDEX "folder_uuid_name_idx" ON "folder"("uuid", "name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "FolderMetadata_folderId_key" ON "FolderMetadata"("folderId");
+CREATE UNIQUE INDEX "folder_metadata_folderId_key" ON "folder_metadata"("folderId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "file_uuid_key" ON "file"("uuid");
 
 -- CreateIndex
-CREATE INDEX "file_repository_id_parent_id_idx" ON "file"("repository_id", "parent_id");
+CREATE INDEX "file_uuid_name_idx" ON "file"("uuid", "name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "file_meta_fileId_key" ON "file_meta"("fileId");
+CREATE UNIQUE INDEX "file_metadata_fileId_key" ON "file_metadata"("fileId");
 
 -- CreateIndex
-CREATE INDEX "file_meta_fileId_sha256_idx" ON "file_meta"("fileId", "sha256");
+CREATE INDEX "file_metadata_sha256_idx" ON "file_metadata"("sha256");
 
 -- CreateIndex
 CREATE INDEX "file_tag_name_idx" ON "file_tag"("name");
@@ -187,7 +186,7 @@ ALTER TABLE "folder" ADD CONSTRAINT "folder_parent_id_fkey" FOREIGN KEY ("parent
 ALTER TABLE "folder" ADD CONSTRAINT "folder_creator_id_fkey" FOREIGN KEY ("creator_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "FolderMetadata" ADD CONSTRAINT "FolderMetadata_folderId_fkey" FOREIGN KEY ("folderId") REFERENCES "folder"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "folder_metadata" ADD CONSTRAINT "folder_metadata_folderId_fkey" FOREIGN KEY ("folderId") REFERENCES "folder"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "file" ADD CONSTRAINT "file_repository_id_fkey" FOREIGN KEY ("repository_id") REFERENCES "repository"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -199,13 +198,13 @@ ALTER TABLE "file" ADD CONSTRAINT "file_parent_id_fkey" FOREIGN KEY ("parent_id"
 ALTER TABLE "file" ADD CONSTRAINT "file_creator_id_fkey" FOREIGN KEY ("creator_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "file_meta" ADD CONSTRAINT "file_meta_fileId_fkey" FOREIGN KEY ("fileId") REFERENCES "file"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "file_metadata" ADD CONSTRAINT "file_metadata_fileId_fkey" FOREIGN KEY ("fileId") REFERENCES "file"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "FileComment" ADD CONSTRAINT "FileComment_fileId_fkey" FOREIGN KEY ("fileId") REFERENCES "file"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "file_comment" ADD CONSTRAINT "file_comment_fileId_fkey" FOREIGN KEY ("fileId") REFERENCES "file"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "FileComment" ADD CONSTRAINT "FileComment_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE CASCADE;
+ALTER TABLE "file_comment" ADD CONSTRAINT "file_comment_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "file_tag_on_file" ADD CONSTRAINT "file_tag_on_file_tag_id_fkey" FOREIGN KEY ("tag_id") REFERENCES "file_tag"("id") ON DELETE CASCADE ON UPDATE CASCADE;

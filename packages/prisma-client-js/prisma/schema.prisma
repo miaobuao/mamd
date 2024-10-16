@@ -9,7 +9,7 @@ datasource db {
 
 model User {
   id       Int      @id @default(autoincrement())
-  uuid     String   @unique @default(cuid())
+  uuid     String   @unique @default(uuid()) @db.Uuid
   username String   @unique
   password String
   isAdmin  Boolean  @default(false) @map("is_admin")
@@ -43,7 +43,7 @@ model VisibleRepository {
 
 model Repository {
   id    Int      @id @default(autoincrement())
-  uuid  String   @unique @default(cuid())
+  uuid  String   @unique @default(uuid()) @db.Uuid
   path  String   @unique
   name  String   @unique
   ctime DateTime @default(now()) @map("created_at")
@@ -65,7 +65,7 @@ model Repository {
 
 model Folder {
   id   Int    @id @default(autoincrement())
-  uuid String @unique @default(cuid())
+  uuid String @unique @default(uuid()) @db.Uuid
   name String
 
   repositoryId Int?        @map("repository_id")
@@ -100,7 +100,7 @@ model FolderMetadata {
 
 model File {
   id   Int    @id @default(autoincrement())
-  uuid String @unique @default(cuid())
+  uuid String @unique @default(uuid()) @db.Uuid
   name String
 
   repositoryId Int?        @map("repository_id")

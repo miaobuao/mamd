@@ -19,13 +19,14 @@ export const RepositoryRouter = router({
 						name: true,
 						linkedFolder: {
 							select: {
+								name: true,
 								uuid: true,
 							},
 						},
 					},
 				},
 			},
-		})
+		}).then(repos => repos.map(repo => repo.repository))
 	}),
 	create: protectedProcedure.input(CreateRepositoryFormValidator).mutation(async ({ ctx: { db, userInfo }, input }) => {
 		if (await fs.access(input.path).then(() => true).catch(() => false)) {
@@ -60,6 +61,7 @@ export const RepositoryRouter = router({
 			})
 			const linkedFolder = await tx.folder.create({
 				data: {
+					name: basename(input.path),
 					repository: {
 						connect: {
 							id: repository.id,
@@ -77,12 +79,6 @@ export const RepositoryRouter = router({
 					},
 				},
 			})
-			await tx.folderMetadata.create({
-				data: {
-					name: basename(input.path),
-					folder: { connect: { id: linkedFolder.id } },
-				},
-			})
 			await tx.repository.update({
 				data: {
 					linkedFolderId: linkedFolder.id,
@@ -96,10 +92,8 @@ export const RepositoryRouter = router({
 				repositoryPath: input.path,
 			})
 			return {
-				repository: {
-					uuid: repository.uuid,
-					name: repository.name,
-				},
+				uuid: repository.uuid,
+				name: repository.name,
 				linkedFolder: {
 					uuid: linkedFolder.uuid,
 				},

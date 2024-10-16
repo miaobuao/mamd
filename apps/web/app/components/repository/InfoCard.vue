@@ -10,6 +10,6 @@ defineEmits<{
 
 <template>
 	<RepositoryOuterCard @click="$emit('click', repository)">
-		<div>{{ repository.folder?.name }}</div>
+		<div>{{ repository.name }}</div>
 	</RepositoryOuterCard>
 </template>

@@ -4,6 +4,7 @@ export default {
 	confirmPassword: 'Confirm password',
 	create: 'Create',
 	createRepository: 'Create Repository',
+	editRepository: 'Edit Repository',
 	createRepositoryDescription: 'Create a repository to store your files',
 	email: 'Email',
 	forgotPassword: 'Forgot password?',

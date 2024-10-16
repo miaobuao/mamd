@@ -13,6 +13,7 @@ useNatsConnection()
 	.then(async (sub) => {
 		for await (const msg of sub) {
 			const content = msg.json<ScannerConsumeContent>()
+			console.log('worker sub: ', content)
 			await handler(content)
 		}
 	})
