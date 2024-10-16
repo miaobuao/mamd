@@ -45,6 +45,7 @@ async function handler({ repositoryId, repositoryPath }: ScannerConsumeContent) 
 	if (!linkedFolder) {
 		const folder = await db.folder.create({
 			data: {
+				name: path.basename(repositoryPath),
 				parentId: null,
 				creatorId: repository.creatorId,
 			},
@@ -64,25 +65,17 @@ async function handler({ repositoryId, repositoryPath }: ScannerConsumeContent) 
 			const folder = await db.folder.findFirst({
 				where: {
 					parentId: parentFolderId,
-					metadata: {
-						name: path.basename(entry.fullPath),
-					},
 				},
 				select: {
 					id: true,
 				},
 			})
 			if (!folder) {
-				const folder = await db.folder.create({
+				const _folder = await db.folder.create({
 					data: {
+						name: path.basename(entry.fullPath),
 						parentId: parentFolderId,
 						creatorId: repository.creatorId,
-					},
-				})
-				const _folderMetadata = await db.folderMetadata.create({
-					data: {
-						folderId: folder.id,
-						name: path.basename(entry.fullPath),
 					},
 				})
 			}
@@ -91,24 +84,17 @@ async function handler({ repositoryId, repositoryPath }: ScannerConsumeContent) 
 			const file = await db.file.findFirst({
 				where: {
 					parentId: parentFolderId,
-					metadata: {
-						name: path.basename(entry.fullPath),
-					},
+					name: path.basename(entry.fullPath),
 				},
 				select: {
 					id: true,
 				},
 			})
 			if (!file) {
-				const file = await db.file.create({
+				const _file = await db.file.create({
 					data: {
 						parentId: parentFolderId,
 						creatorId: repository.creatorId,
-					},
-				})
-				const _fileMetadata = await db.fileMetadata.create({
-					data: {
-						fileId: file.id,
 						name: path.basename(entry.fullPath),
 					},
 				})
@@ -124,9 +110,7 @@ export async function queryFolder(rootFolderId: number, parts: string[]) {
 		const root = await db.folder.findFirst({
 			where: {
 				parentId: rootFolderId,
-				metadata: {
-					name: part,
-				},
+				name: part,
 			},
 			select: {
 				id: true,

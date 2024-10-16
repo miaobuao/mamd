@@ -64,10 +64,9 @@ model Repository {
 }
 
 model Folder {
-  id    Int      @id @default(autoincrement())
-  uuid  String   @unique @default(cuid())
-  ctime DateTime @default(now()) @map("created_at")
-  mtime DateTime @updatedAt @map("modified_at")
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(cuid())
+  name String
 
   repositoryId Int?        @map("repository_id")
   repository   Repository? @relation(fields: [repositoryId], references: [id])
@@ -83,7 +82,7 @@ model Folder {
   subFolders       Folder[]        @relation("parent")
   files            File[]          @relation("parent")
 
-  @@index([uuid])
+  @@index([uuid, name])
   @@map("folder")
 }
 
@@ -91,21 +90,18 @@ model FolderMetadata {
   id          Int      @id @default(autoincrement())
   folderId    Int      @unique
   folder      Folder   @relation("folder-metadata", fields: [folderId], references: [id], onDelete: Cascade)
-  name        String
   fileCount   Int      @default(0)
   folderCount Int      @default(0)
   ctime       DateTime
   mtime       DateTime
 
-  @@index([name])
   @@map("folder_metadata")
 }
 
 model File {
-  id    Int      @id @default(autoincrement())
-  uuid  String   @unique @default(cuid())
-  ctime DateTime @default(now()) @map("created_at")
-  mtime DateTime @updatedAt @map("modified_at")
+  id   Int    @id @default(autoincrement())
+  uuid String @unique @default(cuid())
+  name String
 
   repositoryId Int?        @map("repository_id")
   repository   Repository? @relation("repository", fields: [repositoryId], references: [id])
@@ -120,7 +116,7 @@ model File {
   comments FileComment[]   @relation("file-on-comment")
   tags     FileTagOnFile[] @relation("file-on-tag")
 
-  @@index([uuid])
+  @@index([uuid, name])
   @@map("file")
 }
 
@@ -128,12 +124,11 @@ model FileMetadata {
   id     Int      @id @default(autoincrement())
   fileId Int      @unique
   file   File     @relation("file-metadata", fields: [fileId], references: [id], onDelete: Cascade)
-  name   String
   sha256 String?
   ctime  DateTime
   mtime  DateTime
 
-  @@index([name, sha256])
+  @@index([sha256])
   @@map("file_metadata")
 }
 
