@@ -23,7 +23,7 @@ export async function createContext(event: H3Event) {
 		return {
 			db: event.context.db,
 			event,
-			userId: payload.data.userId,
+			user: payload.data.user,
 		}
 	}
 	return {

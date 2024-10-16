@@ -14,7 +14,7 @@ CREATE TABLE "user" (
 -- CreateTable
 CREATE TABLE "visible_repository" (
     "user_id" INTEGER NOT NULL,
-    "repository_id" TEXT NOT NULL,
+    "repository_id" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "modified_at" TIMESTAMP(3) NOT NULL,
 
@@ -23,24 +23,26 @@ CREATE TABLE "visible_repository" (
 
 -- CreateTable
 CREATE TABLE "repository" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "uuid" TEXT NOT NULL,
     "path" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "modified_at" TIMESTAMP(3) NOT NULL,
     "creator_id" INTEGER NOT NULL,
-    "linked_folder_id" TEXT,
+    "linked_folder_id" INTEGER,
 
     CONSTRAINT "repository_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "folder" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "uuid" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "modified_at" TIMESTAMP(3) NOT NULL,
-    "repository_id" TEXT,
-    "parent_id" TEXT,
+    "repository_id" INTEGER,
+    "parent_id" INTEGER,
     "creator_id" INTEGER NOT NULL,
 
     CONSTRAINT "folder_pkey" PRIMARY KEY ("id")
@@ -49,7 +51,7 @@ CREATE TABLE "folder" (
 -- CreateTable
 CREATE TABLE "FolderMetadata" (
     "id" SERIAL NOT NULL,
-    "folderId" TEXT NOT NULL,
+    "folderId" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
     "fileCount" INTEGER NOT NULL DEFAULT 0,
     "folderCount" INTEGER NOT NULL DEFAULT 0,
@@ -61,11 +63,12 @@ CREATE TABLE "FolderMetadata" (
 
 -- CreateTable
 CREATE TABLE "file" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "uuid" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "modified_at" TIMESTAMP(3) NOT NULL,
-    "repository_id" TEXT,
-    "parent_id" TEXT,
+    "repository_id" INTEGER,
+    "parent_id" INTEGER,
     "creator_id" INTEGER NOT NULL,
 
     CONSTRAINT "file_pkey" PRIMARY KEY ("id")
@@ -74,7 +77,7 @@ CREATE TABLE "file" (
 -- CreateTable
 CREATE TABLE "file_meta" (
     "id" SERIAL NOT NULL,
-    "fileId" TEXT NOT NULL,
+    "fileId" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
     "sha256" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -86,7 +89,7 @@ CREATE TABLE "file_meta" (
 -- CreateTable
 CREATE TABLE "FileComment" (
     "id" SERIAL NOT NULL,
-    "fileId" TEXT NOT NULL,
+    "fileId" INTEGER NOT NULL,
     "user_id" INTEGER NOT NULL,
     "content" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -108,11 +111,14 @@ CREATE TABLE "file_tag" (
 -- CreateTable
 CREATE TABLE "file_tag_on_file" (
     "tag_id" INTEGER NOT NULL,
-    "fileId" TEXT NOT NULL,
+    "fileId" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "file_tag_on_file_pkey" PRIMARY KEY ("tag_id","fileId")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "user_uuid_key" ON "user"("uuid");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "user_username_key" ON "user"("username");
@@ -124,6 +130,9 @@ CREATE INDEX "user_username_uuid_idx" ON "user"("username", "uuid");
 CREATE INDEX "visible_repository_repository_id_user_id_idx" ON "visible_repository"("repository_id", "user_id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "repository_uuid_key" ON "repository"("uuid");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "repository_path_key" ON "repository"("path");
 
 -- CreateIndex
@@ -133,10 +142,16 @@ CREATE UNIQUE INDEX "repository_name_key" ON "repository"("name");
 CREATE UNIQUE INDEX "repository_linked_folder_id_key" ON "repository"("linked_folder_id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "folder_uuid_key" ON "folder"("uuid");
+
+-- CreateIndex
 CREATE INDEX "folder_repository_id_parent_id_idx" ON "folder"("repository_id", "parent_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "FolderMetadata_folderId_key" ON "FolderMetadata"("folderId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "file_uuid_key" ON "file"("uuid");
 
 -- CreateIndex
 CREATE INDEX "file_repository_id_parent_id_idx" ON "file"("repository_id", "parent_id");

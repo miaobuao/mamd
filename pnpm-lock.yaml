@@ -59,6 +59,9 @@ importers:
       '@pinia/nuxt':
         specifier: ^0.5.4
         version: 0.5.5(rollup@4.24.0)(typescript@5.6.3)(vue@3.5.12(typescript@5.6.3))(webpack-sources@3.2.3)
+      '@repo/workers':
+        specifier: workspace:*
+        version: link:../../packages/workers
       '@trpc/client':
         specifier: 11.0.0-rc.571
         version: 11.0.0-rc.571(@trpc/server@11.0.0-rc.571)
@@ -155,9 +158,6 @@ importers:
       prisma-client-js:
         specifier: workspace:*
         version: link:../prisma-client-js
-      superjson:
-        specifier: ^2.2.1
-        version: 2.2.1
 
 packages:
 
@@ -2169,7 +2169,6 @@ packages:
 
   bun@1.1.30:
     resolution: {integrity: sha512-ysRL1pq10Xba0jqVLPrKU3YIv0ohfp3cTajCPtpjCyppbn3lfiAVNpGoHfyaxS17OlPmWmR67UZRPw/EueQuug==}
-    cpu: [arm64, x64]
     os: [darwin, linux, win32]
     hasBin: true
 

@@ -1,4 +1,4 @@
-import { type JWTPayload as BaseJwtPayload, SignJWT, jwtVerify } from 'jose'
+import { type JWTPayload as BaseJwtPayload, jwtVerify, SignJWT } from 'jose'
 
 const config = useRuntimeConfig()
 
@@ -37,6 +37,8 @@ export interface JwtPayload extends BaseJwtPayload {
 }
 
 export interface JwtPayloadData {
-	userId: string
+	user: {
+		uuid: string
+	}
 	remember?: boolean
 }

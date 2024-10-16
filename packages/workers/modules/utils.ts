@@ -1,5 +1,8 @@
+import { Buffer } from 'node:buffer'
 import * as fs from 'node:fs/promises'
+
 import path from 'node:path'
+import superjson from 'superjson'
 
 export async function* directoryIterator(dir: string) {
 	const stack: string[] = [ dir ]
@@ -21,4 +24,14 @@ export async function* directoryIterator(dir: string) {
 			yield { fullPath, isDir }
 		}
 	}
+}
+
+export function serializeJson(json: object) {
+	const str = superjson.stringify(json)
+	return Buffer.from(str)
+}
+
+export function deserializeJson<T = any>(buffer: Buffer) {
+	const str = buffer.toString()
+	return superjson.parse<T>(str)
 }

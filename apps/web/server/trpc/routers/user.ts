@@ -1,6 +1,6 @@
-import { protectedProcedure, publicProcedure, router } from '../trpc'
-import { checkAdminAccountExists } from '../middleware/check-admin-user'
 import { UserLoginSubmitFormValidator, UserRegisterSubmitDataValidator } from '~/utils/validator'
+import { checkAdminAccountExists } from '../middleware/check-admin-user'
+import { protectedProcedure, publicProcedure, router } from '../trpc'
 
 const config = useRuntimeConfig()
 
@@ -15,7 +15,7 @@ export const UserRouter = router({
 			const user = await db.user
 				.findUniqueOrThrow({
 					where: { username: input.username },
-					select: { id: true, username: true, password: true, isAdmin: true },
+					select: { uuid: true, username: true, password: true, isAdmin: true },
 				})
 				.catch(() => {
 					throw new ForbiddenErrorWithI18n(i18n.error.loginFailed)
@@ -24,7 +24,9 @@ export const UserRouter = router({
 				throw new ForbiddenErrorWithI18n(i18n.error.invalidUsernameOrPassword)
 
 			const token = await signToken({
-				userId: user.id,
+				user: {
+					uuid: user.uuid,
+				},
 				remember: input.remember,
 			})
 			if (input.remember) {
@@ -40,7 +42,7 @@ export const UserRouter = router({
 				})
 			}
 			return {
-				id: user.id,
+				uuid: user.uuid,
 				username: user.username,
 				isAdmin: user.isAdmin,
 			}

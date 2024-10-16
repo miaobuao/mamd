@@ -5,8 +5,8 @@ const isDev = process.env.NODE_ENV === 'development'
 module.exports = {
 	apps: [
 		{
-			name: 'worker',
-			script: './modules/repo-scanner/worker.ts',
+			name: 'file-scanner',
+			script: './modules/repo-scanner/scanner.worker.ts',
 			interpreter: 'bun',
 			watch: isDev,
 		},

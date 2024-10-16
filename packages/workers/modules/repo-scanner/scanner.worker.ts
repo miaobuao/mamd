@@ -1,18 +1,30 @@
 import path from 'node:path'
-import type { ConsumeMessage } from 'amqplib'
 import { usePrismaClient } from 'prisma-client-js'
-import { useConnection } from '../connection'
-import { deserializeJson } from '../serializer'
-import type { MasterConsumeContent } from './const'
-import { MASTER_QUEUE } from './const'
-import { directoryIterator } from './utils'
+import { useNatsConnection } from '../nats'
+import { directoryIterator } from '../utils'
+import { SCANNER_QUEUE_NAME, SCANNER_SUBJECT } from './vars'
+
+useNatsConnection()
+	.then(conn =>
+		conn.subscribe(SCANNER_SUBJECT, {
+			queue: SCANNER_QUEUE_NAME,
+		}),
+	)
+	.then(async (sub) => {
+		for await (const msg of sub) {
+			const content = msg.json<ScannerConsumeContent>()
+			await handler(content)
+		}
+	})
 
 const db = usePrismaClient()
 
-async function handler(msg: ConsumeMessage | null) {
-	if (!msg)
-		return
-	const { repositoryId, repositoryPath } = deserializeJson<MasterConsumeContent>(msg.content)
+export interface ScannerConsumeContent {
+	repositoryId: string
+	repositoryPath: string
+}
+
+async function handler({ repositoryId, repositoryPath }: ScannerConsumeContent) {
 	const repository = await db.repository.findFirst({
 		where: {
 			id: repositoryId,
@@ -29,35 +41,48 @@ async function handler(msg: ConsumeMessage | null) {
 	if (!repository)
 		return
 	const { linkedFolder } = repository
+	let linkedFolderId = linkedFolder?.id
 	if (!linkedFolder) {
-		// TODO: create linked folder
-		return
+		const folder = await db.folder.create({
+			data: {
+				parentId: null,
+				creatorId: repository.creatorId,
+			},
+		})
+		linkedFolderId = folder.id
 	}
 	let parentFolderId: string | null = null
 	let parentFolderPath: string | null = null
 	for await (const entry of directoryIterator(repositoryPath)) {
-		const relativePath = path.posix.relative(repositoryPath, entry.parentPath)
+		const relativePath = path.relative(repositoryPath, path.dirname(entry.fullPath))
 		if (relativePath !== parentFolderPath) {
-			const parts = relativePath.split(path.posix.sep)
-			parentFolderId = await queryAlong(linkedFolder.id, parts)
+			const parts = relativePath.split(path.sep)
+			parentFolderId = await queryFolder(linkedFolderId!, parts)
 			parentFolderPath = relativePath
 		}
-		if (entry.isDirectory()) {
+		if (entry.isDir) {
 			const folder = await db.folder.findFirst({
 				where: {
 					parentId: parentFolderId,
-					name: entry.name,
+					metadata: {
+						name: path.basename(entry.fullPath),
+					},
 				},
 				select: {
 					id: true,
 				},
 			})
 			if (!folder) {
-				await db.folder.create({
+				const folder = await db.folder.create({
 					data: {
 						parentId: parentFolderId,
-						name: entry.name,
 						creatorId: repository.creatorId,
+					},
+				})
+				const _folderMetadata = await db.folderMetadata.create({
+					data: {
+						folderId: folder.id,
+						name: path.basename(entry.fullPath),
 					},
 				})
 			}
@@ -66,18 +91,25 @@ async function handler(msg: ConsumeMessage | null) {
 			const file = await db.file.findFirst({
 				where: {
 					parentId: parentFolderId,
-					name: entry.name,
+					metadata: {
+						name: path.basename(entry.fullPath),
+					},
 				},
 				select: {
 					id: true,
 				},
 			})
 			if (!file) {
-				await db.file.create({
+				const file = await db.file.create({
 					data: {
 						parentId: parentFolderId,
-						name: entry.name,
 						creatorId: repository.creatorId,
+					},
+				})
+				const _fileMetadata = await db.fileMetadata.create({
+					data: {
+						fileId: file.id,
+						name: path.basename(entry.fullPath),
 					},
 				})
 			}
@@ -85,14 +117,16 @@ async function handler(msg: ConsumeMessage | null) {
 	}
 }
 
-async function queryAlong(rootId: string, parts: string[]) {
+export async function queryFolder(rootId: string, parts: string[]) {
 	parts = [ ...parts ]
 	while (parts.length > 0) {
 		const part = parts.shift()!
 		const root = await db.folder.findFirst({
 			where: {
 				parentId: rootId,
-				name: part,
+				metadata: {
+					name: part,
+				},
 			},
 			select: {
 				id: true,
@@ -102,10 +136,3 @@ async function queryAlong(rootId: string, parts: string[]) {
 	}
 	return rootId
 }
-
-useConnection()
-	.then(conn => conn.createChannel())
-	.then(async (channel) => {
-		await channel.assertQueue(MASTER_QUEUE)
-		channel.consume(MASTER_QUEUE, handler)
-	})
