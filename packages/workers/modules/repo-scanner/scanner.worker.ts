@@ -13,7 +13,6 @@ useNatsConnection()
 	.then(async (sub) => {
 		for await (const msg of sub) {
 			const content = msg.json<ScannerConsumeContent>()
-			console.log('worker sub: ', content)
 			await handler(content)
 		}
 	})
@@ -53,19 +52,21 @@ async function handler({ repositoryId, repositoryPath }: ScannerConsumeContent) 
 		})
 		linkedFolderId = folder.id
 	}
-	let parentFolderId: number | null = null
-	let parentFolderPath: string | null = null
+	let parentFolderId = linkedFolderId!
+	let parentFolderPath = ''
 	for await (const entry of directoryIterator(repositoryPath)) {
-		const relativePath = path.relative(repositoryPath, path.dirname(entry.fullPath))
-		if (relativePath !== parentFolderPath) {
-			const parts = relativePath.split(path.sep)
+		const relativeParentPath = path.relative(repositoryPath, path.dirname(entry.fullPath))
+		if (relativeParentPath !== parentFolderPath) {
+			const parts = relativeParentPath.split(path.sep)
 			parentFolderId = await queryFolder(linkedFolderId!, parts)
-			parentFolderPath = relativePath
+			parentFolderPath = relativeParentPath
 		}
+		const name = path.basename(entry.fullPath)
 		if (entry.isDir) {
 			const folder = await db.folder.findFirst({
 				where: {
 					parentId: parentFolderId,
+					name,
 				},
 				select: {
 					id: true,
@@ -74,18 +75,19 @@ async function handler({ repositoryId, repositoryPath }: ScannerConsumeContent) 
 			if (!folder) {
 				const _folder = await db.folder.create({
 					data: {
-						name: path.basename(entry.fullPath),
+						name,
 						parentId: parentFolderId,
 						creatorId: repository.creatorId,
 					},
 				})
+				// TODO: update folder metadata
 			}
 		}
 		else {
 			const file = await db.file.findFirst({
 				where: {
 					parentId: parentFolderId,
-					name: path.basename(entry.fullPath),
+					name,
 				},
 				select: {
 					id: true,
@@ -96,9 +98,10 @@ async function handler({ repositoryId, repositoryPath }: ScannerConsumeContent) 
 					data: {
 						parentId: parentFolderId,
 						creatorId: repository.creatorId,
-						name: path.basename(entry.fullPath),
+						name,
 					},
 				})
+				// TODO: update file metadata
 			}
 		}
 	}

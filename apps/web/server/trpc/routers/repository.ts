@@ -102,7 +102,7 @@ export const RepositoryRouter = router({
 		})
 	}),
 
-	startScan: adminProcedure.input(z.object({
+	scan: adminProcedure.input(z.object({
 		repositoryUuid: z.string(),
 	})).mutation(async ({ ctx: { db }, input }) => {
 		const repository = await db.repository.findFirst({
