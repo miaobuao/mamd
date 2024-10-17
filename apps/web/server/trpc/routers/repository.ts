@@ -3,8 +3,9 @@ import * as fs from 'node:fs/promises'
 import { basename } from 'node:path'
 import { dispatchFolderScannerTask } from '@repo/workers'
 import { BadRequestErrorWithI18n } from '~~/server/utils/error'
+import { z } from 'zod'
 import { CreateRepositoryFormValidator } from '~/utils/validator'
-import { protectedProcedure, router } from '../trpc'
+import { adminProcedure, protectedProcedure, router } from '../trpc'
 
 export const RepositoryRouter = router({
 	listVisible: protectedProcedure.query(async ({ ctx: { db, userInfo } }) => {
@@ -28,7 +29,7 @@ export const RepositoryRouter = router({
 			},
 		}).then(repos => repos.map(repo => repo.repository))
 	}),
-	create: protectedProcedure.input(CreateRepositoryFormValidator).mutation(async ({ ctx: { db, userInfo }, input }) => {
+	create: adminProcedure.input(CreateRepositoryFormValidator).mutation(async ({ ctx: { db, userInfo }, input }) => {
 		if (await fs.access(input.path).then(() => true).catch(() => false)) {
 			const isDir = await fs.lstat(input.path).then(stat => stat.isDirectory())
 			if (!isDir) {
@@ -98,6 +99,27 @@ export const RepositoryRouter = router({
 					uuid: linkedFolder.uuid,
 				},
 			}
+		})
+	}),
+
+	startScan: adminProcedure.input(z.object({
+		repositoryUuid: z.string(),
+	})).mutation(async ({ ctx: { db }, input }) => {
+		const repository = await db.repository.findFirst({
+			where: {
+				uuid: input.repositoryUuid,
+			},
+			select: {
+				id: true,
+				path: true,
+			},
+		})
+		if (!repository) {
+			throw new BadRequestErrorWithI18n(i18n.error.repositoryNotExists)
+		}
+		await dispatchFolderScannerTask({
+			repositoryId: repository.id,
+			repositoryPath: repository.path,
 		})
 	}),
 })

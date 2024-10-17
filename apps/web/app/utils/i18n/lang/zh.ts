@@ -35,6 +35,7 @@ export default {
 		permissionDenied: '权限不足',
 		registerFailed: '注册失败',
 		repositoryAlreadyExists: '存储库已存在',
+		repositoryNotExists: '存储库不存在',
 		usernameHasBeenRegistered: '该用户名已被注册',
 	},
 } satisfies typeof en

@@ -33,6 +33,7 @@ export default {
 		permissionDenied: 'Permission denied',
 		registerFailed: 'Register failed',
 		repositoryAlreadyExists: 'Repository already exists',
+		repositoryNotExists: 'Repository not exists',
 		usernameHasBeenRegistered: 'This username has been registered',
 	},
 }

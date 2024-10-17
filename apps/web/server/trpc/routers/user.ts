@@ -1,6 +1,6 @@
 import { UserLoginSubmitFormValidator, UserRegisterSubmitDataValidator } from '~/utils/validator'
 import { checkAdminAccountExists } from '../middleware/check-admin-user'
-import { protectedProcedure, publicProcedure, router } from '../trpc'
+import { adminProcedure, protectedProcedure, publicProcedure, router } from '../trpc'
 
 const config = useRuntimeConfig()
 
@@ -93,12 +93,9 @@ export const UserRouter = router({
 				)
 		}),
 
-	createCommonUser: protectedProcedure
+	createCommonUser: adminProcedure
 		.input(UserRegisterSubmitDataValidator)
-		.mutation(async ({ input, ctx: { db, userInfo } }) => {
-			if (!userInfo.isAdmin) {
-				throw new ForbiddenErrorWithI18n(i18n.error.permissionDenied)
-			}
+		.mutation(async ({ input, ctx: { db } }) => {
 			const hashPassword = await bcryptEncrypt(input.password)
 			await db.user
 				.create({

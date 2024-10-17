@@ -36,3 +36,11 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
 		})
 	return next({ ctx: { ...ctx, userInfo } })
 })
+
+export const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
+	const { userInfo } = ctx
+	if (!userInfo.isAdmin) {
+		throw new ForbiddenErrorWithI18n(i18n.error.permissionDenied)
+	}
+	return next({ ctx })
+})
