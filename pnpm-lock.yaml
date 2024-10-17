@@ -14,6 +14,9 @@ importers:
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
+      bun:
+        specifier: ^1.1.30
+        version: 1.1.30
       dotenv-cli:
         specifier: ^7.4.2
         version: 7.4.2
@@ -152,9 +155,6 @@ importers:
 
   packages/workers:
     dependencies:
-      bun:
-        specifier: ^1.1.30
-        version: 1.1.30
       nats:
         specifier: ^2.28.2
         version: 2.28.2
@@ -2176,7 +2176,6 @@ packages:
 
   bun@1.1.30:
     resolution: {integrity: sha512-ysRL1pq10Xba0jqVLPrKU3YIv0ohfp3cTajCPtpjCyppbn3lfiAVNpGoHfyaxS17OlPmWmR67UZRPw/EueQuug==}
-    cpu: [arm64, x64]
     os: [darwin, linux, win32]
     hasBin: true
 

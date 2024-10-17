@@ -6,7 +6,6 @@
 		"dev": "pm2 start ./ecosystem.config.cjs --watch"
 	},
 	"dependencies": {
-		"bun": "^1.1.30",
 		"nats": "^2.28.2",
 		"prisma-client-js": "workspace:*"
 	}
