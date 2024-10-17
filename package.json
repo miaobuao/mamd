@@ -8,26 +8,27 @@
 	},
 	"scripts": {
 		"build": "turbo build",
-		"dev": "dotenv -e .env.devel -- turbo dev --env-mode loose",
+		"dev": "dotenv -e .env -- turbo dev --env-mode loose",
 		"lint": "turbo lint",
 		"lint-staged": "lint-staged",
 		"prepare": "husky",
-		"prisma:migrate-all": "dotenv -e .env.devel -- turbo prisma:migrate-all --env-mode loose"
+		"prisma:migrate": "dotenv -e .env -- turbo migrate --env-mode loose",
+		"prisma:studio": "dotenv -e .env -- turbo studio --env-mode loose",
+		"prisma:reset": "dotenv -e .env -- turbo reset --env-mode loose -- --force"
 	},
 	"dependencies": {
+		"@antfu/eslint-config": "^3.7.3",
 		"@types/lodash-es": "^4.17.12",
-		"lodash-es": "^4.17.21",
-		"npm-run-all2": "^6.2.3"
-	},
-	"devDependencies": {
-		"@antfu/eslint-config": "^2.26.0",
+		"bun": "^1.1.30",
 		"dotenv-cli": "^7.4.2",
-		"eslint": "9.5.0",
+		"eslint": "9.12.0",
 		"eslint-plugin-format": "^0.1.1",
-		"husky": "^9.0.11",
-		"lint-staged": "^15.2.2",
-		"prettier": "^3.2.5",
-		"prettier-eslint": "^16.3.0",
+		"husky": "^9.1.6",
+		"lint-staged": "^15.2.10",
+		"lodash-es": "^4.17.21",
+		"npm-run-all2": "^6.2.3",
+		"pm2": "^5.4.2",
+		"rxjs": "^7.8.1",
 		"turbo": "latest"
 	}
 }

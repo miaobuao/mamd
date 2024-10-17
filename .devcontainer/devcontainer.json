@@ -4,7 +4,7 @@
 	"name": "Dev Container",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
-	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"workspaceFolder": "/workspaces",
 	"features": {
 		"ghcr.io/meaningful-ooo/devcontainer-features/fish:1": {
 			"fisher": false
@@ -27,9 +27,6 @@
 			]
 		}
 	},
-
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// This can be used to network with other containers or with the host.

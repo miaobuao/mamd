@@ -18,3 +18,8 @@ export const UserLoginSubmitFormValidator = z.object({
 	password: PasswordValidator,
 	remember: z.boolean().optional(),
 })
+
+export const CreateRepositoryFormValidator = z.object({
+	name: z.string().min(1),
+	path: z.string(),
+})

@@ -2,7 +2,7 @@
 	"$schema": "https://turbo.build/schema.json",
 	"globalDependencies": ["**/.env.*local"],
 	"globalEnv": [
-		".env.devel"
+		".env"
 	],
 	"tasks": {
 		"build": {
@@ -15,7 +15,13 @@
 			"cache": false,
 			"persistent": true
 		},
-		"prisma-client-js#prisma:migrate-all": {
+		"prisma-client-js#migrate": {
+			"cache": false
+		},
+		"prisma-client-js#studio": {
+			"cache": false
+		},
+		"prisma-client-js#reset": {
 			"cache": false
 		}
 	}

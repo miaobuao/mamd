@@ -1,21 +1,25 @@
-import { protectedProcedure, publicProcedure, router } from '../trpc'
-import { checkAdminAccountExists } from '../middleware/check-admin-user'
 import { UserLoginSubmitFormValidator, UserRegisterSubmitDataValidator } from '~/utils/validator'
+import { checkAdminAccountExists } from '../middleware/check-admin-user'
+import { adminProcedure, protectedProcedure, publicProcedure, router } from '../trpc'
 
 const config = useRuntimeConfig()
 
 export const UserRouter = router({
 	auth: protectedProcedure.mutation(async ({ ctx: { userInfo } }) => {
-		return userInfo
+		return {
+			uuid: userInfo.uuid,
+			username: userInfo.username,
+			isAdmin: userInfo.isAdmin,
+		}
 	}),
 
 	login: publicProcedure
 		.input(UserLoginSubmitFormValidator)
 		.mutation(async ({ input, ctx: { db, event } }) => {
-			const user = await db.basic.user
+			const user = await db.user
 				.findUniqueOrThrow({
 					where: { username: input.username },
-					select: { id: true, username: true, password: true, isAdmin: true },
+					select: { uuid: true, username: true, password: true, isAdmin: true },
 				})
 				.catch(() => {
 					throw new ForbiddenErrorWithI18n(i18n.error.loginFailed)
@@ -24,7 +28,9 @@ export const UserRouter = router({
 				throw new ForbiddenErrorWithI18n(i18n.error.invalidUsernameOrPassword)
 
 			const token = await signToken({
-				userId: user.id,
+				user: {
+					uuid: user.uuid,
+				},
 				remember: input.remember,
 			})
 			if (input.remember) {
@@ -40,7 +46,7 @@ export const UserRouter = router({
 				})
 			}
 			return {
-				id: user.id,
+				uuid: user.uuid,
 				username: user.username,
 				isAdmin: user.isAdmin,
 			}
@@ -65,7 +71,7 @@ export const UserRouter = router({
 				throw new ForbiddenErrorWithI18n(i18n.error.adminAccountExists)
 			}
 			const hashPassword = await bcryptEncrypt(input.password)
-			await db.basic.user
+			await db.user
 				.create({
 					data: {
 						username: input.username,
@@ -87,14 +93,11 @@ export const UserRouter = router({
 				)
 		}),
 
-	createCommonUser: protectedProcedure
+	createCommonUser: adminProcedure
 		.input(UserRegisterSubmitDataValidator)
-		.mutation(async ({ input, ctx: { db, userInfo } }) => {
-			if (!userInfo.isAdmin) {
-				throw new ForbiddenErrorWithI18n(i18n.error.permissionDenied)
-			}
+		.mutation(async ({ input, ctx: { db } }) => {
 			const hashPassword = await bcryptEncrypt(input.password)
-			await db.basic.user
+			await db.user
 				.create({
 					data: {
 						username: input.username,

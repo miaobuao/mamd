@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod'
+import { Loader2 } from 'lucide-vue-next'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
-import { Loader2 } from 'lucide-vue-next'
 
 const { $text, $trpc } = useNuxtApp()
 const route = useRoute()

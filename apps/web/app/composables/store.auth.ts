@@ -1,5 +1,5 @@
 export interface UserInfo {
-	id: number
+	uuid: string
 	username: string
 	isAdmin: boolean
 }

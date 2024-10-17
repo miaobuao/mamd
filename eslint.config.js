@@ -5,15 +5,16 @@ export default antfu({
 	vue: true,
 }, {
 	rules: {
-		'style/indent': [ 'error', 'tab' ],
-		'vue/html-indent': [ 'error', 'tab' ],
 		'jsonc/indent': [ 'error', 'tab' ],
-		'style/no-tabs': 'off',
-		'vue/array-bracket-spacing': [ 'error', 'always' ],
-		'style/array-bracket-spacing': [ 'error', 'always' ],
 		'no-console': 'error',
-		'ts/no-unsafe-function-type': 'off',
+		'style/array-bracket-spacing': [ 'error', 'always' ],
+		'style/indent': [ 'error', 'tab' ],
+		'style/no-tabs': 'off',
 		'symbol-description': 'off',
+		'ts/no-unsafe-function-type': 'off',
 		'unused-imports/no-unused-imports': 'error',
+		'vue/array-bracket-spacing': [ 'error', 'always' ],
+		'vue/html-indent': [ 'error', 'tab' ],
+		'antfu/no-top-level-await': 'off',
 	},
 })

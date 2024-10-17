@@ -1,0 +1,12 @@
+{
+	"name": "@repo/workers",
+	"type": "module",
+	"main": "./index.ts",
+	"scripts": {
+		"dev": "pm2 start ./ecosystem.config.cjs --watch"
+	},
+	"dependencies": {
+		"nats": "^2.28.2",
+		"prisma-client-js": "workspace:*"
+	}
+}

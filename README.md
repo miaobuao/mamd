@@ -11,7 +11,7 @@ pnpm i
 2. migrate db
 
 ```sh
-pnpm prisma:migrate-all
+pnpm prisma:migrate
 ```
 
 3. run dev

@@ -21,3 +21,9 @@ export class UnauthorizedErrorWithI18n extends ErrorWithI18n {
 		super(StatusCodes.UNAUTHORIZED, i18n, i18nParams)
 	}
 }
+
+export class BadRequestErrorWithI18n extends ErrorWithI18n {
+	constructor(i18n: string, i18nParams?: Record<string, string>) {
+		super(StatusCodes.BAD_REQUEST, i18n, i18nParams)
+	}
+}
