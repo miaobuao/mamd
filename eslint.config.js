@@ -15,5 +15,6 @@ export default antfu({
 		'unused-imports/no-unused-imports': 'error',
 		'vue/array-bracket-spacing': [ 'error', 'always' ],
 		'vue/html-indent': [ 'error', 'tab' ],
+		'antfu/no-top-level-await': 'off',
 	},
 })

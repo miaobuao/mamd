@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ClassValue } from 'clsx'
+import { Home } from 'lucide-vue-next'
 import { Breadcrumb } from '~/components/ui/breadcrumb'
 
 const props = defineProps<{
@@ -24,6 +25,12 @@ const beforeFolderNames = computed(() => {
 <template>
 	<Breadcrumb :class="$props.class">
 		<BreadcrumbList>
+			<BreadcrumbItem>
+				<BreadcrumbLink as-child>
+					<Home class="size-4" />
+				</BreadcrumbLink>
+			</BreadcrumbItem>
+			<BreadcrumbSeparator v-if="beforeFolderNames !== undefined" />
 			<BreadcrumbItem v-for="folderName, i in beforeFolderNames" :key="i">
 				<BreadcrumbLink as-child>
 					<a href="#">{{ folderName }}</a>

@@ -97,6 +97,7 @@ export const RepositoryRouter = router({
 				name: repository.name,
 				linkedFolder: {
 					uuid: linkedFolder.uuid,
+					name: linkedFolder.name,
 				},
 			}
 		})

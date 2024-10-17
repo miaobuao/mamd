@@ -32,6 +32,7 @@
 		"nuxt": "^3.13.0",
 		"prisma-client-js": "workspace:*",
 		"radix-vue": "^1.9.6",
+		"rxdb": "^15.36.1",
 		"shadcn-nuxt": "^0.10.4",
 		"tailwind-merge": "^2.5.3",
 		"tailwindcss-animate": "^1.0.7",

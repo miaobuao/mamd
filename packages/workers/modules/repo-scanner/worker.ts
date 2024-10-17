@@ -1,23 +1,14 @@
 import path from 'node:path'
 import { usePrismaClient } from 'prisma-client-js'
-import { useNatsConnection } from '../nats'
+import { fileMetadataTask } from '../file-metadata/task'
 import { directoryIterator } from '../utils'
-import { SCANNER_QUEUE_NAME, SCANNER_SUBJECT } from './vars'
-
-useNatsConnection()
-	.then(conn =>
-		conn.subscribe(SCANNER_SUBJECT, {
-			queue: SCANNER_QUEUE_NAME,
-		}),
-	)
-	.then(async (sub) => {
-		for await (const msg of sub) {
-			const content = msg.json<ScannerConsumeContent>()
-			await handler(content)
-		}
-	})
+import { scannerTask } from './task'
 
 const db = usePrismaClient()
+
+for await (const content of scannerTask.consume()) {
+	await handler(content)
+}
 
 export interface ScannerConsumeContent {
 	repositoryId: number
@@ -52,6 +43,11 @@ async function handler({ repositoryId, repositoryPath }: ScannerConsumeContent) 
 		})
 		linkedFolderId = folder.id
 	}
+	fileMetadataTask.publish({
+		isFile: false,
+		id: linkedFolderId!,
+		path: repositoryPath,
+	})
 	let parentFolderId = linkedFolderId!
 	let parentFolderPath = ''
 	for await (const entry of directoryIterator(repositoryPath)) {
@@ -63,46 +59,50 @@ async function handler({ repositoryId, repositoryPath }: ScannerConsumeContent) 
 		}
 		const name = path.basename(entry.fullPath)
 		if (entry.isDir) {
-			const folder = await db.folder.findFirst({
+			const _folder = await db.folder.upsert({
 				where: {
-					parentId: parentFolderId,
-					name,
+					repositoryId_parentId_name: {
+						repositoryId,
+						parentId: parentFolderId,
+						name,
+					},
 				},
-				select: {
-					id: true,
+				update: {},
+				create: {
+					name,
+					parentId: parentFolderId,
+					repositoryId,
+					creatorId: repository.creatorId,
 				},
 			})
-			if (!folder) {
-				const _folder = await db.folder.create({
-					data: {
-						name,
-						parentId: parentFolderId,
-						creatorId: repository.creatorId,
-					},
-				})
-				// TODO: update folder metadata
-			}
+			await fileMetadataTask.publish({
+				isFile: false,
+				id: _folder.id,
+				path: entry.fullPath,
+			})
 		}
 		else {
-			const file = await db.file.findFirst({
+			const _file = await db.file.upsert({
 				where: {
-					parentId: parentFolderId,
-					name,
-				},
-				select: {
-					id: true,
-				},
-			})
-			if (!file) {
-				const _file = await db.file.create({
-					data: {
+					repositoryId_parentId_name: {
+						repositoryId,
 						parentId: parentFolderId,
-						creatorId: repository.creatorId,
 						name,
 					},
-				})
-				// TODO: update file metadata
-			}
+				},
+				update: {},
+				create: {
+					repositoryId,
+					parentId: parentFolderId,
+					creatorId: repository.creatorId,
+					name,
+				},
+			})
+			await fileMetadataTask.publish({
+				isFile: true,
+				id: _file.id,
+				path: entry.fullPath,
+			})
 		}
 	}
 }

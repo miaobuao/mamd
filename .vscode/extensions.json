@@ -3,6 +3,8 @@
 		"Prisma.prisma",
 		"dbaeumer.vscode-eslint",
 		"Vue.volar",
-		"bradlc.vscode-tailwindcss"
+		"bradlc.vscode-tailwindcss",
+		"formulahendry.auto-rename-tag",
+		"eamodio.gitlens"
 	]
 }

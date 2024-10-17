@@ -1,8 +1,24 @@
 <script setup lang="ts">
+import { last } from 'lodash-es'
 import { CircleUser, LogOut, Search } from 'lucide-vue-next'
+import type { FileOrFolder } from '~/components/repository/File.vue'
 
+const { $trpc, $text } = useNuxtApp()
 const auth = useAuthStore()
 const route = useRoute()
+
+const items = reactive<FileOrFolder[]>([])
+const repositoryUuid = computed(() => route.params.repoId as string)
+const currentPath = computed(() => route.params.path as string[])
+
+$trpc.fs.listAll.useQuery({
+	repositoryUuid: repositoryUuid.value,
+	folderUuid: last(currentPath.value),
+}).then((entries) => {
+	if (entries.data.value) {
+		items.splice(0, items.length, ...entries.data.value)
+	}
+})
 </script>
 
 <template>
@@ -37,6 +53,19 @@ const route = useRoute()
 				</DropdownMenuContent>
 			</DropdownMenu>
 		</header>
-		view
+		<main class="gap-2 sm:gap-4 grid">
+			<template v-for="item, i in items" :key="i">
+				<NuxtLink :to="`${route.fullPath}/${item.uuid}`">
+					<RepositoryFile v-if="item.isFile" :entry="item" class="text-sm" />
+					<RepositoryFolder v-else :entry="item" />
+				</NuxtLink>
+			</template>
+		</main>
 	</div>
 </template>
+
+<style scoped>
+.grid {
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+}
+</style>

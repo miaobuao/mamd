@@ -53,7 +53,7 @@ CREATE TABLE "folder_metadata" (
     "folderId" INTEGER NOT NULL,
     "fileCount" INTEGER NOT NULL DEFAULT 0,
     "folderCount" INTEGER NOT NULL DEFAULT 0,
-    "ctime" TIMESTAMP(3) NOT NULL,
+    "birthtime" TIMESTAMP(3) NOT NULL,
     "mtime" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "folder_metadata_pkey" PRIMARY KEY ("id")
@@ -76,7 +76,7 @@ CREATE TABLE "file_metadata" (
     "id" SERIAL NOT NULL,
     "fileId" INTEGER NOT NULL,
     "sha256" TEXT,
-    "ctime" TIMESTAMP(3) NOT NULL,
+    "birthtime" TIMESTAMP(3) NOT NULL,
     "mtime" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "file_metadata_pkey" PRIMARY KEY ("id")
@@ -147,6 +147,9 @@ CREATE UNIQUE INDEX "folder_uuid_key" ON "folder"("uuid");
 CREATE INDEX "folder_uuid_name_idx" ON "folder"("uuid", "name");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "folder_repository_id_parent_id_name_key" ON "folder"("repository_id", "parent_id", "name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "folder_metadata_folderId_key" ON "folder_metadata"("folderId");
 
 -- CreateIndex
@@ -154,6 +157,9 @@ CREATE UNIQUE INDEX "file_uuid_key" ON "file"("uuid");
 
 -- CreateIndex
 CREATE INDEX "file_uuid_name_idx" ON "file"("uuid", "name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "file_repository_id_parent_id_name_key" ON "file"("repository_id", "parent_id", "name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "file_metadata_fileId_key" ON "file_metadata"("fileId");

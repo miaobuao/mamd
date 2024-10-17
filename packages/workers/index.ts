@@ -1,1 +1,1 @@
-export { dispatchFolderScannerTask } from './modules/repo-scanner/dispatch'
+export { scannerTask } from './modules/repo-scanner/task'

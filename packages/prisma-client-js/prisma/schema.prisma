@@ -82,6 +82,7 @@ model Folder {
   subFolders       Folder[]        @relation("parent")
   files            File[]          @relation("parent")
 
+  @@unique([repositoryId, parentId, name])
   @@index([uuid, name])
   @@map("folder")
 }
@@ -92,7 +93,7 @@ model FolderMetadata {
   folder      Folder   @relation("folder-metadata", fields: [folderId], references: [id], onDelete: Cascade)
   fileCount   Int      @default(0)
   folderCount Int      @default(0)
-  ctime       DateTime
+  birthtime   DateTime
   mtime       DateTime
 
   @@map("folder_metadata")
@@ -116,17 +117,18 @@ model File {
   comments FileComment[]   @relation("file-on-comment")
   tags     FileTagOnFile[] @relation("file-on-tag")
 
+  @@unique([repositoryId, parentId, name])
   @@index([uuid, name])
   @@map("file")
 }
 
 model FileMetadata {
-  id     Int      @id @default(autoincrement())
-  fileId Int      @unique
-  file   File     @relation("file-metadata", fields: [fileId], references: [id], onDelete: Cascade)
-  sha256 String?
-  ctime  DateTime
-  mtime  DateTime
+  id        Int      @id @default(autoincrement())
+  fileId    Int      @unique
+  file      File     @relation("file-metadata", fields: [fileId], references: [id], onDelete: Cascade)
+  sha256    String?
+  birthtime DateTime
+  mtime     DateTime
 
   @@index([sha256])
   @@map("file_metadata")
