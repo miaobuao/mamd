@@ -1,7 +1,7 @@
 import type { PrismaClient } from '@prisma/client'
 import * as fs from 'node:fs/promises'
 import { basename } from 'node:path'
-import { dispatchFolderScannerTask } from '@repo/workers'
+import { scannerTask } from '@repo/workers'
 import { BadRequestErrorWithI18n } from '~~/server/utils/error'
 import { z } from 'zod'
 import { CreateRepositoryFormValidator } from '~/utils/validator'
@@ -88,7 +88,7 @@ export const RepositoryRouter = router({
 					id: repository.id,
 				},
 			})
-			await dispatchFolderScannerTask({
+			await scannerTask.publish({
 				repositoryId: repository.id,
 				repositoryPath: input.path,
 			})
@@ -118,7 +118,7 @@ export const RepositoryRouter = router({
 		if (!repository) {
 			throw new BadRequestErrorWithI18n(i18n.error.repositoryNotExists)
 		}
-		await dispatchFolderScannerTask({
+		await scannerTask.publish({
 			repositoryId: repository.id,
 			repositoryPath: repository.path,
 		})
