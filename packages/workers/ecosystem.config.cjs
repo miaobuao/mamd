@@ -1,3 +1,4 @@
+const os = require('node:os')
 const process = require('node:process')
 
 const isDev = process.env.NODE_ENV === 'development'
@@ -14,6 +15,7 @@ module.exports = {
 			},
 			interpreter_args: isDev ? [ '--watch' ] : [],
 			watch: isDev,
+			ignore_watch: [ 'node_modules' ],
 		},
 		{
 			name: 'file-metadata',
@@ -25,6 +27,8 @@ module.exports = {
 			},
 			interpreter_args: isDev ? [ '--watch' ] : [],
 			watch: isDev,
+			ignore_watch: [ 'node_modules' ],
+			instances: Math.min(2, os.cpus().length),
 		},
 	],
 }
