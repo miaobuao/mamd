@@ -1,21 +1,25 @@
 # Mamd
 
+## Requirements
+
+- Docker & Docker Compose
+- Node.js >= 20
+- pnpm >= 9
+
 ## Dev
 
-1. install deps
+Copy `.env.example` to `.env` and set the correct environment variables.
 
 ```sh
+# install deps
 pnpm i
-```
 
-2. migrate db
+# run dev setup
+pnpm dev:setup
 
-```sh
+# migrate db
 pnpm prisma:migrate
-```
 
-3. run dev
-
-```sh
+# run dev
 pnpm dev
 ```

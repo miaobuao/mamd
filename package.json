@@ -8,6 +8,7 @@
 	},
 	"scripts": {
 		"build": "turbo build",
+		"dev:setup": "dotenv -e .env -- docker compose -f ./docker-compose.dev.yml up -d",
 		"dev": "dotenv -e .env -- turbo dev --env-mode loose",
 		"lint": "turbo lint",
 		"lint-staged": "lint-staged",

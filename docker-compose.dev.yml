@@ -1,7 +1,4 @@
-version: "3.8"
-
 services:
-
   postgres:
     image: postgres:latest
     ports:
@@ -18,5 +15,16 @@ services:
     ports:
       - ${NATS_CLIENT_PORT}:4222
 
+  minio:
+    image: minio/minio:latest
+    ports:
+      - ${MINIO_PORT}:9000
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+    volumes:
+      - minio-data:/data
+
 volumes:
   postgres-data:
+  minio-data:
