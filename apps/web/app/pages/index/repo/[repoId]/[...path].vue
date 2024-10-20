@@ -25,7 +25,7 @@ $trpc.fs.listAll.useQuery({
 	<div class="sm:py-4">
 		<header class="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-transparent backdrop-blur-sm px-4 sm:h-auto sm:border-0 sm:shadow-sm sm:px-6">
 			<NavSheet />
-			<RepositoryBreadcrumb :path="route.params.path" />
+			<RepositoryBreadcrumb :repository-uuid="repositoryUuid" :path="route.params.path" />
 			<div class="relative ml-auto flex-1 md:grow-0">
 				<Search class="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
 				<Input

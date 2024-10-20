@@ -2,8 +2,10 @@
 import type { ClassValue } from 'clsx'
 import { Home } from 'lucide-vue-next'
 import { Breadcrumb } from '~/components/ui/breadcrumb'
+import { makeRepoUrl } from './utils'
 
 const props = defineProps<{
+	repositoryUuid: string
 	path: string[] | string | undefined
 	class?: ClassValue
 }>()
@@ -27,18 +29,24 @@ const beforeFolderNames = computed(() => {
 		<BreadcrumbList>
 			<BreadcrumbItem>
 				<BreadcrumbLink as-child>
-					<Home class="size-4" />
+					<NuxtLink :to="makeRepoUrl(repositoryUuid)">
+						<Home class="size-4" />
+					</NuxtLink>
 				</BreadcrumbLink>
 			</BreadcrumbItem>
 			<BreadcrumbSeparator v-if="beforeFolderNames !== undefined" />
 			<BreadcrumbItem v-for="folderName, i in beforeFolderNames" :key="i">
 				<BreadcrumbLink as-child>
-					<a href="#">{{ folderName }}</a>
+					<NuxtLink :to="makeRepoUrl(repositoryUuid, ...beforeFolderNames?.slice(0, i + 1))">
+						{{ folderName }}
+					</NuxtLink>
 				</BreadcrumbLink>
 				<BreadcrumbSeparator />
 			</BreadcrumbItem>
 			<BreadcrumbItem>
-				<BreadcrumbPage>{{ currentFolderName }}</BreadcrumbPage>
+				<BreadcrumbPage>
+					{{ currentFolderName }}
+				</BreadcrumbPage>
 			</BreadcrumbItem>
 		</BreadcrumbList>
 	</Breadcrumb>
