@@ -1,0 +1,6 @@
+{
+	"name": "proxy",
+	"scripts": {
+		"dev": "cargo watch -x run"
+	}
+}
