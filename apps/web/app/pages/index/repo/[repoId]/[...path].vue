@@ -61,6 +61,9 @@ $trpc.fs.listAll.useQuery({
 				</NuxtLink>
 			</template>
 		</main>
+		<div class="fixed bottom-0 right-0 m-8">
+			<RepositoryUploadButton />
+		</div>
 	</div>
 </template>
 
