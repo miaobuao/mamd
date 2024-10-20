@@ -1,6 +1,5 @@
 import { type JWTPayload as BaseJwtPayload, jwtVerify, SignJWT } from 'jose'
-
-const config = useRuntimeConfig()
+import { config } from './config'
 
 const secret = new TextEncoder().encode(config.JWT_SECRET)
 
