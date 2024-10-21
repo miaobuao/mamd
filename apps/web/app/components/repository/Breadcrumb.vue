@@ -10,17 +10,24 @@ const props = defineProps<{
 	class?: ClassValue
 }>()
 
-const currentFolderName = computed(() => {
+const filteredPath = computed(() => {
 	if (typeof props.path === 'string') {
 		return props.path
 	}
-	return props.path?.at(-1)
+	return props.path?.filter(Boolean)
+})
+
+const currentFolderName = computed(() => {
+	if (typeof filteredPath.value === 'string') {
+		return filteredPath.value
+	}
+	return filteredPath.value?.at(-1)
 })
 const beforeFolderNames = computed(() => {
-	if (typeof props.path === 'string') {
+	if (typeof filteredPath.value === 'string') {
 		return []
 	}
-	return props.path?.slice(0, -1)
+	return filteredPath.value?.slice(0, -1)
 })
 </script>
 
