@@ -1,8 +1,35 @@
 <script setup lang="ts">
+import { fileOpen } from 'browser-fs-access'
 import { FileUp, FolderPlus, Plus } from 'lucide-vue-next'
 import { cn } from '~/lib/utils'
 
 const expanded = ref(false)
+
+async function handleSelectFile() {
+	try {
+		const file = await fileOpen({
+			mimeTypes: [ '*/*' ],
+			description: 'Select a file',
+		})
+
+		const chunkSize = 512 * 1024 // 512KB
+		const chunks: Blob[] = []
+		const fileSize = file.size
+		let offset = 0
+
+		while (offset < fileSize) {
+			if (offset + chunkSize * 2 > fileSize) {
+				chunks.push(file.slice(offset, fileSize))
+				break
+			}
+			chunks.push(file.slice(offset, offset + chunkSize))
+			offset += chunkSize
+		}
+	}
+	catch (error) {
+		console.error('Error selecting file:', error)
+	}
+}
 </script>
 
 <template>
@@ -22,7 +49,7 @@ const expanded = ref(false)
 			<div class="floating-button">
 				<FolderPlus class="size-6" />
 			</div>
-			<div class="floating-button">
+			<div class="floating-button" @click="handleSelectFile">
 				<FileUp class="size-6" />
 			</div>
 		</div>
