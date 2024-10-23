@@ -9,7 +9,16 @@ const route = useRoute()
 
 const items = reactive<FileOrFolder[]>([])
 const repositoryUuid = computed(() => route.params.repoId as string)
-const currentPath = computed(() => route.params.path as string[])
+const currentPath = computed(() => {
+	let path
+	if (Array.isArray(route.params.path)) {
+		path = route.params.path
+	}
+	else {
+		path = [ route.params.path ]
+	}
+	return path.filter(Boolean) as string[]
+})
 
 $trpc.fs.listAll.useQuery({
 	repositoryUuid: repositoryUuid.value,
@@ -62,7 +71,7 @@ $trpc.fs.listAll.useQuery({
 			</template>
 		</main>
 		<div class="fixed bottom-0 right-0 m-8">
-			<RepositoryUploadButton />
+			<RepositoryUploadButton :repository-uuid="repositoryUuid" :folder-uuid="last(currentPath)!" />
 		</div>
 	</div>
 </template>

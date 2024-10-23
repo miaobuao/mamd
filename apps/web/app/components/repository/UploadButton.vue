@@ -1,34 +1,56 @@
 <script setup lang="ts">
 import { fileOpen } from 'browser-fs-access'
 import { FileUp, FolderPlus, Plus } from 'lucide-vue-next'
+import pLimit from 'p-limit'
 import { cn } from '~/lib/utils'
 
+const props = defineProps<{
+	repositoryUuid: string
+	folderUuid: string
+}>()
+
+const { $trpc } = useNuxtApp()
+
 const expanded = ref(false)
-
+const limit = pLimit(6)
 async function handleSelectFile() {
-	try {
-		const file = await fileOpen({
-			mimeTypes: [ '*/*' ],
-			description: 'Select a file',
-		})
+	const file = await fileOpen({
+		mimeTypes: [ '*/*' ],
+		description: 'Select a file',
+	})
 
-		const chunkSize = 512 * 1024 // 512KB
-		const chunks: Blob[] = []
-		const fileSize = file.size
-		let offset = 0
+	const chunkSize = 16 * 1024 * 1024 // 16MB
+	const chunks: Blob[] = []
+	const fileSize = file.size
+	let offset = 0
 
-		while (offset < fileSize) {
-			if (offset + chunkSize * 2 > fileSize) {
-				chunks.push(file.slice(offset, fileSize))
-				break
-			}
-			chunks.push(file.slice(offset, offset + chunkSize))
-			offset += chunkSize
+	while (offset < fileSize) {
+		if (offset + chunkSize * 2 > fileSize) {
+			chunks.push(file.slice(offset, fileSize))
+			break
 		}
+		chunks.push(file.slice(offset, offset + chunkSize))
+		offset += chunkSize
 	}
-	catch (error) {
-		console.error('Error selecting file:', error)
-	}
+	const uuid = globalThis.crypto.randomUUID()
+	const presignedUrl = await Promise.all(
+		chunks
+			.map((_, idx) => () => $trpc.oss.assignUploadUrl.mutate({
+				uuid,
+				chunkIdx: idx,
+			}))
+			.map(limit),
+	)
+	await Promise.all(chunks.map((blob, idx) => {
+		const file = new File([ blob ], `${idx}`)
+		return limit(() => putObject(presignedUrl[idx]!, file))
+	}))
+	await $trpc.oss.uploadEnded.mutate({
+		uuid,
+		fileName: file.name,
+		folderUuid: props.folderUuid,
+		repositoryUuid: props.repositoryUuid,
+	})
 }
 </script>
 
