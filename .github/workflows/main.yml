@@ -8,7 +8,7 @@ jobs:
   build:
     strategy:
       matrix:
-        node-version: [22.x]
+        bun-version: [latest]
         os: [ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
@@ -16,12 +16,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use Node ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
+        name: Use Bun ${{ matrix.bun-version }}
         with:
-          node-version: ${{ matrix.node-version }}
+          bun-version: ${{ matrix.bun-version }}
 
       - name: Build
         run: |
-          npm i -g pnpm@9.1.1 && pnpm i
-          pnpm run build
+          bun i
+          bun run build
