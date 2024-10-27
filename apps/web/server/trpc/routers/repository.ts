@@ -8,6 +8,23 @@ import { CreateRepositoryFormValidator } from '~/utils/validator'
 import { adminProcedure, protectedProcedure, router } from '../trpc'
 
 export const RepositoryRouter = router({
+	getLinkedFolder: protectedProcedure.input(z.object({
+		repositoryUuid: z.string().uuid(),
+	})).mutation(async ({ input: { repositoryUuid }, ctx: { db } }) => {
+		const repository = await db.repository.findUniqueOrThrow({
+			where: {
+				uuid: repositoryUuid,
+			},
+			select: {
+				linkedFolder: {
+					select: {
+						uuid: true,
+					},
+				},
+			},
+		})
+		return repository.linkedFolder
+	}),
 	listVisible: protectedProcedure.query(async ({ ctx: { db, userInfo } }) => {
 		return db.visibleRepository.findMany({
 			where: {
