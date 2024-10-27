@@ -43,9 +43,5 @@ export default defineNuxtConfig({
 
 	compatibilityDate: '2024-09-21',
 
-	runtimeConfig: {
-		OAUTH_JWT_EXPIRES_IN: '',
-		JWT_SECRET: '',
-		JWT_ISSUER: '',
-	},
+	runtimeConfig: {},
 })

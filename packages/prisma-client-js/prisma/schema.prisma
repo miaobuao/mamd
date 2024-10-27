@@ -126,11 +126,13 @@ model FileMetadata {
   id        Int      @id @default(autoincrement())
   fileId    Int      @unique
   file      File     @relation("file-metadata", fields: [fileId], references: [id], onDelete: Cascade)
-  sha256    String?
+  mimeType  String   @map("mime_type")
+  sha256    Bytes    @db.ByteA
+  size      Int
   birthtime DateTime
   mtime     DateTime
 
-  @@index([sha256])
+  @@index([sha256, mimeType])
   @@map("file_metadata")
 }
 

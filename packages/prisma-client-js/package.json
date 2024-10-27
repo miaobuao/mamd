@@ -2,7 +2,7 @@
 	"name": "prisma-client-js",
 	"main": "./index.ts",
 	"scripts": {
-		"postinstall": "pnpm generate",
+		"postinstall": "run-p generate",
 		"generate": "prisma generate",
 		"migrate": "prisma migrate dev",
 		"reset": "prisma migrate reset",

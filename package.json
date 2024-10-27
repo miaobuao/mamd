@@ -2,12 +2,17 @@
 	"name": "mamd",
 	"type": "module",
 	"private": true,
-	"packageManager": "pnpm@9.1.1",
+	"packageManager": "bun@1.1.33",
 	"engines": {
-		"node": ">=18"
+		"bun": ">=1.1.33"
 	},
+	"workspaces": [
+		"packages/*",
+		"apps/*"
+	],
 	"scripts": {
 		"build": "turbo build",
+		"dev:setup": "dotenv -e .env -- docker compose -f ./docker-compose.dev.yml up -d",
 		"dev": "dotenv -e .env -- turbo dev --env-mode loose",
 		"lint": "turbo lint",
 		"lint-staged": "lint-staged",
@@ -19,14 +24,13 @@
 	"dependencies": {
 		"@antfu/eslint-config": "^3.7.3",
 		"@types/lodash-es": "^4.17.12",
-		"bun": "^1.1.30",
 		"dotenv-cli": "^7.4.2",
 		"eslint": "9.12.0",
 		"eslint-plugin-format": "^0.1.1",
 		"husky": "^9.1.6",
 		"lint-staged": "^15.2.10",
 		"lodash-es": "^4.17.21",
-		"npm-run-all2": "^6.2.3",
+		"npm-run-all2": "^7.0.1",
 		"pm2": "^5.4.2",
 		"rxjs": "^7.8.1",
 		"turbo": "latest"
