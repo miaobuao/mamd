@@ -9,7 +9,16 @@ const route = useRoute()
 
 const items = reactive<FileOrFolder[]>([])
 const repositoryUuid = computed(() => route.params.repoId as string)
-const currentPath = computed(() => route.params.path as string[])
+const currentPath = computed(() => {
+	let path
+	if (Array.isArray(route.params.path)) {
+		path = route.params.path
+	}
+	else {
+		path = [ route.params.path ]
+	}
+	return path.filter(Boolean) as string[]
+})
 
 $trpc.fs.listAll.useQuery({
 	repositoryUuid: repositoryUuid.value,
@@ -25,7 +34,7 @@ $trpc.fs.listAll.useQuery({
 	<div class="sm:py-4">
 		<header class="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-transparent backdrop-blur-sm px-4 sm:h-auto sm:border-0 sm:shadow-sm sm:px-6">
 			<NavSheet />
-			<RepositoryBreadcrumb :path="route.params.path" />
+			<RepositoryBreadcrumb :repository-uuid="repositoryUuid" :path="route.params.path" />
 			<div class="relative ml-auto flex-1 md:grow-0">
 				<Search class="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
 				<Input
@@ -61,6 +70,9 @@ $trpc.fs.listAll.useQuery({
 				</NuxtLink>
 			</template>
 		</main>
+		<div class="fixed bottom-0 right-0 m-8">
+			<RepositoryUploadButton :repository-uuid="repositoryUuid" :folder-uuid="last(currentPath)!" />
+		</div>
 	</div>
 </template>
 
