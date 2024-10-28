@@ -16,7 +16,7 @@
 		"@nuxtjs/tailwindcss": "^6.12.1",
 		"@pinia/nuxt": "^0.5.4",
 		"@repo/workers": "workspace:*",
-		"@trpc/client": "11.0.0-rc.571",
+		"@trpc/client": "11.0.0-rc.593",
 		"@trpc/server": "11.0.0-rc.571",
 		"@types/bcryptjs": "^2.4.6",
 		"@vee-validate/zod": "^4.13.2",
