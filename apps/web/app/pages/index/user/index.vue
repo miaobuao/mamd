@@ -142,7 +142,7 @@ const users_in_db = await getUser()
 													alt="Product image"
 													class="aspect-square rounded-md object-cover"
 													height="64"
-													src="./1.jpg"
+													src=""
 													width="64"
 												>
 											</TableCell>
