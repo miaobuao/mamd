@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import {
-  ContextMenuSub,
-  type ContextMenuSubEmits,
-  type ContextMenuSubProps,
-  useForwardPropsEmits,
+	ContextMenuSub,
+	type ContextMenuSubEmits,
+	type ContextMenuSubProps,
+	useForwardPropsEmits,
 } from 'radix-vue'
 
 const props = defineProps<ContextMenuSubProps>()
@@ -13,7 +13,7 @@ const forwarded = useForwardPropsEmits(props, emits)
 </script>
 
 <template>
-  <ContextMenuSub v-bind="forwarded">
-    <slot />
-  </ContextMenuSub>
+	<ContextMenuSub v-bind="forwarded">
+		<slot />
+	</ContextMenuSub>
 </template>
