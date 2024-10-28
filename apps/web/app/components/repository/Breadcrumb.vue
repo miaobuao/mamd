@@ -51,17 +51,17 @@ const beforeFolderPaths = computed(() => {
 				</BreadcrumbLink>
 			</BreadcrumbItem>
 			<BreadcrumbSeparator v-if="beforeFolderPaths !== undefined" />
-			<BreadcrumbItem v-for="folderName, i in beforeFolderPaths" :key="i">
+			<BreadcrumbItem v-for="folderUuid, i in beforeFolderPaths" :key="i">
 				<BreadcrumbLink as-child>
 					<NuxtLink :to="makeRepoUrl(repository.uuid, ...beforeFolderPaths?.slice(0, i + 1))">
-						{{ folderName }}
+						<RepositoryUuidToName :repository-uuid="repository.uuid" :uuid="folderUuid" type="folder" />
 					</NuxtLink>
 				</BreadcrumbLink>
 				<BreadcrumbSeparator />
 			</BreadcrumbItem>
-			<BreadcrumbItem v-if="currentFolderUuid !== repository.linkedFolder?.uuid">
+			<BreadcrumbItem v-if="currentFolderUuid && currentFolderUuid !== repository.linkedFolder?.uuid">
 				<BreadcrumbPage>
-					{{ currentFolderUuid }}
+					<RepositoryUuidToName :repository-uuid="repository.uuid" :uuid="currentFolderUuid" type="folder" />
 				</BreadcrumbPage>
 			</BreadcrumbItem>
 		</BreadcrumbList>
