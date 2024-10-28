@@ -30,6 +30,7 @@ export const fsRouter = router({
 		})
 
 		if (isNil(visibleRepository)) {
+			// TODO: i18n
 			throw new ForbiddenErrorWithI18n('')
 		}
 
@@ -63,5 +64,30 @@ export const fsRouter = router({
 			...folders.map(d => ({ ...d, isFile: false })),
 			...files.map(d => ({ ...d, isFile: true })),
 		]
+	}),
+	getFolder: protectedProcedure.input(z.object({
+		repositoryUuid: z.string().uuid(),
+		folderUuid: z.string().uuid(),
+	})).query(async ({ ctx, input: { folderUuid, repositoryUuid } }) => {
+		const repository = await ctx.db.visibleRepository.findFirstOrThrow({
+			where: {
+				repository: {
+					uuid: repositoryUuid,
+				},
+				userId: ctx.userInfo.id,
+			},
+			select: {
+				repositoryId: true,
+			},
+		})
+		return ctx.db.folder.findFirst({
+			where: {
+				repositoryId: repository.repositoryId,
+				uuid: folderUuid,
+			},
+			select: {
+				name: true,
+			},
+		})
 	}),
 })

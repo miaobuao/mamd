@@ -10,20 +10,28 @@ import { adminProcedure, protectedProcedure, router } from '../trpc'
 export const RepositoryRouter = router({
 	getLinkedFolder: protectedProcedure.input(z.object({
 		repositoryUuid: z.string().uuid(),
-	})).mutation(async ({ input: { repositoryUuid }, ctx: { db } }) => {
-		const repository = await db.repository.findUniqueOrThrow({
+	})).mutation(async ({ input: { repositoryUuid }, ctx: { db, userInfo } }) => {
+		// TODO: handle error
+		const repository = await db.visibleRepository.findFirstOrThrow({
 			where: {
-				uuid: repositoryUuid,
+				userId: userInfo.id,
+				repository: {
+					uuid: repositoryUuid,
+				},
 			},
 			select: {
-				linkedFolder: {
+				repository: {
 					select: {
-						uuid: true,
+						linkedFolder: {
+							select: {
+								uuid: true,
+							},
+						},
 					},
 				},
 			},
 		})
-		return repository.linkedFolder
+		return repository.repository.linkedFolder
 	}),
 	listVisible: protectedProcedure.query(async ({ ctx: { db, userInfo } }) => {
 		return db.visibleRepository.findMany({
@@ -49,7 +57,8 @@ export const RepositoryRouter = router({
 	getRepository: protectedProcedure.input(z.object({
 		uuid: z.string().uuid(),
 	})).query(async ({ ctx, input }) => {
-		return ctx.db.visibleRepository.findFirst({
+		// TODO: handle error
+		return ctx.db.visibleRepository.findFirstOrThrow({
 			where: {
 				repository: {
 					uuid: input.uuid,
