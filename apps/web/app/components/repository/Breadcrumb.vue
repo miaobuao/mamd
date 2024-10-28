@@ -5,27 +5,33 @@ import { Breadcrumb } from '~/components/ui/breadcrumb'
 import { makeRepoUrl } from './utils'
 
 const props = defineProps<{
-	repositoryUuid: string
+	repository: Repository
 	path: string[] | string | undefined
 	class?: ClassValue
 }>()
 
 const filteredPath = computed(() => {
+	let paths: string[] = []
 	if (typeof props.path === 'string') {
-		return props.path
+		paths = [ props.path ]
 	}
-	return props.path?.filter(Boolean)
+	else if (Array.isArray(props.path)) {
+		paths = props.path
+	}
+	return paths.filter(Boolean)
 })
 
-const currentFolderName = computed(() => {
+const currentFolderUuid = computed(() => {
 	if (typeof filteredPath.value === 'string') {
 		return filteredPath.value
 	}
 	return filteredPath.value?.at(-1)
 })
-const beforeFolderNames = computed(() => {
-	if (typeof filteredPath.value === 'string') {
-		return []
+
+const beforeFolderPaths = computed(() => {
+	const fst = filteredPath.value[0]
+	if (fst === props.repository.linkedFolder?.uuid) {
+		return filteredPath.value.slice(1, -1)
 	}
 	return filteredPath.value?.slice(0, -1)
 })
@@ -36,23 +42,26 @@ const beforeFolderNames = computed(() => {
 		<BreadcrumbList>
 			<BreadcrumbItem>
 				<BreadcrumbLink as-child>
-					<NuxtLink :to="makeRepoUrl(repositoryUuid)">
+					<NuxtLink :to="makeRepoUrl(repository.uuid, repository.linkedFolder?.uuid)" class="flex items-center gap-x-2">
 						<Home class="size-4" />
+						<span>
+							{{ repository.name }}
+						</span>
 					</NuxtLink>
 				</BreadcrumbLink>
 			</BreadcrumbItem>
-			<BreadcrumbSeparator v-if="beforeFolderNames !== undefined" />
-			<BreadcrumbItem v-for="folderName, i in beforeFolderNames" :key="i">
+			<BreadcrumbSeparator v-if="beforeFolderPaths !== undefined" />
+			<BreadcrumbItem v-for="folderName, i in beforeFolderPaths" :key="i">
 				<BreadcrumbLink as-child>
-					<NuxtLink :to="makeRepoUrl(repositoryUuid, ...beforeFolderNames?.slice(0, i + 1))">
+					<NuxtLink :to="makeRepoUrl(repository.uuid, ...beforeFolderPaths?.slice(0, i + 1))">
 						{{ folderName }}
 					</NuxtLink>
 				</BreadcrumbLink>
 				<BreadcrumbSeparator />
 			</BreadcrumbItem>
-			<BreadcrumbItem>
+			<BreadcrumbItem v-if="currentFolderUuid !== repository.linkedFolder?.uuid">
 				<BreadcrumbPage>
-					{{ currentFolderName }}
+					{{ currentFolderUuid }}
 				</BreadcrumbPage>
 			</BreadcrumbItem>
 		</BreadcrumbList>

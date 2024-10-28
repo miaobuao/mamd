@@ -17,6 +17,18 @@ export const useRepositoryStore = defineStore('repository', () => {
 		}
 	})
 
+	async function queryRepository(uuid: string) {
+		const found = repositories.find(v => v.uuid === uuid)
+		if (found) {
+			return found
+		}
+		const repository = await $trpc.repository.getRepository.useQuery({ uuid })
+		if (repository.data.value) {
+			appendRepository(repository.data.value.repository)
+		}
+		return repository.data.value?.repository
+	}
+
 	function removeRepository(uuid: string) {
 		const idx = repositories.findIndex(v => v.uuid === uuid)
 		if (idx === -1) {
@@ -44,6 +56,7 @@ export const useRepositoryStore = defineStore('repository', () => {
 
 	return {
 		repositories: computed(() => [ ...repositories ]),
+		queryRepository,
 		removeRepository,
 		appendRepository,
 		createRepository,

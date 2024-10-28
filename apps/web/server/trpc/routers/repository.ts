@@ -46,6 +46,31 @@ export const RepositoryRouter = router({
 			},
 		}).then(repos => repos.map(repo => repo.repository))
 	}),
+	getRepository: protectedProcedure.input(z.object({
+		uuid: z.string().uuid(),
+	})).query(async ({ ctx, input }) => {
+		return ctx.db.visibleRepository.findFirst({
+			where: {
+				repository: {
+					uuid: input.uuid,
+				},
+			},
+			select: {
+				repository: {
+					select: {
+						uuid: true,
+						name: true,
+						linkedFolder: {
+							select: {
+								name: true,
+								uuid: true,
+							},
+						},
+					},
+				},
+			},
+		})
+	}),
 	create: adminProcedure.input(CreateRepositoryFormValidator).mutation(async ({ ctx: { db, userInfo }, input }) => {
 		if (await fs.access(input.path).then(() => true).catch(() => false)) {
 			const isDir = await fs.lstat(input.path).then(stat => stat.isDirectory())
