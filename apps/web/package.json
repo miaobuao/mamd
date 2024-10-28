@@ -17,7 +17,7 @@
 		"@pinia/nuxt": "^0.5.4",
 		"@repo/workers": "workspace:*",
 		"@trpc/client": "11.0.0-rc.571",
-		"@trpc/server": "11.0.0-rc.571",
+		"@trpc/server": "11.0.0-rc.593",
 		"@types/bcryptjs": "^2.4.6",
 		"@vee-validate/zod": "^4.13.2",
 		"@vueuse/core": "^11.1.0",
