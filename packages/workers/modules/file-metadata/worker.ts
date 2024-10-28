@@ -1,13 +1,17 @@
+import { createReadStream } from 'node:fs'
 import * as fs from 'node:fs/promises'
-import { noop } from 'lodash-es'
+import { Readable } from 'node:stream'
+import { consola } from 'consola'
+import { fileTypeFromStream } from 'file-type'
 import { usePrismaClient } from 'prisma-client-js'
+import { readableToHash } from '../utils'
 import { type FileMetadataConsumeContent, fileMetadataTask, type FileTask, type FolderTask } from './task'
 
 const db = usePrismaClient()
 
 for await (const content of fileMetadataTask.consume()) {
-	await handler(content)
-		.catch(noop)
+	handler(content)
+		.catch(consola.error)
 }
 
 export async function handler(content: FileMetadataConsumeContent) {
@@ -20,8 +24,8 @@ export async function handler(content: FileMetadataConsumeContent) {
 }
 
 async function handleFile(content: FileTask) {
-	const file = Bun.file(content.path)
-	if (!file.exists()) {
+	const fileStat = await fs.stat(content.path)
+	if (!fileStat.isFile()) {
 		await db.file.delete({
 			where: {
 				id: content.id,
@@ -29,13 +33,16 @@ async function handleFile(content: FileTask) {
 		})
 		return
 	}
-	const mimeType = file.type
-	const fileStat = await fs.stat(content.path)
-	const hasher = new Bun.CryptoHasher('sha256')
-	// @ts-expect-error https://bun.sh/docs/api/streams
-	for await (const chunk of file.stream()) {
-		hasher.update(chunk)
+	const fileType = await fileTypeFromStream(
+		Readable.toWeb(
+			createReadStream(content.path),
+		),
+	)
+	if (!fileType) {
+		return
 	}
+	const mimeType = fileType.mime
+	const hasher = await readableToHash(createReadStream(content.path), 'sha256')
 	const sha256 = hasher.digest()
 	const { mtime, birthtime } = fileStat
 	await db.fileMetadata.upsert({
@@ -45,7 +52,7 @@ async function handleFile(content: FileTask) {
 		update: {
 			mtime,
 			birthtime,
-			size: file.size,
+			size: fileStat.size,
 			mimeType,
 			sha256,
 		},
@@ -53,7 +60,7 @@ async function handleFile(content: FileTask) {
 			fileId: content.id,
 			mtime,
 			birthtime,
-			size: file.size,
+			size: fileStat.size,
 			mimeType,
 			sha256,
 		},

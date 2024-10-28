@@ -1,15 +1,30 @@
 {
 	"name": "prisma-client-js",
-	"main": "./index.ts",
+	"main": "./src/index.js",
+	"types": "./src/index.d.ts",
 	"scripts": {
-		"postinstall": "run-p generate",
+		"build": "tsup ./index.ts ",
 		"generate": "prisma generate",
 		"migrate": "prisma migrate dev",
+		"postinstall": "run-s generate",
 		"reset": "prisma migrate reset",
 		"studio": "prisma studio"
 	},
-	"dependencies": {
-		"@prisma/client": "5.21.1",
-		"prisma": "^5.20.0"
+	"tsup": {
+		"format": [
+			"esm"
+		],
+		"dts": {
+			"resolve": true,
+			"entry": [
+				"./index.ts"
+			],
+			"compilerOptions": {
+				"moduleResolution": "node"
+			}
+		},
+		"sourcemap": true,
+		"clean": true,
+		"target": "es6"
 	}
 }
