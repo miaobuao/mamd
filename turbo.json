@@ -15,6 +15,7 @@
 			"cache": false,
 			"persistent": true
 		},
+		"postinstall": {},
 		"prisma-client-js#migrate": {
 			"cache": false
 		},

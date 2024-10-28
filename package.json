@@ -15,12 +15,13 @@
 		"build": "turbo build",
 		"dev:setup": "dotenv -e .env -- docker compose -f ./docker-compose.dev.yml up -d",
 		"dev": "dotenv -e .env -- turbo dev --env-mode loose",
-		"lint": "turbo lint",
 		"lint-staged": "lint-staged",
+		"lint": "turbo lint",
+		"postinstall": "dotenv -e .env -- turbo postinstall",
 		"prepare": "husky",
 		"prisma:migrate": "dotenv -e .env -- turbo migrate --env-mode loose",
-		"prisma:studio": "dotenv -e .env -- turbo studio --env-mode loose",
-		"prisma:reset": "dotenv -e .env -- turbo reset --env-mode loose -- --force"
+		"prisma:reset": "dotenv -e .env -- turbo reset --env-mode loose -- --force",
+		"prisma:studio": "dotenv -e .env -- turbo studio --env-mode loose"
 	},
 	"dependencies": {
 		"@antfu/eslint-config": "^3.7.3",
