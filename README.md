@@ -1,21 +1,35 @@
 # Mamd
 
+## Requirements
+
+- Docker & Docker Compose
+- Node >= 20
+- Bun >= 1.1.33
+
 ## Dev
 
-1. install deps
+1. Copy `.env.example` to `.env` and set the correct environment variables.
+
+2. Install dependencies
 
 ```sh
-pnpm i
+bun i
 ```
 
-2. migrate db
+3. Run dev setup
 
 ```sh
-pnpm prisma:migrate
+bun dev:setup
 ```
 
-3. run dev
+4. Migrate db
 
 ```sh
-pnpm dev
+bun prisma:migrate
+```
+
+5. Run dev server
+
+```sh
+bun dev
 ```

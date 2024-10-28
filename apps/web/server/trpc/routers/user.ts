@@ -1,8 +1,7 @@
+import { config } from '~~/server/utils/config'
 import { UserLoginSubmitFormValidator, UserRegisterSubmitDataValidator } from '~/utils/validator'
 import { checkAdminAccountExists } from '../middleware/check-admin-user'
 import { adminProcedure, protectedProcedure, publicProcedure, router } from '../trpc'
-
-const config = useRuntimeConfig()
 
 export const UserRouter = router({
 	auth: protectedProcedure.mutation(async ({ ctx: { userInfo } }) => {

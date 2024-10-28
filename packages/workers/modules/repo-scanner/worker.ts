@@ -2,7 +2,7 @@ import path from 'node:path'
 import { usePrismaClient } from 'prisma-client-js'
 import { fileMetadataTask } from '../file-metadata/task'
 import { directoryIterator } from '../utils'
-import { scannerTask } from './task'
+import { type ScannerConsumeContent, scannerTask } from './task'
 
 const db = usePrismaClient()
 
@@ -10,12 +10,7 @@ for await (const content of scannerTask.consume()) {
 	await handler(content)
 }
 
-export interface ScannerConsumeContent {
-	repositoryId: number
-	repositoryPath: string
-}
-
-async function handler({ repositoryId, repositoryPath }: ScannerConsumeContent) {
+async function handler({ repositoryId, repositoryPath, basePath }: ScannerConsumeContent) {
 	const repository = await db.repository.findFirst({
 		where: {
 			id: repositoryId,
@@ -50,7 +45,7 @@ async function handler({ repositoryId, repositoryPath }: ScannerConsumeContent) 
 	})
 	let parentFolderId = linkedFolderId!
 	let parentFolderPath = ''
-	for await (const entry of directoryIterator(repositoryPath)) {
+	for await (const entry of directoryIterator(basePath ?? repositoryPath)) {
 		const relativeParentPath = path.relative(repositoryPath, path.dirname(entry.fullPath))
 		if (relativeParentPath !== parentFolderPath) {
 			const parts = relativeParentPath.split(path.sep)

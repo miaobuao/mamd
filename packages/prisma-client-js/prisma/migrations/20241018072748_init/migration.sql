@@ -75,7 +75,9 @@ CREATE TABLE "file" (
 CREATE TABLE "file_metadata" (
     "id" SERIAL NOT NULL,
     "fileId" INTEGER NOT NULL,
-    "sha256" TEXT,
+    "mime_type" TEXT NOT NULL,
+    "sha256" BYTEA NOT NULL,
+    "size" INTEGER NOT NULL,
     "birthtime" TIMESTAMP(3) NOT NULL,
     "mtime" TIMESTAMP(3) NOT NULL,
 
@@ -165,7 +167,7 @@ CREATE UNIQUE INDEX "file_repository_id_parent_id_name_key" ON "file"("repositor
 CREATE UNIQUE INDEX "file_metadata_fileId_key" ON "file_metadata"("fileId");
 
 -- CreateIndex
-CREATE INDEX "file_metadata_sha256_idx" ON "file_metadata"("sha256");
+CREATE INDEX "file_metadata_sha256_mime_type_idx" ON "file_metadata"("sha256", "mime_type");
 
 -- CreateIndex
 CREATE INDEX "file_tag_name_idx" ON "file_tag"("name");
