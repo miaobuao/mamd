@@ -3,7 +3,6 @@
 	"main": "./src/index.js",
 	"types": "./src/index.d.ts",
 	"scripts": {
-		"build": "tsup ./index.ts ",
 		"generate": "prisma generate",
 		"migrate": "prisma migrate dev",
 		"postinstall": "run-s generate",
