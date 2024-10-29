@@ -1,51 +1,54 @@
 import type { inferProcedureOutput } from '@trpc/server'
 import type { AppRouter } from '~~/server/trpc/routers'
 import { isClient } from '@vueuse/core'
+import { from, useObservable } from '@vueuse/rxjs'
 import Dexie, { type EntityTable } from 'dexie'
+import { liveQuery } from 'dexie'
 
-type UuidMap<T> = Map<string, T>
-type Folder = inferProcedureOutput<AppRouter['fs']['getFolder']>
+export type Folder = inferProcedureOutput<AppRouter['fs']['getFolder']>
 
-export const useUuidToNameStore = defineStore('uuid-map', () => {
+export const useUuidMapStore = defineStore('uuid-map', () => {
 	const { $trpc } = useNuxtApp()
 
 	const cacheDatabase = getCacheDatabase()
-	const pendingFolderQueries: Record<string, boolean> = {}
-	// TODO: maybe memory leak
-	const foldersMap = reactive<UuidMap<Folder>>(new Map())
+	const pendingQueries: Record<string, boolean> = {}
 
 	function getFolder(repositoryUuid: string, uuid: string) {
-		if (pendingFolderQueries[uuid] || foldersMap.has(uuid)) {
-			return computed(() => foldersMap.get(uuid))
+		const res = useObservable(
+			from(
+				liveQuery(
+					() => cacheDatabase?.folders.get([ repositoryUuid, uuid ]),
+				),
+			),
+		)
+		if (pendingQueries[uuid]) {
+			return res
 		}
-		cacheDatabase?.folders.get([ repositoryUuid, uuid ])
-			.then(async (cachedFolder) => {
-				if (cachedFolder) {
-					foldersMap.set(uuid, cachedFolder.data)
-				}
-			})
-		pendingFolderQueries[uuid] = true
+		pendingQueries[uuid] = true
 		$trpc.fs.getFolder
 			.useQuery({ folderUuid: uuid, repositoryUuid })
 			.then(({ data }) => {
-				if (!data.value) {
-					return
+				if (data.value) {
+					upsertFolder(repositoryUuid, uuid, data.value)
 				}
-				foldersMap.set(uuid, data.value)
-				cacheDatabase?.folders.put({
-					repositoryUuid,
-					uuid,
-					data: data.value,
-				})
 			})
 			.finally(() => {
-				delete pendingFolderQueries[uuid]
+				delete pendingQueries[uuid]
 			})
-		return computed(() => foldersMap.get(uuid))
+		return res
+	}
+
+	function upsertFolder(repositoryUuid: string, uuid: string, data: Folder) {
+		return cacheDatabase?.folders.put({
+			repositoryUuid,
+			uuid,
+			data,
+		})
 	}
 
 	return {
 		getFolder,
+		upsertFolder,
 	}
 })
 

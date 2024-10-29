@@ -5,11 +5,11 @@ const props = defineProps<{
 	type: 'file' | 'folder'
 }>()
 
-const uuidToNameStore = useUuidToNameStore()
+const uuidMapStore = useUuidMapStore()
 
-const name = props.type === 'folder' ? uuidToNameStore.getFolder(props.repositoryUuid, props.uuid) : null
+const name = props.type === 'folder' ? uuidMapStore.getFolder(props.repositoryUuid, props.uuid) : null
 </script>
 
 <template>
-	{{ name?.name }}
+	{{ name?.data.name }}
 </template>

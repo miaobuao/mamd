@@ -6,6 +6,7 @@ import type { FileOrFolder } from '~/components/repository/File.vue'
 const { $trpc, $text } = useNuxtApp()
 
 const auth = useAuthStore()
+const uuidMapStore = useUuidMapStore()
 const route = useRoute()
 const router = useRouter()
 const repositoryStore = useRepositoryStore()
@@ -48,9 +49,17 @@ watch([ repository, currentPath ], ([ repository, currentPath ]) => {
 		repositoryUuid: repository.uuid,
 		folderUuid: last(currentPath),
 	}).then((entries) => {
-		if (entries.data.value) {
-			items.value = entries.data.value
+		if (!entries.data.value) {
+			return
 		}
+		items.value = entries.data.value
+		items.value.forEach((item) => {
+			if (!item.isFile) {
+				uuidMapStore.upsertFolder(repositoryUuid.value, item.uuid, {
+					name: item.name,
+				})
+			}
+		})
 	})
 }, {
 	immediate: true,
