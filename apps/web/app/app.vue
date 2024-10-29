@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import '@/assets/style/global.css'
+import { Toaster } from '@/components/ui/sonner'
 import {
 	useLocalStorage,
 	useNavigatorLanguage,
 	usePreferredLanguages,
 } from '@vueuse/core'
-import { Toaster } from '@/components/ui/sonner'
+import '@/assets/style/global.css'
 
 const { setLocale: _setLocale } = useI18n()
 

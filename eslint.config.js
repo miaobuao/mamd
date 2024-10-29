@@ -17,4 +17,5 @@ export default antfu({
 		'vue/html-indent': [ 'error', 'tab' ],
 		'antfu/no-top-level-await': 'off',
 	},
+	ignores: [ '**/node_modules' ],
 })

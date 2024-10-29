@@ -4,7 +4,7 @@
 
 - Docker & Docker Compose
 - Node >= 20
-- Bun >= 1.1.33
+- pnpm >= 9
 
 ## Dev
 
@@ -13,23 +13,23 @@
 2. Install dependencies
 
 ```sh
-bun i
+pnpm i
 ```
 
 3. Run dev setup
 
 ```sh
-bun dev:setup
+pnpm dev:setup
 ```
 
 4. Migrate db
 
 ```sh
-bun prisma:migrate
+pnpm prisma:migrate
 ```
 
 5. Run dev server
 
 ```sh
-bun dev
+pnpm dev
 ```
