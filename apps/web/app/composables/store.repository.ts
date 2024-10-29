@@ -38,7 +38,13 @@ export const useRepositoryStore = defineStore('repository', () => {
 	}
 
 	function appendRepository(repository: Repository) {
-		repositories.push(repository)
+		const idx = repositories.findIndex(v => v.uuid === repository.uuid)
+		if (idx === -1) {
+			repositories.push(repository)
+		}
+		else {
+			repositories[idx] = repository
+		}
 	}
 
 	async function createRepository(repo: TypeOf<typeof CreateRepositoryFormValidator>) {
