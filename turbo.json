@@ -15,7 +15,6 @@
 			"cache": false,
 			"persistent": true
 		},
-		"postinstall": {},
 		"prisma-client-js#migrate": {
 			"cache": false
 		},
@@ -23,6 +22,9 @@
 			"cache": false
 		},
 		"prisma-client-js#reset": {
+			"cache": false
+		},
+		"prisma-client-js#generate": {
 			"cache": false
 		}
 	}

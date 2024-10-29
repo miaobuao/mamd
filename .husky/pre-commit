@@ -1,2 +1,2 @@
 #!/usr/bin/env sh
-bun x --bun lint-staged
+pnpm lint-staged --allow-empty

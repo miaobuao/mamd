@@ -1,4 +1,5 @@
 import path from 'node:path'
+import { consola } from 'consola'
 import { usePrismaClient } from 'prisma-client-js'
 import { fileMetadataTask } from '../file-metadata/task'
 import { directoryIterator } from '../utils'
@@ -7,7 +8,8 @@ import { type ScannerConsumeContent, scannerTask } from './task'
 const db = usePrismaClient()
 
 for await (const content of scannerTask.consume()) {
-	await handler(content)
+	handler(content)
+		.catch(consola.error)
 }
 
 async function handler({ repositoryId, repositoryPath, basePath }: ScannerConsumeContent) {

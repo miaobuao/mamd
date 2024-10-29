@@ -4,11 +4,26 @@ import { CircleUser, LogOut, Search } from 'lucide-vue-next'
 import type { FileOrFolder } from '~/components/repository/File.vue'
 
 const { $trpc, $text } = useNuxtApp()
-const auth = useAuthStore()
-const route = useRoute()
 
-const items = reactive<FileOrFolder[]>([])
+const auth = useAuthStore()
+const uuidMapStore = useUuidMapStore()
+const route = useRoute()
+const router = useRouter()
+const repositoryStore = useRepositoryStore()
+
+const items = ref<FileOrFolder[]>([])
 const repositoryUuid = computed(() => route.params.repoId as string)
+const repository = ref<Repository>()
+
+watch(repositoryUuid, (uuid) => {
+	useAsyncData(() => repositoryStore.queryRepository(uuid))
+		.then((d) => {
+			repository.value = d.data.value
+		})
+}, {
+	immediate: true,
+})
+
 const currentPath = computed(() => {
 	let path
 	if (Array.isArray(route.params.path)) {
@@ -20,21 +35,47 @@ const currentPath = computed(() => {
 	return path.filter(Boolean) as string[]
 })
 
-$trpc.fs.listAll.useQuery({
-	repositoryUuid: repositoryUuid.value,
-	folderUuid: last(currentPath.value),
-}).then((entries) => {
-	if (entries.data.value) {
-		items.splice(0, items.length, ...entries.data.value)
+watch([ repository, currentPath ], ([ repository, currentPath ]) => {
+	if (!repository)
+		return
+	if (currentPath.length === 0) {
+		const linkedFolder = repository.linkedFolder?.uuid
+		if (linkedFolder) {
+			router.replace(`${route.fullPath}/${linkedFolder}`)
+			return
+		}
 	}
+	$trpc.fs.listAll.useQuery({
+		repositoryUuid: repository.uuid,
+		folderUuid: last(currentPath),
+	}).then((entries) => {
+		if (!entries.data.value) {
+			return
+		}
+		items.value = entries.data.value
+		items.value.forEach((item) => {
+			if (!item.isFile) {
+				uuidMapStore.upsertFolder(repositoryUuid.value, item.uuid, {
+					name: item.name,
+				})
+			}
+		})
+	})
+}, {
+	immediate: true,
 })
 </script>
 
 <template>
-	<div class="sm:py-4">
-		<header class="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-transparent backdrop-blur-sm px-4 sm:h-auto sm:border-0 sm:shadow-sm sm:px-6">
+	<div>
+		<header class="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-transparent backdrop-blur-sm px-4 sm:h-auto sm:border-0 sm:shadow-sm sm:px-6 sm:py-2">
 			<NavSheet />
-			<RepositoryBreadcrumb :repository-uuid="repositoryUuid" :path="route.params.path" />
+			<RepositoryBreadcrumb
+				v-if="repository"
+				class="hidden sm:block"
+				:repository="repository"
+				:path="route.params.path"
+			/>
 			<div class="relative ml-auto flex-1 md:grow-0">
 				<Search class="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
 				<Input
