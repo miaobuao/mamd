@@ -1,6 +1,7 @@
+import type { Readable } from 'node:stream'
 import { Buffer } from 'node:buffer'
+import { createHash, type Hash } from 'node:crypto'
 import * as fs from 'node:fs/promises'
-
 import path from 'node:path'
 import superjson from 'superjson'
 
@@ -53,4 +54,16 @@ export async function * asyncChunk<T>(arr: Iterable<T>, chunkSize: number): Asyn
 	if (result.length > 0) {
 		yield result
 	}
+}
+
+export function readableToHash(stream: Readable, alg: string): Promise<Hash> {
+	const hasher = createHash(alg)
+	stream.pipe(hasher)
+	return new Promise<Hash>((resolve, reject) => {
+		stream.on('end', () => {
+			hasher.end()
+			resolve(hasher)
+		})
+		stream.on('error', reject)
+	})
 }

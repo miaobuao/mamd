@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import {
-  ContextMenuRadioGroup,
-  type ContextMenuRadioGroupEmits,
-  type ContextMenuRadioGroupProps,
-  useForwardPropsEmits,
+	ContextMenuRadioGroup,
+	type ContextMenuRadioGroupEmits,
+	type ContextMenuRadioGroupProps,
+	useForwardPropsEmits,
 } from 'radix-vue'
 
 const props = defineProps<ContextMenuRadioGroupProps>()
@@ -13,7 +13,7 @@ const forwarded = useForwardPropsEmits(props, emits)
 </script>
 
 <template>
-  <ContextMenuRadioGroup v-bind="forwarded">
-    <slot />
-  </ContextMenuRadioGroup>
+	<ContextMenuRadioGroup v-bind="forwarded">
+		<slot />
+	</ContextMenuRadioGroup>
 </template>

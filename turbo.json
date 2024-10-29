@@ -23,6 +23,9 @@
 		},
 		"prisma-client-js#reset": {
 			"cache": false
+		},
+		"prisma-client-js#generate": {
+			"cache": false
 		}
 	}
 }
