@@ -13,7 +13,8 @@
 	"scripts": {
 		"build": "turbo build",
 		"dev:setup": "dotenv -e .env -- docker compose -f ./docker-compose.dev.yml up -d",
-		"dev": "dotenv -e .env -- turbo dev --env-mode loose",
+		"dev:start": "dotenv -e .env -- turbo dev --env-mode loose",
+		"dev": "run-s dev:setup dev:start",
 		"lint-staged": "lint-staged",
 		"lint": "turbo lint",
 		"prepare": "husky",

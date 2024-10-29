@@ -5,19 +5,11 @@ const props = defineProps<{
 	type: 'file' | 'folder'
 }>()
 
-const { $trpc } = useNuxtApp()
-const name = ref('')
+const uuidToNameStore = useUuidToNameStore()
 
-if (props.type === 'folder') {
-	// TODO: cache
-	const folder = await $trpc.fs.getFolder.useQuery({
-		folderUuid: props.uuid,
-		repositoryUuid: props.repositoryUuid,
-	})
-	name.value = folder.data.value?.name ?? ''
-}
+const name = props.type === 'folder' ? uuidToNameStore.getFolder(props.repositoryUuid, props.uuid) : null
 </script>
 
 <template>
-	{{ name }}
+	{{ name?.name }}
 </template>

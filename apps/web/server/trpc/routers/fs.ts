@@ -80,7 +80,8 @@ export const fsRouter = router({
 				repositoryId: true,
 			},
 		})
-		return ctx.db.folder.findFirst({
+		// TODO: handle not found
+		return ctx.db.folder.findUniqueOrThrow({
 			where: {
 				repositoryId: repository.repositoryId,
 				uuid: folderUuid,

@@ -58,10 +58,15 @@ watch([ repository, currentPath ], ([ repository, currentPath ]) => {
 </script>
 
 <template>
-	<div class="sm:py-4">
-		<header class="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-transparent backdrop-blur-sm px-4 sm:h-auto sm:border-0 sm:shadow-sm sm:px-6">
+	<div>
+		<header class="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-transparent backdrop-blur-sm px-4 sm:h-auto sm:border-0 sm:shadow-sm sm:px-6 sm:py-2">
 			<NavSheet />
-			<RepositoryBreadcrumb v-if="repository" :repository="repository" :path="route.params.path" />
+			<RepositoryBreadcrumb
+				v-if="repository"
+				class="hidden sm:block"
+				:repository="repository"
+				:path="route.params.path"
+			/>
 			<div class="relative ml-auto flex-1 md:grow-0">
 				<Search class="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
 				<Input
