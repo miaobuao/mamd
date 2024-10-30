@@ -1,7 +1,8 @@
 {
 	"name": "prisma-client-js",
-	"main": "./src/index.js",
-	"types": "./src/index.d.ts",
+	"type": "module",
+	"main": "./src/index.mjs",
+	"types": "./src/index.d.mts",
 	"scripts": {
 		"generate": "prisma generate",
 		"migrate": "prisma migrate dev",
