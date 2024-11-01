@@ -116,4 +116,9 @@ export const UserRouter = router({
 					}),
 				)
 		}),
+
+	listUsers: adminProcedure
+		.query(async ({ ctx: { db } }) => {
+			return await db.user.findMany()
+		}),
 })

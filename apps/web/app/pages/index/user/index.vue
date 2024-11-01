@@ -1,80 +1,14 @@
 <script setup lang="ts">
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Tabs, TabsContent } from '@/components/ui/tabs'
-import { Home, LineChart, ListFilter, MoreHorizontal, Package, Package2, PanelLeft, PlusCircle, ShoppingCart, Users2 } from 'lucide-vue-next'
-import { PrismaClient } from 'prisma-client-js'
+import { ListFilter, MoreHorizontal, PlusCircle } from 'lucide-vue-next'
 
-const prisma = new PrismaClient()
+const { $trpc, $text } = useNuxtApp()
 
-async function getUser() {
-	const user = await prisma.user.findMany({})
-	return user
-}
-
-const users_in_db = await getUser()
+const users_in_db = await $trpc.user.listUsers.query()
 </script>
 
 <template>
 	<div class="flex min-h-screen w-full flex-col bg-muted/40">
 		<div class="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-			<header class="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-				<Sheet>
-					<SheetTrigger as-child>
-						<Button size="icon" variant="outline" class="sm:hidden">
-							<PanelLeft class="h-5 w-5" />
-							<span class="sr-only">Toggle Menu</span>
-						</Button>
-					</SheetTrigger>
-					<SheetContent side="left" class="sm:max-w-xs">
-						<a
-							href="#"
-							class="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
-						>
-							<Package2 class="h-5 w-5 transition-all group-hover:scale-110" />
-							<span class="sr-only">Acme Inc</span>
-						</a>
-						<a
-							href="#"
-							class="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-						>
-							<Home class="h-5 w-5" />
-							Dashboard
-						</a>
-						<a
-							href="#"
-							class="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-						>
-							<ShoppingCart class="h-5 w-5" />
-							Orders
-						</a>
-						<a
-							href="#"
-							class="flex items-center gap-4 px-2.5 text-foreground"
-						>
-							<Package class="h-5 w-5" />
-							Products
-						</a>
-						<a
-							href="#"
-							class="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-						>
-							<Users2 class="h-5 w-5" />
-							Customers
-						</a>
-						<a
-							href="#"
-							class="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-						>
-							<LineChart class="h-5 w-5" />
-							Settings
-						</a>
-					</SheetContent>
-				</Sheet>
-			</header>
 			<main class="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
 				<Tabs default-value="all">
 					<div class="flex items-center">
@@ -86,25 +20,23 @@ const users_in_db = await getUser()
 									<Button variant="outline" size="sm" class="h-7 gap-1">
 										<ListFilter class="h-3.5 w-3.5" />
 										<span class="sr-only sm:not-sr-only sm:whitespace-nowrap">
-											Filter
+											{{ $text.filter() }}
 										</span>
 									</Button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="end">
-									<DropdownMenuLabel>Filter by</DropdownMenuLabel>
+									<DropdownMenuLabel>{{ $text.filterBy() }}</DropdownMenuLabel>
 									<DropdownMenuSeparator />
 									<DropdownMenuItem checked>
-										Manager
+										{{ $text.manager() }}
 									</DropdownMenuItem>
-									<DropdownMenuItem>User</DropdownMenuItem>
+									<DropdownMenuItem>{{ $text.user() }}</DropdownMenuItem>
 								</DropdownMenuContent>
 							</DropdownMenu>
 							<!-- Add User -->
 							<Button size="sm" class="h-7 gap-1">
 								<PlusCircle class="h-3.5 w-3.5" />
-								<span class="sr-only sm:not-sr-only sm:whitespace-nowrap">
-									Add User
-								</span>
+								<span class="sr-only sm:not-sr-only sm:whitespace-nowrap">{{ $text.addUser() }}</span>
 							</Button>
 						</div>
 					</div>
@@ -112,9 +44,9 @@ const users_in_db = await getUser()
 						<Card>
 							<!-- Title and SubTitle -->
 							<CardHeader>
-								<CardTitle>User Management</CardTitle>
+								<CardTitle>{{ $text.userManagement() }}</CardTitle>
 								<CardDescription>
-									Manage Users And Edit Theirs Account.
+									{{ $text.manageUser() }}
 								</CardDescription>
 							</CardHeader>
 							<CardContent>
@@ -123,14 +55,14 @@ const users_in_db = await getUser()
 									<TableHeader>
 										<TableRow>
 											<TableHead class="hidden w-[100px] sm:table-cell">
-												<span class="sr-only">Avatar</span>
+												<span class="sr-only">{{ $text.avatar() }}</span>
 											</TableHead>
-											<TableHead>ID</TableHead>
-											<TableHead>Name</TableHead>
-											<TableHead>isManager</TableHead>
-											<TableHead>Created Time</TableHead>
+											<TableHead>{{ $text.id() }}</TableHead>
+											<TableHead>{{ $text.username() }}</TableHead>
+											<TableHead>{{ $text.isManager() }}</TableHead>
+											<TableHead>{{ $text.createTime() }}</TableHead>
 											<TableHead>
-												<span class="sr-only">Actions</span>
+												<span class="sr-only">{{ $text.action() }}</span>
 											</TableHead>
 										</TableRow>
 									</TableHeader>
@@ -139,10 +71,10 @@ const users_in_db = await getUser()
 										<TableRow v-for="user_member in users_in_db" :key="user_member.id">
 											<TableCell class="hidden sm:table-cell">
 												<img
-													alt="Product image"
+													alt="{{$text.atavar()}}"
 													class="aspect-square rounded-md object-cover"
 													height="64"
-													src=""
+													src="https://github.com/radix-vue.png"
 													width="64"
 												>
 											</TableCell>
@@ -167,13 +99,13 @@ const users_in_db = await getUser()
 															variant="ghost"
 														>
 															<MoreHorizontal class="h-4 w-4" />
-															<span class="sr-only">Toggle menu</span>
+															<span class="sr-only">{{ $text.toggleMenu() }}</span>
 														</Button>
 													</DropdownMenuTrigger>
 													<DropdownMenuContent align="end">
-														<DropdownMenuLabel>Actions</DropdownMenuLabel>
-														<DropdownMenuItem>Edit</DropdownMenuItem>
-														<DropdownMenuItem>Delete</DropdownMenuItem>
+														<DropdownMenuLabel>{{ $text.action() }}</DropdownMenuLabel>
+														<DropdownMenuItem>{{ $text.edit() }}</DropdownMenuItem>
+														<DropdownMenuItem>{{ $text.delete() }}</DropdownMenuItem>
 													</DropdownMenuContent>
 												</DropdownMenu>
 											</TableCell>
