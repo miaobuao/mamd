@@ -38,9 +38,11 @@ export default {
 	action: '选项',
 	manager: '管理员',
 	user: '用户',
+	users: '用户',
 	edit: '编辑',
 	delete: '删除',
 	toggleMenu: '切换菜单',
+	userShowWords: '展示所有的',
 	error: {
 		adminAccountExists: '管理员账户已存在',
 		invalidUsernameOrPassword: '用户名或密码错误',

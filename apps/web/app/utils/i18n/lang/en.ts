@@ -36,9 +36,11 @@ export default {
 	manager: 'Manager',
 	action: 'Action',
 	user: 'User',
+	users: 'Users',
 	edit: 'Edit',
 	delete: 'Delete',
 	toggleMenu: 'Toggle Menu',
+	userShowWords: 'Showing All of',
 	error: {
 		adminAccountExists: 'Admin account already exists',
 		invalidUsernameOrPassword: 'Invalid username or password',

@@ -3,7 +3,13 @@ import { ListFilter, MoreHorizontal, PlusCircle } from 'lucide-vue-next'
 
 const { $trpc, $text } = useNuxtApp()
 
-const users_in_db = await $trpc.user.listUsers.query()
+const { data: users, error } = await useAsyncData(
+	'query_users',
+	async () => await $trpc.user.listUsers.query(),
+)
+if (error.value) {
+	console.error(new Error(error.value))
+}
 </script>
 
 <template>
@@ -68,7 +74,7 @@ const users_in_db = await $trpc.user.listUsers.query()
 									</TableHeader>
 									<!-- content -->
 									<TableBody>
-										<TableRow v-for="user_member in users_in_db" :key="user_member.id">
+										<TableRow v-for="user_member in users" :key="user_member.id">
 											<TableCell class="hidden sm:table-cell">
 												<img
 													alt="{{$text.atavar()}}"
@@ -115,8 +121,7 @@ const users_in_db = await $trpc.user.listUsers.query()
 							</CardContent>
 							<CardFooter>
 								<div class="text-xs text-muted-foreground">
-									Showing <strong>1-10</strong> of <strong>32</strong>
-									products
+									{{ $text.userShowWords() }} <strong>{{ users.length }}</strong> {{ $text.users() }}
 								</div>
 							</CardFooter>
 						</Card>
