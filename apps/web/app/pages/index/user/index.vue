@@ -4,10 +4,7 @@ import { MoreHorizontal, PlusCircle } from 'lucide-vue-next'
 
 const { $trpc, $text } = useNuxtApp()
 
-const { data: users, pending, error } = $trpc.user.listUsers.useQuery()
-if (error.value) {
-	console.error(new Error(error.value))
-}
+const { data: users, pending } = $trpc.user.listUsers.useQuery()
 </script>
 
 <template>
