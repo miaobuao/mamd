@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { ListFilter, MoreHorizontal, PlusCircle } from 'lucide-vue-next'
+import { Skeleton } from '@/components/ui/skeleton'
+import { MoreHorizontal, PlusCircle } from 'lucide-vue-next'
 
 const { $trpc, $text } = useNuxtApp()
 
-const { data: users, error } = await useAsyncData(
-	'query_users',
-	async () => await $trpc.user.listUsers.query(),
-)
+const { data: users, pending, error } = $trpc.user.listUsers.useQuery()
 if (error.value) {
 	console.error(new Error(error.value))
 }
@@ -18,27 +16,8 @@ if (error.value) {
 			<main class="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
 				<Tabs default-value="all">
 					<div class="flex items-center">
-						<!-- Top Filter And Add User -->
+						<!-- Add User -->
 						<div class="ml-auto flex items-center gap-2">
-							<!-- Filter -->
-							<DropdownMenu>
-								<DropdownMenuTrigger as-child>
-									<Button variant="outline" size="sm" class="h-7 gap-1">
-										<ListFilter class="h-3.5 w-3.5" />
-										<span class="sr-only sm:not-sr-only sm:whitespace-nowrap">
-											{{ $text.filter() }}
-										</span>
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent align="end">
-									<DropdownMenuLabel>{{ $text.filterBy() }}</DropdownMenuLabel>
-									<DropdownMenuSeparator />
-									<DropdownMenuItem checked>
-										{{ $text.manager() }}
-									</DropdownMenuItem>
-									<DropdownMenuItem>{{ $text.user() }}</DropdownMenuItem>
-								</DropdownMenuContent>
-							</DropdownMenu>
 							<!-- Add User -->
 							<Button size="sm" class="h-7 gap-1">
 								<PlusCircle class="h-3.5 w-3.5" />
@@ -73,7 +52,14 @@ if (error.value) {
 										</TableRow>
 									</TableHeader>
 									<!-- content -->
-									<TableBody>
+									<TableBody v-if="pending">
+										<TableRow v-for="user_member in users" :key="user_member.id">
+											<!-- <TableCell class="hidden sm:table-cell"> -->
+											<Skeleton class="h-[110px] w-full rounded-xl" />
+											<!-- </TableCell> -->
+										</TableRow>
+									</TableBody>
+									<TableBody v-else>
 										<TableRow v-for="user_member in users" :key="user_member.id">
 											<TableCell class="hidden sm:table-cell">
 												<img
@@ -87,13 +73,13 @@ if (error.value) {
 											<TableCell class="font-medium">
 												{{ user_member.id }}
 											</TableCell>
-											<TableCell>
+											<TableCell class="hidden md:table-cell">
 												{{ user_member.username }}
 											</TableCell>
-											<TableCell>
+											<TableCell class="hidden md:table-cell">
 												{{ user_member.isAdmin }}
 											</TableCell>
-											<TableCell>
+											<TableCell class="hidden md:table-cell">
 												{{ user_member.ctime }}
 											</TableCell>
 											<TableCell>

@@ -36,8 +36,6 @@ export default {
 	filter: '筛选',
 	filterBy: '筛选条件',
 	action: '选项',
-	manager: '管理员',
-	user: '用户',
 	users: '用户',
 	edit: '编辑',
 	delete: '删除',
