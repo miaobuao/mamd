@@ -5,6 +5,15 @@ import { MoreHorizontal, PlusCircle } from 'lucide-vue-next'
 const { $trpc, $text } = useNuxtApp()
 
 const { data: users, pending } = $trpc.user.listUsers.useQuery()
+
+const visable = ref(false)
+const cancel = function () {
+	visable.value = false
+}
+
+const create = function () {
+	visable.value = true
+}
 </script>
 
 <template>
@@ -16,7 +25,7 @@ const { data: users, pending } = $trpc.user.listUsers.useQuery()
 						<!-- Add User -->
 						<div class="ml-auto flex items-center gap-2">
 							<!-- Add User -->
-							<Button size="sm" class="h-7 gap-1">
+							<Button size="sm" class="h-7 gap-1" @click="create">
 								<PlusCircle class="h-3.5 w-3.5" />
 								<span class="sr-only sm:not-sr-only sm:whitespace-nowrap">{{ $text.addUser() }}</span>
 							</Button>
@@ -124,5 +133,41 @@ const { data: users, pending } = $trpc.user.listUsers.useQuery()
 				</Tabs>
 			</main>
 		</div>
+	</div>
+
+	<div v-if="visable" class="fixed inset-0 flex items-center justify-center bg-black/50">
+		<Card v-if="visable" class="w-[350px]">
+			<CardHeader>
+				<CardTitle>{{ $text.createUser() }}</CardTitle>
+				<CardDescription>{{ $text.createUserDescription() }}</CardDescription>
+			</CardHeader>
+			<CardContent>
+				<form>
+					<div class="grid items-center w-full gap-4">
+						<div class="flex flex-col space-y-1.5">
+							<Label for="username">{{ $text.username() }}</Label>
+							<Input id="username" />
+						</div>
+						<div class="flex flex-col space-y-1.5">
+							<Label for="password">{{ $text.password() }}</Label>
+							<Input id="password" />
+						</div>
+						<div class="flex items-center space-x-2">
+							<Label for="isAdmin"><b>{{ $text.isManager() }}</b></Label>
+							<Switch id="isAdmin" />
+						</div>
+					</div>
+				</form>
+			</CardContent>
+			<CardFooter class="flex justify-between px-6 pb-6">
+				<Button variant="outline" @click="cancel">
+					{{ $text.cancel() }}
+				</Button>
+				<Button type="submit" :disabled="loading">
+					<Loader2 v-show="loading" class="w-4 h-4 mr-2 animate-spin" />
+					{{ $text.create() }}
+				</Button>
+			</CardFooter>
+		</Card>
 	</div>
 </template>

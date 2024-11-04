@@ -39,6 +39,10 @@ export default {
 	delete: 'Delete',
 	toggleMenu: 'Toggle Menu',
 	userShowWords: 'Showing All of',
+	createUser: 'Create User',
+	true: 'True',
+	false: 'False',
+	createUserDescription: 'Create a user to access the system',
 	error: {
 		adminAccountExists: 'Admin account already exists',
 		invalidUsernameOrPassword: 'Invalid username or password',

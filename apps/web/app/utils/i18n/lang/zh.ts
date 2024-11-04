@@ -41,6 +41,10 @@ export default {
 	delete: '删除',
 	toggleMenu: '切换菜单',
 	userShowWords: '展示所有的',
+	createUser: '创建用户',
+	true: '是',
+	false: '否',
+	createUserDescription: '创建一个用户来管理你的存储库',
 	error: {
 		adminAccountExists: '管理员账户已存在',
 		invalidUsernameOrPassword: '用户名或密码错误',
