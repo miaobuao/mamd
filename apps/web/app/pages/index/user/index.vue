@@ -54,9 +54,21 @@ if (error.value) {
 									<!-- content -->
 									<TableBody v-if="pending">
 										<TableRow v-for="user_member in users" :key="user_member.id">
-											<!-- <TableCell class="hidden sm:table-cell"> -->
-											<Skeleton class="h-[110px] w-full rounded-xl" />
-											<!-- </TableCell> -->
+											<TableCell class="hidden sm:table-cell">
+												<Skeleton class="h-[70px] w-full rounded-xl" />
+											</TableCell>
+											<TableCell class="hidden sm:table-cell">
+												<Skeleton class="h-[70px] w-full rounded-xl" />
+											</TableCell>
+											<TableCell class="hidden sm:table-cell">
+												<Skeleton class="h-[70px] w-full rounded-xl" />
+											</TableCell>
+											<TableCell class="hidden sm:table-cell">
+												<Skeleton class="h-[70px] w-full rounded-xl" />
+											</TableCell>
+											<TableCell class="hidden sm:table-cell">
+												<Skeleton class="h-[70px] w-full rounded-xl" />
+											</TableCell>
 										</TableRow>
 									</TableBody>
 									<TableBody v-else>
