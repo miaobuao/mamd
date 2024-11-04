@@ -13,6 +13,12 @@ export const UserRegisterInputFormValidator = z.object({
 
 export const UserRegisterSubmitDataValidator = BasicUserRegisterFormValidator
 
+export const CreateUserInputValidator = BasicUserRegisterFormValidator.and(
+	z.object({
+		isAdmin: z.boolean(),
+	}),
+)
+
 export const UserLoginSubmitFormValidator = z.object({
 	username: z.string(),
 	password: PasswordValidator,

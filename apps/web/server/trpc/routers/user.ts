@@ -1,5 +1,5 @@
 import { config } from '~~/server/utils/config'
-import { UserLoginSubmitFormValidator, UserRegisterSubmitDataValidator } from '~/utils/validator'
+import { CreateUserInputValidator, UserLoginSubmitFormValidator, UserRegisterSubmitDataValidator } from '~/utils/validator'
 import { checkAdminAccountExists } from '../middleware/check-admin-user'
 import { adminProcedure, protectedProcedure, publicProcedure, router } from '../trpc'
 
@@ -92,8 +92,8 @@ export const UserRouter = router({
 				)
 		}),
 
-	createCommonUser: adminProcedure
-		.input(UserRegisterSubmitDataValidator)
+	createUser: adminProcedure
+		.input(CreateUserInputValidator)
 		.mutation(async ({ input, ctx: { db } }) => {
 			const hashPassword = await bcryptEncrypt(input.password)
 			await db.user
@@ -101,6 +101,7 @@ export const UserRouter = router({
 					data: {
 						username: input.username,
 						password: hashPassword,
+						isAdmin: input.isAdmin,
 					},
 				})
 				.catch(
@@ -115,5 +116,10 @@ export const UserRouter = router({
 						},
 					}),
 				)
+		}),
+
+	listUsers: adminProcedure
+		.query(async ({ ctx: { db } }) => {
+			return await db.user.findMany()
 		}),
 })
