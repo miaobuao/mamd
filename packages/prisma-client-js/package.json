@@ -26,7 +26,5 @@
 		"sourcemap": true,
 		"clean": true,
 		"target": "es6"
-	},
-	"dependencies": {
 	}
 }
