@@ -195,6 +195,9 @@ importers:
       bun:
         specifier: ^1.2.1
         version: 1.2.1
+      chokidar:
+        specifier: ^4.0.1
+        version: 4.0.1
       drizzle-client:
         specifier: workspace:*
         version: link:../drizzle-client

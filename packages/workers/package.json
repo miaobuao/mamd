@@ -13,6 +13,7 @@
 	"devDependencies": {
 		"@types/mime-types": "^2.1.4",
 		"bun": "^1.2.1",
+		"chokidar": "^4.0.1",
 		"drizzle-client": "workspace:*",
 		"drizzle-orm": "^0.39.1",
 		"file-type": "^19.6.0",
