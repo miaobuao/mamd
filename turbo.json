@@ -26,6 +26,9 @@
 		},
 		"prisma-client-js#generate": {
 			"cache": false
+		},
+		"clean": {
+			"cache": false
 		}
 	}
 }

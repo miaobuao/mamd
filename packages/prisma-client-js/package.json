@@ -6,9 +6,10 @@
 	"scripts": {
 		"generate": "prisma generate",
 		"migrate": "prisma migrate dev",
-		"postinstall": "run-s generate",
+		"postinstall": "prisma generate",
 		"reset": "prisma migrate reset",
-		"studio": "prisma studio"
+		"studio": "prisma studio",
+		"clean": "rimraf node_modules"
 	},
 	"tsup": {
 		"format": [
