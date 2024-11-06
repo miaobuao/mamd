@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod'
-import { Loader2, MoreHorizontal, PlusCircle } from 'lucide-vue-next'
+import { MoreHorizontal } from 'lucide-vue-next'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 
@@ -35,6 +35,10 @@ const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻�
 		refresh()
 	}
 })
+
+const onClose = function () {
+	visible.value = false
+}
 </script>
 
 <template>
@@ -46,12 +50,62 @@ const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻�
 						<!-- Add User -->
 						<div class="ml-auto flex items-center gap-2">
 							<!-- Add User -->
-							<Button size="sm" class="h-7 gap-1" @click="visControl">
-								<PlusCircle class="h-3.5 w-3.5" />
-								<span class="sr-only sm:not-sr-only sm:whitespace-nowrap">{{ $text.addUser() }}</span>
-							</Button>
+							<Dialog :open="visible" @close="onClose">
+								<DialogTrigger as-child>
+									<Button variant="outline" @click="visControl">
+										{{ $text.createUser() }}
+									</Button>
+								</DialogTrigger>
+								<DialogContent class="sm:max-w-[425px]">
+									<DialogHeader>
+										<DialogTitle>{{ $text.createUser() }}</DialogTitle>
+										<DialogDescription>
+											{{ $text.createUserDescription() }}
+										</DialogDescription>
+									</DialogHeader>
+
+									<form @submit="onSubmit">
+										<FormField v-slot="{ componentField }" name="username">
+											<FormItem>
+												<FormLabel>{{ $text.username() }}</FormLabel>
+												<FormControl>
+													<Input v-bind="componentField" />
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										</FormField>
+										<FormField v-slot="{ componentField }" name="password">
+											<FormItem>
+												<FormLabel>{{ $text.password() }}</FormLabel>
+												<FormControl>
+													<Input type="password" v-bind="componentField" />
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										</FormField>
+										<FormField v-slot="{ value, handleChange }" name="isAdmin">
+											<FormItem class="mt-4">
+												<div class="flex items-center space-x-2">
+													<FormLabel>{{ $text.isManager() }}</FormLabel>
+													<FormControl>
+														<Switch id="isAdmin" :checked="value" @update:checked="handleChange" />
+													</FormControl>
+												</div>
+												<FormMessage />
+											</FormItem>
+										</FormField>
+										<DialogFooter>
+											<Button type="submit" :disabled="loading">
+												<Loader2 v-show="loading" class="w-4 h-4 mr-2 animate-spin" />
+												{{ $text.create() }}
+											</Button>
+										</DialogFooter>
+									</form>
+								</DialogContent>
+							</Dialog>
 						</div>
 					</div>
+
 					<TabsContent value="all">
 						<Card>
 							<!-- Title and SubTitle -->
@@ -154,58 +208,5 @@ const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻�
 				</Tabs>
 			</main>
 		</div>
-	</div>
-
-	<div v-if="visible" class="fixed inset-0 flex items-center justify-center bg-black/50">
-		<Card v-if="visible" class="w-[350px]">
-			<CardHeader>
-				<CardTitle>{{ $text.createUser() }}</CardTitle>
-				<CardDescription>{{ $text.createUserDescription() }}</CardDescription>
-			</CardHeader>
-			<form @submit="onSubmit">
-				<CardContent>
-					<FormField v-slot="{ componentField }" name="username">
-						<FormItem>
-							<FormLabel>{{ $text.username() }}</FormLabel>
-							<FormControl>
-								<Input v-bind="componentField" />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					</FormField>
-					<FormField v-slot="{ componentField }" name="password">
-						<FormItem>
-							<FormLabel>{{ $text.password() }}</FormLabel>
-							<FormControl>
-								<Input type="password" v-bind="componentField" />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					</FormField>
-					<FormField v-slot="{ value, handleChange }" name="isAdmin">
-						<FormItem class="mt-4">
-							<div class="flex items-center space-x-2">
-								<FormLabel>{{ $text.isManager() }}</FormLabel>
-								<FormControl>
-									<Switch id="isAdmin" :checked="value" @update:checked="handleChange" />
-								</FormControl>
-							</div>
-							<FormMessage />
-						</FormItem>
-					</FormField>
-					<CardFooter class="flex justify-between w-full mt-6">
-						<!-- 用户界面取消按钮 -->
-						<Button variant="outline" @click="visControl">
-							{{ $text.cancel() }}
-						</Button>
-						<!-- 用户界面数据提交 -->
-						<Button type="submit" :disabled="loading">
-							<Loader2 v-show="loading" class="w-4 h-4 mr-2 animate-spin" />
-							{{ $text.create() }}
-						</Button>
-					</CardFooter>
-				</CardContent>
-			</form>
-		</Card>
 	</div>
 </template>

@@ -122,4 +122,14 @@ export const UserRouter = router({
 		.query(async ({ ctx: { db } }) => {
 			return await db.user.findMany()
 		}),
+
+	// deleteUser: adminProcedure
+	// 	.mutation(async ({ id, ctx: { db } }) => {
+	// 		await db.user
+	// 			.delete({
+	// 				where: {
+	// 					uuid: id,
+	// 				},
+	// 			})
+	// 	}),
 })
