@@ -25,6 +25,7 @@ export default {
 	successfullyCreatedRepository: '创建存储库成功',
 	successfullyLoggedIn: '登录成功',
 	successfullyRegistered: '注册成功!',
+	successfullyCreatedUser: '创建用户成功！',
 	username: '用户名',
 	userManagement: '用户管理', // new add
 	avatar: '头像',
@@ -56,5 +57,6 @@ export default {
 		repositoryAlreadyExists: '存储库已存在',
 		repositoryNotExists: '存储库不存在',
 		usernameHasBeenRegistered: '该用户名已被注册',
+		createUserFailed: '创建用户失败',
 	},
 } satisfies typeof en

@@ -23,6 +23,7 @@ export default {
 	successfullyCreatedRepository: 'Successfully created repository!',
 	successfullyLoggedIn: 'Successfully logged in!',
 	successfullyRegistered: 'Successfully registered!',
+	successfullyCreatedUser: 'Successfully created user!',
 	username: 'Username',
 	userManagement: 'User management', // new add
 	avatar: 'Avatar',
@@ -54,5 +55,6 @@ export default {
 		repositoryAlreadyExists: 'Repository already exists',
 		repositoryNotExists: 'Repository not exists',
 		usernameHasBeenRegistered: 'This username has been registered',
+		createUserFailed: 'Create user failed',
 	},
 }

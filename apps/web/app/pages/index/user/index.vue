@@ -1,19 +1,42 @@
 <script setup lang="ts">
-import { Skeleton } from '@/components/ui/skeleton'
-import { MoreHorizontal, PlusCircle } from 'lucide-vue-next'
+import { toTypedSchema } from '@vee-validate/zod'
+import { Loader2, MoreHorizontal, PlusCircle } from 'lucide-vue-next'
+import { useForm } from 'vee-validate'
+import { toast } from 'vue-sonner'
 
 const { $trpc, $text } = useNuxtApp()
-
-const { data: users, pending } = $trpc.user.listUsers.useQuery()
-
-const visable = ref(false)
-const cancel = function () {
-	visable.value = false
+// 查询模块 : 接收后端接口查询数据库结果
+let { data: users, status } = $trpc.user.listUsers.useQuery()
+// 添加模块 : web端添加用户并在user页面呈现
+const createUserFormSchema = toTypedSchema(CreateUserInputValidator)
+const form = useForm({
+	validationSchema: createUserFormSchema,
+})
+const loading = ref(false) // 添加用户界面按钮加载状态开关
+const visable = ref(false) // 添加用户界面开关
+const visControl = function () {
+	visable.value = !visable.value
 }
 
-const create = function () {
-	visable.value = true
-}
+const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻辑
+	loading.value = true
+	try {
+		await $trpc.user.createUser.mutate(values)
+		nextTick(() => {
+			toast($text.successfullyCreatedUser())
+		})
+	}
+	catch {
+		toast($text.error.createUserFailed())
+	}
+	finally {
+		loading.value = false
+		visable.value = !visable.value
+		const { data: users_new, status: status_new } = $trpc.user.listUsers.useQuery()
+		users = users_new
+		status = status_new
+	}
+})
 </script>
 
 <template>
@@ -25,7 +48,7 @@ const create = function () {
 						<!-- Add User -->
 						<div class="ml-auto flex items-center gap-2">
 							<!-- Add User -->
-							<Button size="sm" class="h-7 gap-1" @click="create">
+							<Button size="sm" class="h-7 gap-1" @click="visControl">
 								<PlusCircle class="h-3.5 w-3.5" />
 								<span class="sr-only sm:not-sr-only sm:whitespace-nowrap">{{ $text.addUser() }}</span>
 							</Button>
@@ -58,7 +81,7 @@ const create = function () {
 										</TableRow>
 									</TableHeader>
 									<!-- content -->
-									<TableBody v-if="pending">
+									<TableBody v-if="status === 'pending'">
 										<TableRow v-for="user_member in users" :key="user_member.id">
 											<TableCell class="hidden sm:table-cell">
 												<Skeleton class="h-[70px] w-full rounded-xl" />
@@ -77,7 +100,7 @@ const create = function () {
 											</TableCell>
 										</TableRow>
 									</TableBody>
-									<TableBody v-else>
+									<TableBody v-if="status === 'success'">
 										<TableRow v-for="user_member in users" :key="user_member.id">
 											<TableCell class="hidden sm:table-cell">
 												<img
@@ -125,7 +148,7 @@ const create = function () {
 							</CardContent>
 							<CardFooter>
 								<div class="text-xs text-muted-foreground">
-									{{ $text.userShowWords() }} <strong>{{ users.length }}</strong> {{ $text.users() }}
+									{{ $text.userShowWords() }} <strong>{{ users ? users.length : 0 }}</strong> {{ $text.users() }}
 								</div>
 							</CardFooter>
 						</Card>
@@ -141,33 +164,50 @@ const create = function () {
 				<CardTitle>{{ $text.createUser() }}</CardTitle>
 				<CardDescription>{{ $text.createUserDescription() }}</CardDescription>
 			</CardHeader>
-			<CardContent>
-				<form>
-					<div class="grid items-center w-full gap-4">
-						<div class="flex flex-col space-y-1.5">
-							<Label for="username">{{ $text.username() }}</Label>
-							<Input id="username" />
-						</div>
-						<div class="flex flex-col space-y-1.5">
-							<Label for="password">{{ $text.password() }}</Label>
-							<Input id="password" />
-						</div>
-						<div class="flex items-center space-x-2">
-							<Label for="isAdmin"><b>{{ $text.isManager() }}</b></Label>
-							<Switch id="isAdmin" />
-						</div>
-					</div>
-				</form>
-			</CardContent>
-			<CardFooter class="flex justify-between px-6 pb-6">
-				<Button variant="outline" @click="cancel">
-					{{ $text.cancel() }}
-				</Button>
-				<Button type="submit" :disabled="loading">
-					<Loader2 v-show="loading" class="w-4 h-4 mr-2 animate-spin" />
-					{{ $text.create() }}
-				</Button>
-			</CardFooter>
+			<form @submit="onSubmit">
+				<CardContent>
+					<FormField v-slot="{ componentField }" name="username">
+						<FormItem>
+							<FormLabel>{{ $text.username() }}</FormLabel>
+							<FormControl>
+								<Input v-bind="componentField" />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					</FormField>
+					<FormField v-slot="{ componentField }" name="password">
+						<FormItem>
+							<FormLabel>{{ $text.password() }}</FormLabel>
+							<FormControl>
+								<Input type="password" v-bind="componentField" />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					</FormField>
+					<FormField v-slot="{ value, handleChange }" name="isAdmin">
+						<FormItem class="mt-4">
+							<div class="flex items-center space-x-2">
+								<FormLabel>{{ $text.isManager() }}</FormLabel>
+								<FormControl>
+									<Switch id="isAdmin" :checked="value" @update:checked="handleChange" />
+								</FormControl>
+							</div>
+							<FormMessage />
+						</FormItem>
+					</FormField>
+					<CardFooter class="flex justify-between w-full mt-6">
+						<!-- 用户界面取消按钮 -->
+						<Button variant="outline" @click="visControl">
+							{{ $text.cancel() }}
+						</Button>
+						<!-- 用户界面数据提交 -->
+						<Button type="submit" :disabled="loading">
+							<Loader2 v-show="loading" class="w-4 h-4 mr-2 animate-spin" />
+							{{ $text.create() }}
+						</Button>
+					</CardFooter>
+				</CardContent>
+			</form>
 		</Card>
 	</div>
 </template>

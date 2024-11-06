@@ -15,7 +15,7 @@ export const UserRegisterSubmitDataValidator = BasicUserRegisterFormValidator
 
 export const CreateUserInputValidator = BasicUserRegisterFormValidator.and(
 	z.object({
-		isAdmin: z.boolean(),
+		isAdmin: z.boolean().default(false),
 	}),
 )
 
