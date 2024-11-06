@@ -6,16 +6,16 @@ import { toast } from 'vue-sonner'
 
 const { $trpc, $text } = useNuxtApp()
 // 查询模块 : 接收后端接口查询数据库结果
-let { data: users, status } = $trpc.user.listUsers.useQuery()
+const { data: users, status, refresh } = $trpc.user.listUsers.useQuery()
 // 添加模块 : web端添加用户并在user页面呈现
 const createUserFormSchema = toTypedSchema(CreateUserInputValidator)
 const form = useForm({
 	validationSchema: createUserFormSchema,
 })
 const loading = ref(false) // 添加用户界面按钮加载状态开关
-const visable = ref(false) // 添加用户界面开关
+const visible = ref(false) // 添加用户界面开关
 const visControl = function () {
-	visable.value = !visable.value
+	visible.value = !visible.value
 }
 
 const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻辑
@@ -31,10 +31,8 @@ const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻�
 	}
 	finally {
 		loading.value = false
-		visable.value = !visable.value
-		const { data: users_new, status: status_new } = $trpc.user.listUsers.useQuery()
-		users = users_new
-		status = status_new
+		visible.value = false
+		refresh()
 	}
 })
 </script>
@@ -158,8 +156,8 @@ const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻�
 		</div>
 	</div>
 
-	<div v-if="visable" class="fixed inset-0 flex items-center justify-center bg-black/50">
-		<Card v-if="visable" class="w-[350px]">
+	<div v-if="visible" class="fixed inset-0 flex items-center justify-center bg-black/50">
+		<Card v-if="visible" class="w-[350px]">
 			<CardHeader>
 				<CardTitle>{{ $text.createUser() }}</CardTitle>
 				<CardDescription>{{ $text.createUserDescription() }}</CardDescription>
