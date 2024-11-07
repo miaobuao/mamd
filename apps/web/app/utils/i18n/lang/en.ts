@@ -23,6 +23,7 @@ export default {
 	successfullyCreatedRepository: 'Successfully created repository!',
 	successfullyLoggedIn: 'Successfully logged in!',
 	successfullyRegistered: 'Successfully registered!',
+	successfullyCreatedUser: 'Successfully created user!',
 	username: 'Username',
 	userManagement: 'User management', // new add
 	avatar: 'Avatar',
@@ -39,6 +40,10 @@ export default {
 	delete: 'Delete',
 	toggleMenu: 'Toggle Menu',
 	userShowWords: 'Showing All of',
+	createUser: 'Create User',
+	true: 'True',
+	false: 'False',
+	createUserDescription: 'Create a user to access the system',
 	error: {
 		adminAccountExists: 'Admin account already exists',
 		invalidUsernameOrPassword: 'Invalid username or password',
@@ -50,5 +55,6 @@ export default {
 		repositoryAlreadyExists: 'Repository already exists',
 		repositoryNotExists: 'Repository not exists',
 		usernameHasBeenRegistered: 'This username has been registered',
+		createUserFailed: 'Create user failed',
 	},
 }
