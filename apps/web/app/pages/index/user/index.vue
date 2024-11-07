@@ -14,9 +14,6 @@ const form = useForm({
 })
 const loading = ref(false) // 添加用户界面按钮加载状态开关
 const visible = ref(false) // 添加用户界面开关
-const visControl = function () {
-	visible.value = true
-}
 
 const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻辑
 	loading.value = true
@@ -42,7 +39,7 @@ const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻�
 		<section class="flex justify-end">
 			<Dialog v-model:open="visible">
 				<DialogTrigger as-child>
-					<Button variant="outline" @click="visControl">
+					<Button variant="outline">
 						{{ $text.createUser() }}
 					</Button>
 				</DialogTrigger>
