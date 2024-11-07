@@ -32,10 +32,16 @@ const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻�
 		refresh()
 	}
 })
+
+async function deleteUser(uuid: string) {
+	await $trpc.user.deleteUser.mutate({ uuid })
+	users.value = users.value?.filter(user => user.uuid !== uuid) || []
+	// refresh()
+}
 </script>
 
 <template>
-	<main class="flex flex-col min-h-screen gap-y-2 p-4 bg-muted/40">
+	<main class="flex flex-col min-h-screen gap-y-2 p-4 bg-muted/40 ml-6">
 		<section class="flex justify-end">
 			<Dialog v-model:open="visible">
 				<DialogTrigger as-child>
@@ -116,7 +122,7 @@ const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻�
 					</TableHeader>
 					<!-- content -->
 					<TableBody v-if="status === 'pending'">
-						<TableRow v-for="user_member in users" :key="user_member.id">
+						<TableRow v-for="user_member in users" :key="user_member.uuid">
 							<TableCell class="hidden sm:table-cell">
 								<Skeleton class="h-[70px] w-full rounded-xl" />
 							</TableCell>
@@ -135,7 +141,7 @@ const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻�
 						</TableRow>
 					</TableBody>
 					<TableBody v-if="status === 'success'">
-						<TableRow v-for="user_member in users" :key="user_member.id">
+						<TableRow v-for="user_member in users" :key="user_member.uuid">
 							<TableCell class="hidden sm:table-cell">
 								<img
 									alt="{{$text.atavar()}}"
@@ -146,7 +152,7 @@ const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻�
 								>
 							</TableCell>
 							<TableCell class="font-medium">
-								{{ user_member.id }}
+								{{ user_member.uuid }}
 							</TableCell>
 							<TableCell class="hidden md:table-cell">
 								{{ user_member.username }}
@@ -172,7 +178,9 @@ const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻�
 									<DropdownMenuContent align="end">
 										<DropdownMenuLabel>{{ $text.action() }}</DropdownMenuLabel>
 										<DropdownMenuItem>{{ $text.edit() }}</DropdownMenuItem>
-										<DropdownMenuItem>{{ $text.delete() }}</DropdownMenuItem>
+										<DropdownMenuItem @click="deleteUser(user_member.uuid)">
+											{{ $text.delete() }}
+										</DropdownMenuItem>
 									</DropdownMenuContent>
 								</DropdownMenu>
 							</TableCell>

@@ -58,5 +58,6 @@ export default {
 		repositoryNotExists: '存储库不存在',
 		usernameHasBeenRegistered: '该用户名已被注册',
 		createUserFailed: '创建用户失败',
+		deleteUserFailed: '删除用户失败',
 	},
 } satisfies typeof en

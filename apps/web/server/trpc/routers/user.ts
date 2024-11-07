@@ -1,5 +1,5 @@
 import { config } from '~~/server/utils/config'
-import { CreateUserInputValidator, UserLoginSubmitFormValidator, UserRegisterSubmitDataValidator } from '~/utils/validator'
+import { CreateUserInputValidator, DeleteUserInputValidator, UserLoginSubmitFormValidator, UserRegisterSubmitDataValidator } from '~/utils/validator'
 import { checkAdminAccountExists } from '../middleware/check-admin-user'
 import { adminProcedure, protectedProcedure, publicProcedure, router } from '../trpc'
 
@@ -17,7 +17,7 @@ export const UserRouter = router({
 		.mutation(async ({ input, ctx: { db, event } }) => {
 			const user = await db.user
 				.findUniqueOrThrow({
-					where: { username: input.username },
+					where: { username: input.username, isDeleted: false },
 					select: { uuid: true, username: true, password: true, isAdmin: true },
 				})
 				.catch(() => {
@@ -120,16 +120,24 @@ export const UserRouter = router({
 
 	listUsers: adminProcedure
 		.query(async ({ ctx: { db } }) => {
-			return await db.user.findMany()
+			return await db.user.findMany({
+				where: {
+					isDeleted: false,
+				},
+			})
 		}),
 
-	// deleteUser: adminProcedure
-	// 	.mutation(async ({ id, ctx: { db } }) => {
-	// 		await db.user
-	// 			.delete({
-	// 				where: {
-	// 					uuid: id,
-	// 				},
-	// 			})
-	// 	}),
+	deleteUser: adminProcedure
+		.input(DeleteUserInputValidator)
+		.mutation(async ({ input, ctx: { db } }) => {
+			await db.user.update({
+				where: {
+					uuid: input.uuid,
+				},
+				data: {
+					isDeleted: true,
+					username: input.uuid,
+				},
+			})
+		}),
 })

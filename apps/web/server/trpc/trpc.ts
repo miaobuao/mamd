@@ -19,6 +19,7 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
 		.findUniqueOrThrow({
 			where: {
 				uuid: user.uuid,
+				isDeleted: false,
 			},
 			select: {
 				id: true,
@@ -39,7 +40,7 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
 
 export const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
 	const { userInfo } = ctx
-	if (!userInfo.isAdmin) {
+	if (!userInfo.isAdmin || !userInfo.isDeleted) {
 		throw new ForbiddenErrorWithI18n(i18n.error.permissionDenied)
 	}
 	return next({ ctx })

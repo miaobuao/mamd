@@ -20,7 +20,7 @@
 		"prepare": "husky",
 		"prisma:generate": "dotenv -e .env -- turbo prisma-client-js#generate --env-mode loose",
 		"prisma:migrate": "dotenv -e .env -- turbo prisma-client-js#migrate --env-mode loose",
-		"prisma:reset": "dotenv -e .env -- turbo prisma-client-js#reset --env-mode loose -- --force",
+		"prisma:reset": "dotenv -e .env -- pnpm --filter prisma-client-js reset --force",
 		"prisma:studio": "dotenv -e .env -- turbo prisma-client-js#studio --env-mode loose",
 		"clean": "run-s clean:all clean:root",
 		"clean:all": "turbo clean",

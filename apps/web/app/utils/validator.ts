@@ -29,3 +29,7 @@ export const CreateRepositoryFormValidator = z.object({
 	name: z.string().min(1),
 	path: z.string(),
 })
+
+export const DeleteUserInputValidator = z.object({
+	uuid: z.string(),
+})

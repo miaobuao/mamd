@@ -56,5 +56,6 @@ export default {
 		repositoryNotExists: 'Repository not exists',
 		usernameHasBeenRegistered: 'This username has been registered',
 		createUserFailed: 'Create user failed',
+		deleteUserFailed: 'Delete user failed',
 	},
 }
