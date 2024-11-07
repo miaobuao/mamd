@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod'
-import { MoreHorizontal } from 'lucide-vue-next'
+import { Loader2, MoreHorizontal } from 'lucide-vue-next'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 
@@ -15,7 +15,7 @@ const form = useForm({
 const loading = ref(false) // 添加用户界面按钮加载状态开关
 const visible = ref(false) // 添加用户界面开关
 const visControl = function () {
-	visible.value = !visible.value
+	visible.value = true
 }
 
 const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻辑
@@ -49,9 +49,7 @@ const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻�
 				<DialogContent class="sm:max-w-[425px]">
 					<DialogHeader>
 						<DialogTitle>{{ $text.createUser() }}</DialogTitle>
-						<DialogDescription>
-							{{ $text.createUserDescription() }}
-						</DialogDescription>
+						<DialogDescription>{{ $text.createUserDescription() }}</DialogDescription>
 					</DialogHeader>
 
 					<form @submit="onSubmit">
