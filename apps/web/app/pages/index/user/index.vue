@@ -35,16 +35,12 @@ const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻�
 		refresh()
 	}
 })
-
-const onClose = function () {
-	visible.value = false
-}
 </script>
 
 <template>
 	<main class="flex flex-col min-h-screen gap-y-2 p-4 bg-muted/40">
 		<section class="flex justify-end">
-			<Dialog :open="visible" @close="onClose">
+			<Dialog v-model:open="visible">
 				<DialogTrigger as-child>
 					<Button variant="outline" @click="visControl">
 						{{ $text.createUser() }}
