@@ -14,7 +14,7 @@ export async function useNatsConnection() {
 const sc = StringCodec()
 
 export class NatsTask<T> {
-	constructor(readonly subject: string, readonly queue: string) {}
+	constructor(readonly subject: string, readonly queue?: string) {}
 
 	async publish(payload: T) {
 		const conn = await useNatsConnection()

@@ -1,0 +1,11 @@
+import { NatsTask } from '../nats'
+
+export interface RepositoryWatcherConsumeContent {
+	repositoryId: number
+}
+
+export const repositoryWatcherStartTask = new NatsTask<RepositoryWatcherConsumeContent>('repository-watcher:start', 'repository-watcher:start')
+
+export const repositoryWatcherStopTask = new NatsTask<RepositoryWatcherConsumeContent>('repository-watcher:stop')
+
+export const repositoryWatcherRestartTask = new NatsTask<RepositoryWatcherConsumeContent>('repository-watcher:restart')

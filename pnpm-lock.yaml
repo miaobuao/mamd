@@ -178,6 +178,9 @@ importers:
 
   packages/workers:
     dependencies:
+      chokidar:
+        specifier: ^4.0.1
+        version: 4.0.1
       file-type:
         specifier: ^19.6.0
         version: 19.6.0
