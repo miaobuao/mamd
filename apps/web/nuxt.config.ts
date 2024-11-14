@@ -28,6 +28,7 @@ export default defineNuxtConfig({
 		locales: [ 'en', 'zh' ],
 		lazy: true,
 		vueI18n: './i18n/i18n.config.ts',
+		strategy: 'no_prefix',
 	},
 
 	shadcn: {

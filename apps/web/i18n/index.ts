@@ -1,7 +1,7 @@
 import { cloneDeep, isPlainObject } from 'lodash-es'
 
-import en from './locales/en'
-import zh from './locales/zh'
+import en from './lang/en'
+import zh from './lang/zh'
 
 type DeepKeyToPath<T, P extends string = ''> = {
 	[K in keyof T]: T[K] extends object
