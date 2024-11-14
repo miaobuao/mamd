@@ -27,7 +27,8 @@ export default defineNuxtConfig({
 		defaultLocale: 'zh',
 		locales: [ 'en', 'zh' ],
 		lazy: true,
-		vueI18n: './app/i18n.config.ts',
+		vueI18n: './i18n/i18n.config.ts',
+		strategy: 'no_prefix',
 	},
 
 	shadcn: {
@@ -41,7 +42,7 @@ export default defineNuxtConfig({
 
 	devtools: { enabled: true },
 
-	compatibilityDate: '2024-09-21',
+	compatibilityDate: '2024-11-13',
 
 	runtimeConfig: {},
 })

@@ -1,4 +1,4 @@
-import { buildLanguagePack } from '~/utils/i18n'
+import { buildLanguagePack } from '~~/i18n'
 
 export default defineNuxtPlugin(() => {
 	const { $i18n } = useNuxtApp()

@@ -15,18 +15,6 @@
 			"cache": false,
 			"persistent": true
 		},
-		"prisma-client-js#migrate": {
-			"cache": false
-		},
-		"prisma-client-js#studio": {
-			"cache": false
-		},
-		"prisma-client-js#reset": {
-			"cache": false
-		},
-		"prisma-client-js#generate": {
-			"cache": false
-		},
 		"clean": {
 			"cache": false
 		}

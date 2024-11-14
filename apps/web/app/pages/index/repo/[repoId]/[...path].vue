@@ -3,8 +3,7 @@ import { last } from 'lodash-es'
 import { CircleUser, LogOut, Search } from 'lucide-vue-next'
 import type { FileOrFolder } from '~/components/repository/File.vue'
 
-const { $trpc, $text } = useNuxtApp()
-
+const { $trpc } = useNuxtApp()
 const auth = useAuthStore()
 const uuidMapStore = useUuidMapStore()
 const route = useRoute()

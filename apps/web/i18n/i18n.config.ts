@@ -1,4 +1,5 @@
-import { en, zh } from './utils/i18n'
+import en from './lang/en'
+import zh from './lang/zh'
 
 export default defineI18nConfig(() => ({
 	legacy: false,

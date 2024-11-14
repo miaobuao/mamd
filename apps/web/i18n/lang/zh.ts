@@ -1,5 +1,3 @@
-import type en from './en'
-
 export default {
 	cancel: '取消',
 	confirm: '确认',
@@ -59,4 +57,4 @@ export default {
 		usernameHasBeenRegistered: '该用户名已被注册',
 		createUserFailed: '创建用户失败',
 	},
-} satisfies typeof en
+} as const

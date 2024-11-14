@@ -6,26 +6,8 @@
 	"scripts": {
 		"generate": "prisma generate",
 		"migrate": "prisma migrate dev",
-		"postinstall": "prisma generate",
 		"reset": "prisma migrate reset",
 		"studio": "prisma studio",
 		"clean": "rimraf node_modules"
-	},
-	"tsup": {
-		"format": [
-			"esm"
-		],
-		"dts": {
-			"resolve": true,
-			"entry": [
-				"./index.ts"
-			],
-			"compilerOptions": {
-				"moduleResolution": "node"
-			}
-		},
-		"sourcemap": true,
-		"clean": true,
-		"target": "es6"
 	}
 }
