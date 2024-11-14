@@ -9,9 +9,15 @@ export type Folder = inferProcedureOutput<AppRouter['fs']['getFolder']>
 
 export const useUuidMapStore = defineStore('uuid-map', () => {
 	const { $trpc } = useNuxtApp()
+	const pendingQueries: Map<string, boolean> = new Map()
 
 	const cacheDatabase = getCacheDatabase()
-	const pendingQueries: Record<string, boolean> = {}
+	if (isClient) {
+		LogoutSubject.subscribe(() => {
+			cacheDatabase?.delete()
+			pendingQueries.clear()
+		})
+	}
 
 	function getFolder(repositoryUuid: string, uuid: string) {
 		const res = useObservable(
@@ -21,10 +27,10 @@ export const useUuidMapStore = defineStore('uuid-map', () => {
 				),
 			),
 		)
-		if (pendingQueries[uuid]) {
+		if (pendingQueries.has(uuid)) {
 			return res
 		}
-		pendingQueries[uuid] = true
+		pendingQueries.set(uuid, true)
 		$trpc.fs.getFolder
 			.useQuery({ folderUuid: uuid, repositoryUuid })
 			.then(({ data }) => {
@@ -33,7 +39,7 @@ export const useUuidMapStore = defineStore('uuid-map', () => {
 				}
 			})
 			.finally(() => {
-				delete pendingQueries[uuid]
+				pendingQueries.delete(uuid)
 			})
 		return res
 	}

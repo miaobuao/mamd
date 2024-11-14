@@ -11,6 +11,10 @@ export const useRepositoryStore = defineStore('repository', () => {
 
 	const repositories = reactive<Repository[]>([])
 
+	LogoutSubject.subscribe(() => {
+		repositories.splice(0, repositories.length)
+	})
+
 	$trpc.repository.listVisible.useQuery().then(({ data }) => {
 		if (data.value) {
 			repositories.splice(0, repositories.length, ...data.value)
