@@ -57,4 +57,4 @@ export default {
 		usernameHasBeenRegistered: 'This username has been registered',
 		createUserFailed: 'Create user failed',
 	},
-}
+} as const

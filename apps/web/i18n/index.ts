@@ -1,14 +1,18 @@
 import { cloneDeep, isPlainObject } from 'lodash-es'
 
-import en from './lang/en'
-import zh from './lang/zh'
+import en from './locales/en'
+import zh from './locales/zh'
 
-export { en, zh }
+type DeepKeyToPath<T, P extends string = ''> = {
+	[K in keyof T]: T[K] extends object
+		? DeepKeyToPath<T[K], `${P}${Extract<K, string>}.`>
+		: `${P}${Extract<K, string>}`
+}
 
-export type LangPackage = typeof zh & typeof en
+export type LangPackage = typeof zh
 
 export function buildLanguagePack(t: TranslateFunc) {
-	const text = Object.assign({}, cloneDeep(en), cloneDeep(zh))
+	const text: typeof zh = Object.assign({}, cloneDeep(en), cloneDeep(zh))
 	ReplaceWithTranslateFunction(t)(text)
 	return text as unknown as StringToI18nText<typeof text>
 }
@@ -16,7 +20,7 @@ export function buildLanguagePack(t: TranslateFunc) {
 export function buildLanguageSource() {
 	const source = Object.assign({}, cloneDeep(en), cloneDeep(zh))
 	ReplaceWithStringPath()(source)
-	return source
+	return source as unknown as DeepKeyToPath<LangPackage>
 }
 
 function DFS<T extends Function>(cb: T) {
@@ -50,6 +54,12 @@ type I18nParams = Record<string, string | number>
 
 type StringToI18nText<T> = {
 	[K in keyof T]: T[K] extends string
-		? (args?: I18nParams) => string
+		? (args?: ExtractKeys<T[K]>) => string
 		: StringToI18nText<T[K]>;
 }
+
+export type ExtractKeys<T extends string> =
+	T extends `${infer _Start}{${infer Key}}${infer Rest}`
+		? { [K in Key]: string } & ExtractKeys<Rest>
+		// eslint-disable-next-line ts/no-empty-object-type
+		: {}
