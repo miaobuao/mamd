@@ -6,11 +6,13 @@ import { type RepositoryWatcherConsumeContent, repositoryWatcherRestartTask, rep
 
 const db = usePrismaClient()
 
-Promise.all([
-	handleStartTask(),
-	handleStopTask(),
-	handleRestartTask(),
-])
+export async function startRepositoryWatcherWorker() {
+	return await Promise.all([
+		handleStartTask(),
+		handleStopTask(),
+		handleRestartTask(),
+	])
+}
 
 async function handleStartTask() {
 	for await (const message of repositoryWatcherStartTask.consume()) {

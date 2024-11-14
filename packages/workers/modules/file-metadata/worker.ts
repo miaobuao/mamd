@@ -9,9 +9,11 @@ import { type FileMetadataConsumeContent, fileMetadataTask, type FileTask, type 
 
 const db = usePrismaClient()
 
-for await (const content of fileMetadataTask.consume()) {
-	handler(content)
-		.catch(consola.error)
+export async function startFileMetadataWorker() {
+	for await (const content of fileMetadataTask.consume()) {
+		handler(content)
+			.catch(consola.error)
+	}
 }
 
 export async function handler(content: FileMetadataConsumeContent) {

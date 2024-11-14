@@ -3,10 +3,11 @@
 	"type": "module",
 	"main": "./index.ts",
 	"scripts": {
-		"build": "tsup ./modules --format esm",
+		"build": "tsup ./modules --format esm --clean",
 		"dev:deploy": "pm2 start ./ecosystem.config.cjs",
 		"dev:build": "tsup ./modules --format esm --watch",
-		"dev": "run-p dev:*",
+		"dev:all": "run-p dev:build dev:deploy",
+		"dev": "run-s build dev:all",
 		"postinstall": "run-p build",
 		"clean": "rimraf node_modules"
 	},

@@ -7,9 +7,11 @@ import { type ScannerConsumeContent, scannerTask } from './task'
 
 const db = usePrismaClient()
 
-for await (const content of scannerTask.consume()) {
-	handler(content)
-		.catch(consola.error)
+export async function startRepositoryScannerWorker() {
+	for await (const content of scannerTask.consume()) {
+		handler(content)
+			.catch(consola.error)
+	}
 }
 
 async function handler({ repositoryId, repositoryPath, basePath }: ScannerConsumeContent) {
