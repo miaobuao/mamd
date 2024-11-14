@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { fileOpen } from 'browser-fs-access'
 import { FileUp, FolderPlus, Plus } from 'lucide-vue-next'
-import { cn } from '~/lib/utils'
 
 const props = defineProps<{
 	repositoryUuid: string
