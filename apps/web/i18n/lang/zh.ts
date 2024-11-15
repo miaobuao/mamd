@@ -24,6 +24,7 @@ export default {
 	successfullyLoggedIn: '登录成功',
 	successfullyRegistered: '注册成功!',
 	successfullyCreatedUser: '创建用户成功！',
+	successfullyUpdatedUser: '更新用户成功！',
 	username: '用户名',
 	userManagement: '用户管理', // new add
 	avatar: '头像',
@@ -44,6 +45,8 @@ export default {
 	true: '是',
 	false: '否',
 	createUserDescription: '创建一个用户来管理你的存储库',
+	updateUser: '更新用户',
+	updateUserDescription: '更新用户信息',
 	error: {
 		adminAccountExists: '管理员账户已存在',
 		invalidUsernameOrPassword: '用户名或密码错误',
@@ -56,5 +59,6 @@ export default {
 		repositoryNotExists: '存储库不存在',
 		usernameHasBeenRegistered: '该用户名已被注册',
 		createUserFailed: '创建用户失败',
+		updateUserFailed: '更新用户失败',
 	},
 } as const

@@ -7,15 +7,20 @@ import { toast } from 'vue-sonner'
 const { $trpc, $text } = useNuxtApp()
 // 查询模块 : 接收后端接口查询数据库结果
 const { data: users, status, refresh } = $trpc.user.listUsers.useQuery()
-// 添加模块 : web端添加用户并在user页面呈现
-const createUserFormSchema = toTypedSchema(CreateUserInputValidator)
-const form = useForm({
-	validationSchema: createUserFormSchema,
-})
-const loading = ref(false) // 添加用户界面按钮加载状态开关
-const visible = ref(false) // 添加用户界面开关
 
-const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻辑
+const createUserFormSchema = toTypedSchema(CreateUserInputValidator)
+const formCreateUser = useForm({ validationSchema: createUserFormSchema })
+
+const editUserFormSchema = toTypedSchema(EditUserInputValidator)
+const formUpdateUser = useForm({ validationSchema: editUserFormSchema })
+
+const loading = ref(false) // 添加用户界面按钮加载状态开关
+const createVisible = ref(false) // 添加用户界面开关
+const updateVisible = ref(false) // 更新用户界面开关
+const passwordExist = ref('') // 更新用户界面密码输入框是否显示
+const uuid = ref('') // 接受待更新用户的用户uuid
+
+const onSubmit = formCreateUser.handleSubmit(async (values) => { // 添加用户按钮逻辑
 	loading.value = true
 	try {
 		await $trpc.user.createUser.mutate(values)
@@ -28,16 +33,40 @@ const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻�
 	}
 	finally {
 		loading.value = false
-		visible.value = false
+		createVisible.value = false
 		refresh()
 	}
 })
+
+const onUpdate = formUpdateUser.handleSubmit(async (values) => { // 更新用户按钮逻辑
+	values.uuid = uuid.value
+	loading.value = true
+	try {
+		await $trpc.user.editUser.mutate(values)
+		nextTick(() => {
+			toast($text.successfullyUpdatedUser())
+		})
+	}
+	catch {
+		toast($text.error.updateUserFailed())
+	}
+	finally {
+		loading.value = false
+		updateVisible.value = false
+		refresh()
+	}
+})
+
+async function deleteUser(uuid: string) {
+	await $trpc.user.deleteUser.mutate({ uuid })
+	users.value = users.value?.filter(user => user.uuid !== uuid) || []
+}
 </script>
 
 <template>
-	<main class="flex flex-col min-h-screen gap-y-2 p-4 bg-muted/40">
+	<main class="flex flex-col min-h-screen gap-y-2 p-4 bg-muted/40 ml-6">
 		<section class="flex justify-end">
-			<Dialog v-model:open="visible">
+			<Dialog v-model:open="createVisible">
 				<DialogTrigger as-child>
 					<Button variant="outline">
 						{{ $text.createUser() }}
@@ -89,6 +118,61 @@ const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻�
 				</DialogContent>
 			</Dialog>
 		</section>
+		<Dialog v-model:open="updateVisible">
+			<DialogContent class="sm:max-w-[425px]">
+				<DialogHeader>
+					<DialogTitle>{{ $text.updateUser() }}</DialogTitle>
+					<DialogDescription>{{ $text.updateUserDescription() }}</DialogDescription>
+				</DialogHeader>
+
+				<form @submit="onUpdate">
+					<FormField v-slot="{ componentField }" name="username">
+						<FormItem>
+							<FormLabel>{{ $text.username() }}</FormLabel>
+							<FormControl>
+								<Input v-bind="componentField" />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					</FormField>
+					<FormField v-slot="{ componentField }" name="password">
+						<FormItem>
+							<FormLabel>{{ $text.password() }}</FormLabel>
+							<FormControl>
+								<Input v-bind="componentField" v-model="passwordExist" type="password" />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					</FormField>
+					<FormField v-if="passwordExist" v-slot="{ componentField }" name="confirmPassword">
+						<FormItem>
+							<FormLabel>{{ $text.confirmPassword() }}</FormLabel>
+							<FormControl>
+								<Input v-bind="componentField" type="password" />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					</FormField>
+					<FormField v-slot="{ value, handleChange }" name="isAdmin">
+						<FormItem class="mt-4">
+							<div class="flex items-center space-x-2">
+								<FormLabel>{{ $text.isManager() }}</FormLabel>
+								<FormControl>
+									<Switch id="isAdmin" :checked="value" @update:checked="handleChange" />
+								</FormControl>
+							</div>
+							<FormMessage />
+						</FormItem>
+					</FormField>
+					<DialogFooter>
+						<Button type="submit" :disabled="loading">
+							<Loader2 v-show="loading" class="w-4 h-4 mr-2 animate-spin" />
+							{{ $text.updateUser() }}
+						</Button>
+					</DialogFooter>
+				</form>
+			</DialogContent>
+		</Dialog>
 		<Card>
 			<!-- Title and SubTitle -->
 			<CardHeader>
@@ -116,7 +200,7 @@ const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻�
 					</TableHeader>
 					<!-- content -->
 					<TableBody v-if="status === 'pending'">
-						<TableRow v-for="user_member in users" :key="user_member.id">
+						<TableRow v-for="user_member in users" :key="user_member.uuid">
 							<TableCell class="hidden sm:table-cell">
 								<Skeleton class="h-[70px] w-full rounded-xl" />
 							</TableCell>
@@ -135,7 +219,7 @@ const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻�
 						</TableRow>
 					</TableBody>
 					<TableBody v-if="status === 'success'">
-						<TableRow v-for="user_member in users" :key="user_member.id">
+						<TableRow v-for="user_member in users" :key="user_member.uuid">
 							<TableCell class="hidden sm:table-cell">
 								<img
 									alt="{{$text.atavar()}}"
@@ -146,7 +230,7 @@ const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻�
 								>
 							</TableCell>
 							<TableCell class="font-medium">
-								{{ user_member.id }}
+								{{ user_member.uuid }}
 							</TableCell>
 							<TableCell class="hidden md:table-cell">
 								{{ user_member.username }}
@@ -171,8 +255,12 @@ const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻�
 									</DropdownMenuTrigger>
 									<DropdownMenuContent align="end">
 										<DropdownMenuLabel>{{ $text.action() }}</DropdownMenuLabel>
-										<DropdownMenuItem>{{ $text.edit() }}</DropdownMenuItem>
-										<DropdownMenuItem>{{ $text.delete() }}</DropdownMenuItem>
+										<DropdownMenuItem @click="updateVisible = true, uuid = user_member.uuid">
+											{{ $text.edit() }}
+										</DropdownMenuItem>
+										<DropdownMenuItem @click="deleteUser(user_member.uuid)">
+											{{ $text.delete() }}
+										</DropdownMenuItem>
 									</DropdownMenuContent>
 								</DropdownMenu>
 							</TableCell>

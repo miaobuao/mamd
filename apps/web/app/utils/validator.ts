@@ -29,3 +29,17 @@ export const CreateRepositoryFormValidator = z.object({
 	name: z.string().min(1),
 	path: z.string(),
 })
+
+export const DeleteUserInputValidator = z.object({
+	uuid: z.string(),
+})
+
+export const EditUserInputValidator = z.object({
+	uuid: z.string(),
+	username: z.string().min(2).optional(),
+	password: z.string().min(6).optional(),
+	confirmPassword: z.string().min(6).optional(),
+	isAdmin: z.boolean(),
+}).refine((input) => {
+	return input.password === input.confirmPassword
+}, {})

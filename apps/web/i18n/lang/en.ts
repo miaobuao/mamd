@@ -24,6 +24,7 @@ export default {
 	successfullyLoggedIn: 'Successfully logged in!',
 	successfullyRegistered: 'Successfully registered!',
 	successfullyCreatedUser: 'Successfully created user!',
+	successfullyUpdatedUser: 'Successfully updated user!',
 	username: 'Username',
 	userManagement: 'User management', // new add
 	avatar: 'Avatar',
@@ -44,6 +45,8 @@ export default {
 	true: 'True',
 	false: 'False',
 	createUserDescription: 'Create a user to access the system',
+	updateUser: 'Update User',
+	updateUserDescription: 'Update user information',
 	error: {
 		adminAccountExists: 'Admin account already exists',
 		invalidUsernameOrPassword: 'Invalid username or password',
@@ -56,5 +59,6 @@ export default {
 		repositoryNotExists: 'Repository not exists',
 		usernameHasBeenRegistered: 'This username has been registered',
 		createUserFailed: 'Create user failed',
+		updateUserFailed: 'Update user failed',
 	},
 } as const

@@ -1,5 +1,5 @@
 import { config } from '~~/server/utils/config'
-import { CreateUserInputValidator, UserLoginSubmitFormValidator, UserRegisterSubmitDataValidator } from '~/utils/validator'
+import { CreateUserInputValidator, DeleteUserInputValidator, EditUserInputValidator, UserLoginSubmitFormValidator, UserRegisterSubmitDataValidator } from '~/utils/validator'
 import { checkAdminAccountExists } from '../middleware/check-admin-user'
 import { adminProcedure, protectedProcedure, publicProcedure, router } from '../trpc'
 
@@ -120,16 +120,53 @@ export const UserRouter = router({
 
 	listUsers: adminProcedure
 		.query(async ({ ctx: { db } }) => {
-			return await db.user.findMany()
+			return await db.user.findMany({
+				where: {
+					isDeleted: false,
+				},
+			})
 		}),
 
-	// deleteUser: adminProcedure
-	// 	.mutation(async ({ id, ctx: { db } }) => {
-	// 		await db.user
-	// 			.delete({
-	// 				where: {
-	// 					uuid: id,
-	// 				},
-	// 			})
-	// 	}),
+	deleteUser: adminProcedure
+		.input(DeleteUserInputValidator)
+		.mutation(async ({ input, ctx: { db } }) => {
+			await db.user.update({
+				where: {
+					uuid: input.uuid,
+				},
+				data: {
+					isDeleted: true,
+					username: input.uuid,
+				},
+			})
+		}),
+
+	editUser: adminProcedure
+		.input(EditUserInputValidator)
+		.mutation(async ({ input, ctx: { db } }) => {
+			if (input.password) {
+				const hashPassword = await bcryptEncrypt(input.password)
+				await db.user.update({
+					where: {
+						uuid: input.uuid,
+					},
+					data: {
+						username: input.username,
+						password: hashPassword,
+						isAdmin: input.isAdmin,
+					},
+				})
+			}
+			else {
+				await db.user.update({
+					where: {
+						uuid: input.uuid,
+					},
+					data: {
+						username: input.username,
+						isAdmin: input.isAdmin,
+					},
+				})
+			}
+		}),
 })
