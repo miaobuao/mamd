@@ -5,7 +5,7 @@ export default defineNuxtConfig({
 	},
 
 	build: {
-		transpile: [ 'trpc-nuxt' ],
+		transpile: [ 'trpc-nuxt', 'rxjs' ],
 	},
 
 	modules: [
