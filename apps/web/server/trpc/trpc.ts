@@ -19,6 +19,7 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
 		.findUniqueOrThrow({
 			where: {
 				uuid: user.uuid,
+				isDeleted: false,
 			},
 			select: {
 				id: true,

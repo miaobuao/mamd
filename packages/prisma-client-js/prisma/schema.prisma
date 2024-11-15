@@ -8,13 +8,14 @@ datasource db {
 }
 
 model User {
-  id       Int      @id @default(autoincrement())
-  uuid     String   @unique @default(uuid()) @db.Uuid
-  username String   @unique
-  password String
-  isAdmin  Boolean  @default(false) @map("is_admin")
-  ctime    DateTime @default(now()) @map("created_at")
-  mtime    DateTime @updatedAt @map("modified_at")
+  id        Int      @id @default(autoincrement())
+  uuid      String   @unique @default(uuid()) @db.Uuid
+  username  String   @unique
+  password  String
+  isAdmin   Boolean  @default(false) @map("is_admin")
+  ctime     DateTime @default(now()) @map("created_at")
+  mtime     DateTime @updatedAt @map("modified_at")
+  isDeleted Boolean  @default(false) @map("is_deleted")
 
   createdRepositories Repository[]
   visibleRepositories VisibleRepository[]
