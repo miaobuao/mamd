@@ -1,6 +1,5 @@
 import type { H3Event } from 'h3'
 import { isNil } from 'lodash-es'
-import { config } from '../utils/config'
 
 export async function createContext(event: H3Event) {
 	const token = getCookie(event, 'auth-token')
@@ -16,7 +15,7 @@ export async function createContext(event: H3Event) {
 			const token = await signToken(payload.data)
 			setCookie(event, 'auth-token', token, {
 				httpOnly: true,
-				maxAge: secs(config.OAUTH_JWT_EXPIRES_IN),
+				maxAge: secs(useRuntimeConfig().OAUTH_JWT_EXPIRES_IN),
 			})
 		}
 		return {

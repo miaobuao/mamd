@@ -1,7 +1,4 @@
 import { type JWTPayload as BaseJwtPayload, jwtVerify, SignJWT } from 'jose'
-import { config } from './config'
-
-const secret = new TextEncoder().encode(config.JWT_SECRET)
 
 export async function signToken(
 	payload: JwtPayloadData,
@@ -13,6 +10,8 @@ export async function signToken(
 		exp?: string
 	} = {},
 ) {
+	const config = useRuntimeConfig()
+	const secret = new TextEncoder().encode(config.JWT_SECRET)
 	return await new SignJWT({ data: payload })
 		.setProtectedHeader({ alg: 'HS256' })
 		.setIssuer(issuer ?? config.JWT_ISSUER)
@@ -22,6 +21,8 @@ export async function signToken(
 
 export async function verifyToken(token: string) {
 	try {
+		const config = useRuntimeConfig()
+		const secret = new TextEncoder().encode(config.JWT_SECRET)
 		return await jwtVerify<JwtPayload>(token, secret, {
 			issuer: config.JWT_ISSUER,
 		})

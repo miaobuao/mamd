@@ -1,4 +1,3 @@
-import { config } from '~~/server/utils/config'
 import { CreateUserInputValidator, UserLoginSubmitFormValidator, UserRegisterSubmitDataValidator } from '~/utils/validator'
 import { checkAdminAccountExists } from '../middleware/check-admin-user'
 import { adminProcedure, protectedProcedure, publicProcedure, router } from '../trpc'
@@ -33,7 +32,7 @@ export const UserRouter = router({
 				remember: input.remember,
 			})
 			if (input.remember) {
-				const maxAge = secs(config.OAUTH_JWT_EXPIRES_IN)
+				const maxAge = secs(useRuntimeConfig().OAUTH_JWT_EXPIRES_IN)
 				setCookie(event, 'auth-token', token, {
 					httpOnly: true,
 					maxAge,
