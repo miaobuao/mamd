@@ -8,6 +8,7 @@ export default antfu({
 		'jsonc/indent': [ 'error', 'tab' ],
 		'no-console': 'error',
 		'style/array-bracket-spacing': [ 'error', 'always' ],
+		'style/arrow-parens': [ 'error', 'always' ],
 		'style/indent': [ 'error', 'tab' ],
 		'style/no-tabs': 'off',
 		'symbol-description': 'off',
