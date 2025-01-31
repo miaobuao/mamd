@@ -1,0 +1,760 @@
+{
+	"id": "a013ce36-a2b7-4d0e-acc6-87b002ebeb29",
+	"prevId": "00000000-0000-0000-0000-000000000000",
+	"version": "7",
+	"dialect": "postgresql",
+	"tables": {
+		"public.file": {
+			"name": "file",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"uuid": {
+					"name": "uuid",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"name": {
+					"name": "name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"repository_id": {
+					"name": "repository_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"parent_id": {
+					"name": "parent_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"creator_id": {
+					"name": "creator_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				}
+			},
+			"indexes": {
+				"file_uuid_name_idx": {
+					"name": "file_uuid_name_idx",
+					"columns": [
+						{
+							"expression": "uuid",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "name",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": true,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {
+				"file_repository_id_repository_id_fk": {
+					"name": "file_repository_id_repository_id_fk",
+					"tableFrom": "file",
+					"tableTo": "repository",
+					"columnsFrom": [
+						"repository_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				},
+				"file_parent_id_folder_id_fk": {
+					"name": "file_parent_id_folder_id_fk",
+					"tableFrom": "file",
+					"tableTo": "folder",
+					"columnsFrom": [
+						"parent_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"file_creator_id_user_id_fk": {
+					"name": "file_creator_id_user_id_fk",
+					"tableFrom": "file",
+					"tableTo": "user",
+					"columnsFrom": [
+						"creator_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"file_uuid_unique": {
+					"name": "file_uuid_unique",
+					"nullsNotDistinct": false,
+					"columns": [
+						"uuid"
+					]
+				},
+				"file_repository_id_parent_id_name_unique": {
+					"name": "file_repository_id_parent_id_name_unique",
+					"nullsNotDistinct": false,
+					"columns": [
+						"repository_id",
+						"parent_id",
+						"name"
+					]
+				}
+			},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.file_metadata": {
+			"name": "file_metadata",
+			"schema": "",
+			"columns": {
+				"file_id": {
+					"name": "file_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"mime_type": {
+					"name": "mime_type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"sha256": {
+					"name": "sha256",
+					"type": "varchar(64)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"size": {
+					"name": "size",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"birthtime": {
+					"name": "birthtime",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"mtime": {
+					"name": "mtime",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {
+				"sha256_mime_idx": {
+					"name": "sha256_mime_idx",
+					"columns": [
+						{
+							"expression": "sha256",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "mime_type",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": true,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {
+				"file_metadata_file_id_file_id_fk": {
+					"name": "file_metadata_file_id_file_id_fk",
+					"tableFrom": "file_metadata",
+					"tableTo": "file",
+					"columnsFrom": [
+						"file_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"file_metadata_file_id_unique": {
+					"name": "file_metadata_file_id_unique",
+					"nullsNotDistinct": false,
+					"columns": [
+						"file_id"
+					]
+				}
+			},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.folder": {
+			"name": "folder",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"uuid": {
+					"name": "uuid",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"name": {
+					"name": "name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"repository_id": {
+					"name": "repository_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"parent_id": {
+					"name": "parent_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"creator_id": {
+					"name": "creator_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				}
+			},
+			"indexes": {
+				"folder_uuid_name_idx": {
+					"name": "folder_uuid_name_idx",
+					"columns": [
+						{
+							"expression": "uuid",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "name",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": true,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {
+				"folder_repository_id_repository_id_fk": {
+					"name": "folder_repository_id_repository_id_fk",
+					"tableFrom": "folder",
+					"tableTo": "repository",
+					"columnsFrom": [
+						"repository_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				},
+				"folder_parent_id_folder_id_fk": {
+					"name": "folder_parent_id_folder_id_fk",
+					"tableFrom": "folder",
+					"tableTo": "folder",
+					"columnsFrom": [
+						"parent_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"folder_creator_id_user_id_fk": {
+					"name": "folder_creator_id_user_id_fk",
+					"tableFrom": "folder",
+					"tableTo": "user",
+					"columnsFrom": [
+						"creator_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"folder_uuid_unique": {
+					"name": "folder_uuid_unique",
+					"nullsNotDistinct": false,
+					"columns": [
+						"uuid"
+					]
+				},
+				"folder_repository_id_parent_id_name_unique": {
+					"name": "folder_repository_id_parent_id_name_unique",
+					"nullsNotDistinct": false,
+					"columns": [
+						"repository_id",
+						"parent_id",
+						"name"
+					]
+				}
+			},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.folder_metadata": {
+			"name": "folder_metadata",
+			"schema": "",
+			"columns": {
+				"folder_id": {
+					"name": "folder_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"file_count": {
+					"name": "file_count",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"default": 0
+				},
+				"folder_count": {
+					"name": "folder_count",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"default": 0
+				},
+				"birthtime": {
+					"name": "birthtime",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"mtime": {
+					"name": "mtime",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"folder_metadata_folder_id_folder_id_fk": {
+					"name": "folder_metadata_folder_id_folder_id_fk",
+					"tableFrom": "folder_metadata",
+					"tableTo": "folder",
+					"columnsFrom": [
+						"folder_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"folder_metadata_folder_id_unique": {
+					"name": "folder_metadata_folder_id_unique",
+					"nullsNotDistinct": false,
+					"columns": [
+						"folder_id"
+					]
+				}
+			},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.repository": {
+			"name": "repository",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"uuid": {
+					"name": "uuid",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"path": {
+					"name": "path",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"name": {
+					"name": "name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false,
+					"default": "now()"
+				},
+				"modified_at": {
+					"name": "modified_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false,
+					"default": "now()"
+				},
+				"creator_id": {
+					"name": "creator_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"linked_folder_id": {
+					"name": "linked_folder_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				}
+			},
+			"indexes": {
+				"repository_uuid_idx": {
+					"name": "repository_uuid_idx",
+					"columns": [
+						{
+							"expression": "uuid",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": true,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {
+				"repository_creator_id_user_id_fk": {
+					"name": "repository_creator_id_user_id_fk",
+					"tableFrom": "repository",
+					"tableTo": "user",
+					"columnsFrom": [
+						"creator_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				},
+				"repository_linked_folder_id_folder_id_fk": {
+					"name": "repository_linked_folder_id_folder_id_fk",
+					"tableFrom": "repository",
+					"tableTo": "folder",
+					"columnsFrom": [
+						"linked_folder_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "set null",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"repository_uuid_unique": {
+					"name": "repository_uuid_unique",
+					"nullsNotDistinct": false,
+					"columns": [
+						"uuid"
+					]
+				},
+				"repository_path_unique": {
+					"name": "repository_path_unique",
+					"nullsNotDistinct": false,
+					"columns": [
+						"path"
+					]
+				},
+				"repository_name_unique": {
+					"name": "repository_name_unique",
+					"nullsNotDistinct": false,
+					"columns": [
+						"name"
+					]
+				},
+				"repository_linked_folder_id_unique": {
+					"name": "repository_linked_folder_id_unique",
+					"nullsNotDistinct": false,
+					"columns": [
+						"linked_folder_id"
+					]
+				}
+			},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.user": {
+			"name": "user",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "serial",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"uuid": {
+					"name": "uuid",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"username": {
+					"name": "username",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"password": {
+					"name": "password",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"is_admin": {
+					"name": "is_admin",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": false,
+					"default": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false,
+					"default": "now()"
+				},
+				"modified_at": {
+					"name": "modified_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false,
+					"default": "now()"
+				},
+				"is_deleted": {
+					"name": "is_deleted",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": false,
+					"default": false
+				}
+			},
+			"indexes": {
+				"username_uuid_idx": {
+					"name": "username_uuid_idx",
+					"columns": [
+						{
+							"expression": "username",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "uuid",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": true,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"user_uuid_unique": {
+					"name": "user_uuid_unique",
+					"nullsNotDistinct": false,
+					"columns": [
+						"uuid"
+					]
+				},
+				"user_username_unique": {
+					"name": "user_username_unique",
+					"nullsNotDistinct": false,
+					"columns": [
+						"username"
+					]
+				}
+			},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.visible_repository": {
+			"name": "visible_repository",
+			"schema": "",
+			"columns": {
+				"user_id": {
+					"name": "user_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"repository_id": {
+					"name": "repository_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false,
+					"default": "now()"
+				},
+				"modified_at": {
+					"name": "modified_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false,
+					"default": "now()"
+				}
+			},
+			"indexes": {
+				"repo_user_idx": {
+					"name": "repo_user_idx",
+					"columns": [
+						{
+							"expression": "repository_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "user_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": true,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {
+				"visible_repository_user_id_user_id_fk": {
+					"name": "visible_repository_user_id_user_id_fk",
+					"tableFrom": "visible_repository",
+					"tableTo": "user",
+					"columnsFrom": [
+						"user_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"visible_repository_repository_id_repository_id_fk": {
+					"name": "visible_repository_repository_id_repository_id_fk",
+					"tableFrom": "visible_repository",
+					"tableTo": "repository",
+					"columnsFrom": [
+						"repository_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		}
+	},
+	"enums": {},
+	"schemas": {},
+	"sequences": {},
+	"roles": {},
+	"policies": {},
+	"views": {},
+	"_meta": {
+		"columns": {},
+		"schemas": {},
+		"tables": {}
+	}
+}

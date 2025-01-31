@@ -1,9 +1,13 @@
+import { UserTable } from 'drizzle-client'
+import { eq } from 'drizzle-orm'
 import { t } from '../trpc'
 
 export const checkAdminAccountExists = t.middleware(async ({ ctx, next }) => {
-	const hasAdmin = await ctx.db.user.findFirst({
-		where: { isAdmin: true },
-		select: { id: true },
+	const hasAdmin = await ctx.db.query.UserTable.findFirst({
+		where: eq(UserTable.isAdmin, true),
+		columns: {
+			id: true,
+		},
 	}).then((user) => {
 		return !!user
 	})
