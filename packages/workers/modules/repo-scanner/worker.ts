@@ -9,9 +9,11 @@ import { type ScannerConsumeContent, scannerTask } from './task'
 
 const db = useDrizzleClient(config.databaseUrl)
 
-for await (const content of scannerTask.consume()) {
-	handler(content)
-		.catch(consola.error)
+export async function startRepoScannerWorker() {
+	for await (const content of scannerTask.consume()) {
+		handler(content)
+			.catch(consola.error)
+	}
 }
 
 async function handler({ repositoryId, repositoryPath, basePath }: ScannerConsumeContent) {

@@ -3,14 +3,15 @@
 	"type": "module",
 	"main": "./index.ts",
 	"scripts": {
-		"build": "tsup ./modules --format esm",
+		"build": "bun build ./main.ts --target node --outdir=dist",
 		"dev:deploy": "pm2 start ./ecosystem.config.cjs",
-		"dev:build": "tsup ./modules --format esm --watch",
+		"dev:build": "bun build ./main.ts --target node --outdir=dist --watch",
 		"dev": "run-p dev:*",
 		"postinstall": "run-p build",
 		"clean": "rimraf node_modules"
 	},
 	"devDependencies": {
+		"bun": "^1.2.1",
 		"drizzle-client": "workspace:*",
 		"drizzle-orm": "^0.39.1",
 		"file-type": "^19.6.0",
