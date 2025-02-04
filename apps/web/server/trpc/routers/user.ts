@@ -8,7 +8,7 @@ import { adminProcedure, protectedProcedure, publicProcedure, router } from '../
 export const UserRouter = router({
 	auth: protectedProcedure.mutation(async ({ ctx: { userInfo } }) => {
 		return {
-			uuid: userInfo.uuid,
+			uuid: userInfo.id,
 			username: userInfo.username,
 			isAdmin: userInfo.isAdmin,
 		}
@@ -21,7 +21,6 @@ export const UserRouter = router({
 				where: eq(UserTable.username, input.username),
 				columns: {
 					id: true,
-					uuid: true,
 					isAdmin: true,
 					username: true,
 					password: true,
@@ -35,7 +34,7 @@ export const UserRouter = router({
 			}
 			const token = await signToken({
 				user: {
-					uuid: user.uuid,
+					id: user.id,
 				},
 				remember: input.remember,
 			})
@@ -52,7 +51,7 @@ export const UserRouter = router({
 				})
 			}
 			return {
-				uuid: user.uuid,
+				uuid: user.id,
 				username: user.username,
 				isAdmin: user.isAdmin,
 			}

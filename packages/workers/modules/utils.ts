@@ -67,3 +67,9 @@ export function readableToHash(stream: Readable, alg: string): Promise<Hash> {
 		stream.on('error', reject)
 	})
 }
+
+export function bufferToHash(buffer: Buffer, alg: string): Hash {
+	const hasher = createHash(alg)
+	hasher.end(buffer)
+	return hasher
+}

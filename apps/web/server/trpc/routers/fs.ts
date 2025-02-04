@@ -15,7 +15,7 @@ export const fsRouter = router({
 			.$dynamic()
 			.where(eq(VisibleRepositoryTable.userId, userInfo.id))
 			.innerJoin(RepositoryTable, eq(RepositoryTable.id, VisibleRepositoryTable.repositoryId))
-			.where(eq(RepositoryTable.uuid, repositoryUuid))
+			.where(eq(RepositoryTable.id, repositoryUuid))
 			.innerJoin(FolderTable, eq(RepositoryTable.linkedFolderId, FolderTable.id))
 			.limit(1)
 
@@ -24,7 +24,7 @@ export const fsRouter = router({
 			throw new ForbiddenErrorWithI18n('')
 		}
 
-		folderUuid ??= visibleRepository.folder.uuid
+		folderUuid ??= visibleRepository.folder.id
 
 		const SubFoldersTable = db
 			.select()
@@ -32,11 +32,11 @@ export const fsRouter = router({
 			.as('SubFolders')
 		const folders = await db
 			.select({
-				uuid: SubFoldersTable.uuid,
+				id: SubFoldersTable.id,
 				name: SubFoldersTable.name,
 			})
 			.from(FolderTable)
-			.where(eq(FolderTable.uuid, folderUuid))
+			.where(eq(FolderTable.id, folderUuid))
 			.innerJoin(SubFoldersTable, eq(SubFoldersTable.id, FolderTable.parentId))
 		const SubFilesTable = db
 			.select()
@@ -44,11 +44,11 @@ export const fsRouter = router({
 			.as('SubFiles')
 		const files = await db
 			.select({
-				uuid: SubFilesTable.uuid,
+				id: SubFilesTable.id,
 				name: SubFilesTable.name,
 			})
 			.from(FolderTable)
-			.where(eq(FolderTable.uuid, folderUuid))
+			.where(eq(FolderTable.id, folderUuid))
 			.innerJoin(SubFilesTable, eq(SubFilesTable.parentId, FolderTable.id))
 		return [
 			...folders.map((d) => ({ ...d, isFile: false })),
@@ -72,11 +72,11 @@ export const fsRouter = router({
 				RepositoryTable,
 				eq(RepositoryTable.id, VisibleRepositoryTable.repositoryId),
 			)
-			.where(eq(RepositoryTable.uuid, repositoryUuid))
+			.where(eq(RepositoryTable.id, repositoryUuid))
 			.innerJoin(
 				FolderTable,
 				eq(FolderTable.id, RepositoryTable.linkedFolderId),
 			)
-			.where(eq(FolderTable.uuid, folderUuid))
+			.where(eq(FolderTable.id, folderUuid))
 	}),
 })

@@ -11,10 +11,13 @@
 		"clean": "rimraf node_modules"
 	},
 	"devDependencies": {
+		"@types/mime-types": "^2.1.4",
 		"bun": "^1.2.1",
 		"drizzle-client": "workspace:*",
 		"drizzle-orm": "^0.39.1",
 		"file-type": "^19.6.0",
+		"junk": "^4.0.1",
+		"mime-types": "^2.1.35",
 		"nats": "^2.28.2"
 	}
 }

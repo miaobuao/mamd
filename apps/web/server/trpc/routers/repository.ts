@@ -15,19 +15,19 @@ export const RepositoryRouter = router({
 		// TODO: handle not found
 		const [ folder ] = await db
 			.select({
-				uuid: FolderTable.uuid,
+				uuid: FolderTable.id,
 			})
 			.from(VisibleRepositoryTable)
 			.$dynamic()
 			.where(eq(VisibleRepositoryTable.userId, userInfo.id))
 			.innerJoin(RepositoryTable, eq(RepositoryTable.id, VisibleRepositoryTable.repositoryId))
-			.where(eq(RepositoryTable.uuid, repositoryUuid))
+			.where(eq(RepositoryTable.id, repositoryUuid))
 			.innerJoin(FolderTable, eq(RepositoryTable.linkedFolderId, FolderTable.id))
 			.limit(1)
 		return folder
 	}),
 
-	listVisible: protectedProcedure.query(async ({ ctx: { db, userInfo } }): Promise<{
+	listVisibleRepository: protectedProcedure.query(async ({ ctx: { db, userInfo } }): Promise<{
 		uuid: string
 		name: string
 		linkedFolder: { uuid: string, name: string }
@@ -39,10 +39,10 @@ export const RepositoryRouter = router({
 			.innerJoin(RepositoryTable, eq(RepositoryTable.id, VisibleRepositoryTable.repositoryId))
 			.innerJoin(FolderTable, eq(RepositoryTable.linkedFolderId, FolderTable.id))
 		return visibleRepositories.map((repo) => ({
-			uuid: repo.repository.uuid,
+			uuid: repo.repository.id,
 			name: repo.repository.name,
 			linkedFolder: {
-				uuid: repo.folder.uuid,
+				uuid: repo.folder.id,
 				name: repo.folder.name,
 			},
 		}))
@@ -54,10 +54,10 @@ export const RepositoryRouter = router({
 		// TODO: handle error: not found
 		const [ res ] = await db
 			.select({
-				uuid: RepositoryTable.uuid,
+				uuid: RepositoryTable.id,
 				name: RepositoryTable.name,
 				linkedFolder: {
-					uuid: FolderTable.uuid,
+					uuid: FolderTable.id,
 					name: FolderTable.name,
 				},
 			})
@@ -65,7 +65,7 @@ export const RepositoryRouter = router({
 			.$dynamic()
 			.where(eq(VisibleRepositoryTable.userId, userInfo.id))
 			.innerJoin(RepositoryTable, eq(RepositoryTable.id, VisibleRepositoryTable.repositoryId))
-			.where(eq(RepositoryTable.uuid, repositoryUuid))
+			.where(eq(RepositoryTable.id, repositoryUuid))
 			.innerJoin(FolderTable, eq(RepositoryTable.linkedFolderId, FolderTable.id))
 		return res
 	}),
@@ -88,7 +88,7 @@ export const RepositoryRouter = router({
 				name: input.name,
 				path: input.path,
 				creatorId: userInfo.id,
-			}).returning({ id: RepositoryTable.id, uuid: RepositoryTable.uuid })
+			}).returning({ id: RepositoryTable.id })
 			await tx.insert(VisibleRepositoryTable)
 				.values({
 					repositoryId: repository.id,
@@ -100,16 +100,15 @@ export const RepositoryRouter = router({
 				creatorId: userInfo.id,
 			}).returning({
 				id: FolderTable.id,
-				uuid: FolderTable.uuid,
 			})
 			await tx.update(RepositoryTable).set({
 				linkedFolderId: folder.id,
 			})
 			return {
-				uuid: repository.uuid,
+				uuid: repository.id,
 				name: input.name,
 				linkedFolder: {
-					uuid: folder.uuid,
+					uuid: folder.id,
 					name: input.name,
 				},
 			}
@@ -121,7 +120,7 @@ export const RepositoryRouter = router({
 		repositoryUuid: z.string(),
 	})).mutation(async ({ ctx: { db }, input }) => {
 		const repository = await db.query.RepositoryTable.findFirst({
-			where: eq(RepositoryTable.uuid, input.repositoryUuid),
+			where: eq(RepositoryTable.id, input.repositoryUuid),
 			columns: {
 				id: true,
 				path: true,

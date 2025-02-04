@@ -1,11 +1,11 @@
 import { relations } from 'drizzle-orm'
-import { integer, pgTable, text, timestamp, uniqueIndex, varchar } from 'drizzle-orm/pg-core'
+import { index, integer, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
 import { FileTable } from './file'
 
 export const FileMetadataTable = pgTable(
 	'file_metadata',
 	{
-		fileId: integer('file_id').unique().references(() => FileTable.id, { onDelete: 'cascade' }).notNull(),
+		fileId: uuid('file_id').primaryKey().references(() => FileTable.id, { onDelete: 'cascade' }),
 		mimeType: text('mime_type').notNull(),
 		sha256: varchar('sha256', { length: 64 }).notNull(),
 		size: integer('size').notNull(),
@@ -13,7 +13,7 @@ export const FileMetadataTable = pgTable(
 		mtime: timestamp('mtime').notNull(),
 	},
 	(t) => [
-		uniqueIndex('sha256_mime_idx').on(t.sha256, t.mimeType),
+		index().on(t.sha256, t.mimeType),
 	],
 )
 
