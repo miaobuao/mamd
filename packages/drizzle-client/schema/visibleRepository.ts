@@ -1,13 +1,13 @@
 import { relations } from 'drizzle-orm'
-import { integer, pgTable, timestamp, uniqueIndex } from 'drizzle-orm/pg-core'
+import { pgTable, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core'
 import { RepositoryTable } from './repository'
 import { UserTable } from './user'
 
 export const VisibleRepositoryTable = pgTable(
 	'visible_repository',
 	{
-		userId: integer('user_id').references(() => UserTable.id, { onDelete: 'cascade' }),
-		repositoryId: integer('repository_id').references(() => RepositoryTable.id, { onDelete: 'cascade' }),
+		userId: uuid('user_id').references(() => UserTable.id, { onDelete: 'cascade' }),
+		repositoryId: uuid('repository_id').references(() => RepositoryTable.id, { onDelete: 'cascade' }),
 		ctime: timestamp('created_at').defaultNow(),
 		mtime: timestamp('modified_at').defaultNow().$onUpdate(() => new Date()),
 	},

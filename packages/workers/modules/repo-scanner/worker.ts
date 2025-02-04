@@ -2,6 +2,8 @@ import path from 'node:path'
 import { consola } from 'consola'
 import { FileTable, FolderTable, RepositoryTable, useDrizzleClient } from 'drizzle-client'
 import { and, eq } from 'drizzle-orm'
+import { isJunk } from 'junk'
+import { isNil } from 'lodash-es'
 import config from '../config'
 import { fileMetadataTask } from '../file-metadata/task'
 import { directoryIterator } from '../utils'
@@ -46,6 +48,9 @@ async function handler({ repositoryId, repositoryPath, basePath }: ScannerConsum
 	let parentFolderId = linkedFolderId!
 	let parentFolderPath = ''
 	for await (const entry of directoryIterator(basePath ?? repositoryPath)) {
+		if (!entry.isDir && isJunk(path.basename(entry.fullPath))) {
+			continue
+		}
 		const relativeParentPath = path.relative(repositoryPath, path.dirname(entry.fullPath))
 		if (relativeParentPath !== parentFolderPath) {
 			const parts = relativeParentPath.split(path.sep)
@@ -54,7 +59,7 @@ async function handler({ repositoryId, repositoryPath, basePath }: ScannerConsum
 		}
 		const name = path.basename(entry.fullPath)
 		if (entry.isDir) {
-			const [ _folder ] = await db.insert(FolderTable)
+			let [ folder ] = await db.insert(FolderTable)
 				.values({
 					name,
 					parentId: parentFolderId,
@@ -63,29 +68,61 @@ async function handler({ repositoryId, repositoryPath, basePath }: ScannerConsum
 				})
 				.onConflictDoNothing()
 				.returning({ id: FolderTable.id })
+			if (isNil(folder)) {
+				const _folder = await db.query.FolderTable.findFirst({
+					where: and(
+						eq(FolderTable.repositoryId, repositoryId),
+						eq(FolderTable.parentId, parentFolderId),
+						eq(FolderTable.name, name),
+					),
+					columns: {
+						id: true,
+					},
+				})
+				if (!_folder) {
+					continue
+				}
+				folder = _folder
+			}
 			await fileMetadataTask.publish({
 				isFile: false,
-				id: _folder.id,
+				id: folder.id,
 				path: entry.fullPath,
 			})
 		}
 		else {
-			const [ _file ] = await db.insert(FileTable).values({
+			let [ file ] = await db.insert(FileTable).values({
 				repositoryId,
 				parentId: parentFolderId,
 				creatorId: repository.creatorId,
 				name,
 			}).onConflictDoNothing().returning({ id: FileTable.id })
+			if (isNil(file)) {
+				const _file = await db.query.FileTable.findFirst({
+					where: and(
+						eq(FileTable.repositoryId, repositoryId),
+						eq(FileTable.parentId, parentFolderId),
+						eq(FileTable.name, name),
+					),
+					columns: {
+						id: true,
+					},
+				})
+				if (!_file) {
+					continue
+				}
+				file = _file
+			}
 			await fileMetadataTask.publish({
 				isFile: true,
-				id: _file.id,
+				id: file.id,
 				path: entry.fullPath,
 			})
 		}
 	}
 }
 
-export async function queryFolder(rootFolderId: number, parts: string[]) {
+export async function queryFolder(rootFolderId: string, parts: string[]) {
 	parts = [ ...parts ]
 	while (parts.length > 0) {
 		const part = parts.shift()!

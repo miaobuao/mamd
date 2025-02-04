@@ -16,16 +16,16 @@
 pnpm i
 ```
 
-3. Run dev setup
+3. Start docker-compose
 
 ```sh
-pnpm dev:setup
+pnpm dev:docker-compose
 ```
 
 4. Migrate db
 
 ```sh
-pnpm prisma:migrate
+pnpm db:migrate
 ```
 
 5. Run dev server

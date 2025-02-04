@@ -1,11 +1,11 @@
 import { relations } from 'drizzle-orm'
-import { integer, pgTable, timestamp } from 'drizzle-orm/pg-core'
+import { integer, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { FolderTable } from './folder'
 
 export const FolderMetadataTable = pgTable(
 	'folder_metadata',
 	{
-		folderId: integer('folder_id').unique().references(() => FolderTable.id, { onDelete: 'cascade' }).notNull(),
+		folderId: uuid('folder_id').primaryKey().references(() => FolderTable.id, { onDelete: 'cascade' }),
 		fileCount: integer('file_count').default(0),
 		folderCount: integer('folder_count').default(0),
 		birthtime: timestamp('birthtime').notNull(),

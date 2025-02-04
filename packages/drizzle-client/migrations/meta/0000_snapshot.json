@@ -1,5 +1,5 @@
 {
-	"id": "a013ce36-a2b7-4d0e-acc6-87b002ebeb29",
+	"id": "6677a4fb-5e81-4a3e-8361-4c5553a6217e",
 	"prevId": "00000000-0000-0000-0000-000000000000",
 	"version": "7",
 	"dialect": "postgresql",
@@ -10,15 +10,10 @@
 			"columns": {
 				"id": {
 					"name": "id",
-					"type": "serial",
-					"primaryKey": true,
-					"notNull": true
-				},
-				"uuid": {
-					"name": "uuid",
 					"type": "uuid",
-					"primaryKey": false,
-					"notNull": true
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
 				},
 				"name": {
 					"name": "name",
@@ -28,33 +23,27 @@
 				},
 				"repository_id": {
 					"name": "repository_id",
-					"type": "integer",
+					"type": "uuid",
 					"primaryKey": false,
 					"notNull": false
 				},
 				"parent_id": {
 					"name": "parent_id",
-					"type": "integer",
+					"type": "uuid",
 					"primaryKey": false,
 					"notNull": false
 				},
 				"creator_id": {
 					"name": "creator_id",
-					"type": "integer",
+					"type": "uuid",
 					"primaryKey": false,
 					"notNull": false
 				}
 			},
 			"indexes": {
-				"file_uuid_name_idx": {
-					"name": "file_uuid_name_idx",
+				"file_name_index": {
+					"name": "file_name_index",
 					"columns": [
-						{
-							"expression": "uuid",
-							"isExpression": false,
-							"asc": true,
-							"nulls": "last"
-						},
 						{
 							"expression": "name",
 							"isExpression": false,
@@ -62,7 +51,7 @@
 							"nulls": "last"
 						}
 					],
-					"isUnique": true,
+					"isUnique": false,
 					"concurrently": false,
 					"method": "btree",
 					"with": {}
@@ -79,7 +68,7 @@
 					"columnsTo": [
 						"id"
 					],
-					"onDelete": "no action",
+					"onDelete": "cascade",
 					"onUpdate": "no action"
 				},
 				"file_parent_id_folder_id_fk": {
@@ -111,13 +100,6 @@
 			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {
-				"file_uuid_unique": {
-					"name": "file_uuid_unique",
-					"nullsNotDistinct": false,
-					"columns": [
-						"uuid"
-					]
-				},
 				"file_repository_id_parent_id_name_unique": {
 					"name": "file_repository_id_parent_id_name_unique",
 					"nullsNotDistinct": false,
@@ -138,8 +120,8 @@
 			"columns": {
 				"file_id": {
 					"name": "file_id",
-					"type": "integer",
-					"primaryKey": false,
+					"type": "uuid",
+					"primaryKey": true,
 					"notNull": true
 				},
 				"mime_type": {
@@ -174,8 +156,8 @@
 				}
 			},
 			"indexes": {
-				"sha256_mime_idx": {
-					"name": "sha256_mime_idx",
+				"file_metadata_sha256_mime_type_index": {
+					"name": "file_metadata_sha256_mime_type_index",
 					"columns": [
 						{
 							"expression": "sha256",
@@ -190,7 +172,7 @@
 							"nulls": "last"
 						}
 					],
-					"isUnique": true,
+					"isUnique": false,
 					"concurrently": false,
 					"method": "btree",
 					"with": {}
@@ -212,15 +194,7 @@
 				}
 			},
 			"compositePrimaryKeys": {},
-			"uniqueConstraints": {
-				"file_metadata_file_id_unique": {
-					"name": "file_metadata_file_id_unique",
-					"nullsNotDistinct": false,
-					"columns": [
-						"file_id"
-					]
-				}
-			},
+			"uniqueConstraints": {},
 			"policies": {},
 			"checkConstraints": {},
 			"isRLSEnabled": false
@@ -231,15 +205,10 @@
 			"columns": {
 				"id": {
 					"name": "id",
-					"type": "serial",
-					"primaryKey": true,
-					"notNull": true
-				},
-				"uuid": {
-					"name": "uuid",
 					"type": "uuid",
-					"primaryKey": false,
-					"notNull": true
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
 				},
 				"name": {
 					"name": "name",
@@ -249,33 +218,27 @@
 				},
 				"repository_id": {
 					"name": "repository_id",
-					"type": "integer",
+					"type": "uuid",
 					"primaryKey": false,
 					"notNull": false
 				},
 				"parent_id": {
 					"name": "parent_id",
-					"type": "integer",
+					"type": "uuid",
 					"primaryKey": false,
 					"notNull": false
 				},
 				"creator_id": {
 					"name": "creator_id",
-					"type": "integer",
+					"type": "uuid",
 					"primaryKey": false,
 					"notNull": false
 				}
 			},
 			"indexes": {
-				"folder_uuid_name_idx": {
-					"name": "folder_uuid_name_idx",
+				"folder_name_index": {
+					"name": "folder_name_index",
 					"columns": [
-						{
-							"expression": "uuid",
-							"isExpression": false,
-							"asc": true,
-							"nulls": "last"
-						},
 						{
 							"expression": "name",
 							"isExpression": false,
@@ -283,7 +246,7 @@
 							"nulls": "last"
 						}
 					],
-					"isUnique": true,
+					"isUnique": false,
 					"concurrently": false,
 					"method": "btree",
 					"with": {}
@@ -300,7 +263,7 @@
 					"columnsTo": [
 						"id"
 					],
-					"onDelete": "no action",
+					"onDelete": "cascade",
 					"onUpdate": "no action"
 				},
 				"folder_parent_id_folder_id_fk": {
@@ -332,13 +295,6 @@
 			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {
-				"folder_uuid_unique": {
-					"name": "folder_uuid_unique",
-					"nullsNotDistinct": false,
-					"columns": [
-						"uuid"
-					]
-				},
 				"folder_repository_id_parent_id_name_unique": {
 					"name": "folder_repository_id_parent_id_name_unique",
 					"nullsNotDistinct": false,
@@ -359,8 +315,8 @@
 			"columns": {
 				"folder_id": {
 					"name": "folder_id",
-					"type": "integer",
-					"primaryKey": false,
+					"type": "uuid",
+					"primaryKey": true,
 					"notNull": true
 				},
 				"file_count": {
@@ -407,15 +363,7 @@
 				}
 			},
 			"compositePrimaryKeys": {},
-			"uniqueConstraints": {
-				"folder_metadata_folder_id_unique": {
-					"name": "folder_metadata_folder_id_unique",
-					"nullsNotDistinct": false,
-					"columns": [
-						"folder_id"
-					]
-				}
-			},
+			"uniqueConstraints": {},
 			"policies": {},
 			"checkConstraints": {},
 			"isRLSEnabled": false
@@ -426,15 +374,10 @@
 			"columns": {
 				"id": {
 					"name": "id",
-					"type": "serial",
-					"primaryKey": true,
-					"notNull": true
-				},
-				"uuid": {
-					"name": "uuid",
 					"type": "uuid",
-					"primaryKey": false,
-					"notNull": true
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
 				},
 				"path": {
 					"name": "path",
@@ -447,6 +390,18 @@
 					"type": "text",
 					"primaryKey": false,
 					"notNull": true
+				},
+				"creator_id": {
+					"name": "creator_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"linked_folder_id": {
+					"name": "linked_folder_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": false
 				},
 				"created_at": {
 					"name": "created_at",
@@ -461,32 +416,20 @@
 					"primaryKey": false,
 					"notNull": false,
 					"default": "now()"
-				},
-				"creator_id": {
-					"name": "creator_id",
-					"type": "integer",
-					"primaryKey": false,
-					"notNull": false
-				},
-				"linked_folder_id": {
-					"name": "linked_folder_id",
-					"type": "integer",
-					"primaryKey": false,
-					"notNull": false
 				}
 			},
 			"indexes": {
-				"repository_uuid_idx": {
-					"name": "repository_uuid_idx",
+				"repository_path_index": {
+					"name": "repository_path_index",
 					"columns": [
 						{
-							"expression": "uuid",
+							"expression": "path",
 							"isExpression": false,
 							"asc": true,
 							"nulls": "last"
 						}
 					],
-					"isUnique": true,
+					"isUnique": false,
 					"concurrently": false,
 					"method": "btree",
 					"with": {}
@@ -522,13 +465,6 @@
 			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {
-				"repository_uuid_unique": {
-					"name": "repository_uuid_unique",
-					"nullsNotDistinct": false,
-					"columns": [
-						"uuid"
-					]
-				},
 				"repository_path_unique": {
 					"name": "repository_path_unique",
 					"nullsNotDistinct": false,
@@ -561,15 +497,10 @@
 			"columns": {
 				"id": {
 					"name": "id",
-					"type": "serial",
-					"primaryKey": true,
-					"notNull": true
-				},
-				"uuid": {
-					"name": "uuid",
 					"type": "uuid",
-					"primaryKey": false,
-					"notNull": true
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
 				},
 				"username": {
 					"name": "username",
@@ -613,23 +544,17 @@
 				}
 			},
 			"indexes": {
-				"username_uuid_idx": {
-					"name": "username_uuid_idx",
+				"user_username_index": {
+					"name": "user_username_index",
 					"columns": [
 						{
 							"expression": "username",
 							"isExpression": false,
 							"asc": true,
 							"nulls": "last"
-						},
-						{
-							"expression": "uuid",
-							"isExpression": false,
-							"asc": true,
-							"nulls": "last"
 						}
 					],
-					"isUnique": true,
+					"isUnique": false,
 					"concurrently": false,
 					"method": "btree",
 					"with": {}
@@ -638,13 +563,6 @@
 			"foreignKeys": {},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {
-				"user_uuid_unique": {
-					"name": "user_uuid_unique",
-					"nullsNotDistinct": false,
-					"columns": [
-						"uuid"
-					]
-				},
 				"user_username_unique": {
 					"name": "user_username_unique",
 					"nullsNotDistinct": false,
@@ -663,13 +581,13 @@
 			"columns": {
 				"user_id": {
 					"name": "user_id",
-					"type": "integer",
+					"type": "uuid",
 					"primaryKey": false,
 					"notNull": false
 				},
 				"repository_id": {
 					"name": "repository_id",
-					"type": "integer",
+					"type": "uuid",
 					"primaryKey": false,
 					"notNull": false
 				},

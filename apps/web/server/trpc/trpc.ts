@@ -18,12 +18,11 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
 		throw new UnauthorizedErrorWithI18n(i18n.pleaseLogIn)
 	const userInfo = await ctx.db.query.UserTable.findFirst({
 		where: and(
-			eq(UserTable.uuid, user.uuid),
+			eq(UserTable.id, user.id),
 			eq(UserTable.isDeleted, false),
 		),
 		columns: {
 			id: true,
-			uuid: true,
 			isAdmin: true,
 			username: true,
 		},

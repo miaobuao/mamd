@@ -12,33 +12,35 @@
 	],
 	"scripts": {
 		"build": "turbo build",
-		"dev:setup": "dotenv -e .env -- docker compose -f ./docker-compose.dev.yml up -d",
+		"dev:docker-compose": "dotenv -e .env -- docker compose -f ./docker-compose.dev.yml up -d",
 		"dev:start": "dotenv -e .env -- turbo dev --env-mode loose",
-		"dev": "run-s dev:setup dev:start",
+		"dev": "run-s dev:docker-compose dev:start",
 		"lint-staged": "lint-staged",
 		"lint": "turbo lint",
 		"prepare": "husky",
-		"drizzle:generate": "dotenv -e .env -- pnpm --filter drizzle-client generate",
-		"drizzle:migrate": "dotenv -e .env -- pnpm --filter drizzle-client migrate",
-		"drizzle:studio": "dotenv -e .env -- pnpm --filter drizzle-client studio",
+		"db:generate": "dotenv -e .env -- pnpm --filter drizzle-client generate",
+		"db:migrate": "dotenv -e .env -- pnpm --filter drizzle-client migrate",
+		"db:studio": "dotenv -e .env -- pnpm --filter drizzle-client studio",
 		"clean": "run-s clean:all clean:root",
 		"clean:all": "turbo clean",
 		"clean:root": "rimraf node_modules"
 	},
 	"dependencies": {
-		"@antfu/eslint-config": "^3.8.0",
 		"@types/lodash-es": "^4.17.12",
 		"consola": "^3.2.3",
+		"lodash-es": "^4.17.21",
+		"rxjs": "^7.8.1"
+	},
+	"devDependencies": {
+		"@antfu/eslint-config": "^3.8.0",
 		"dotenv-cli": "^7.4.2",
 		"eslint": "9.14.0",
 		"eslint-plugin-format": "^0.1.2",
 		"husky": "^9.1.6",
 		"lint-staged": "^15.2.10",
-		"lodash-es": "^4.17.21",
 		"npm-run-all2": "^7.0.1",
 		"pm2": "^5.4.2",
 		"rimraf": "^6.0.1",
-		"rxjs": "^7.8.1",
 		"tsup": "^8.3.5",
 		"turbo": "latest"
 	}
