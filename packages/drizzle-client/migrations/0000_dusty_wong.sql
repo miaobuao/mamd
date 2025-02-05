@@ -12,7 +12,7 @@ CREATE TABLE "file_metadata" (
 	"file_id" uuid PRIMARY KEY NOT NULL,
 	"mime_type" text NOT NULL,
 	"sha256" varchar(64) NOT NULL,
-	"size" integer NOT NULL,
+	"size" bigint NOT NULL,
 	"birthtime" timestamp NOT NULL,
 	"mtime" timestamp NOT NULL
 );
@@ -37,14 +37,12 @@ CREATE TABLE "folder_metadata" (
 --> statement-breakpoint
 CREATE TABLE "repository" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"full_path" text NOT NULL,
 	"name" text NOT NULL,
 	"creator_id" uuid,
 	"linked_folder_id" uuid,
 	"created_at" timestamp DEFAULT now(),
 	"modified_at" timestamp DEFAULT now(),
-	CONSTRAINT "repository_linked_folder_id_unique" UNIQUE("linked_folder_id"),
-	CONSTRAINT "repository_creator_id_full_path_unique" UNIQUE("creator_id","full_path")
+	CONSTRAINT "repository_linked_folder_id_unique" UNIQUE("linked_folder_id")
 );
 --> statement-breakpoint
 CREATE TABLE "user" (

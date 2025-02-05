@@ -1,5 +1,5 @@
 {
-	"id": "9c7b6646-2cce-4102-916d-2b5dabb4ea5a",
+	"id": "b26fc57c-cbd6-424c-8e8f-d128e31e96af",
 	"prevId": "00000000-0000-0000-0000-000000000000",
 	"version": "7",
 	"dialect": "postgresql",
@@ -155,7 +155,7 @@
 				},
 				"size": {
 					"name": "size",
-					"type": "integer",
+					"type": "bigint",
 					"primaryKey": false,
 					"notNull": true
 				},
@@ -413,12 +413,6 @@
 					"notNull": true,
 					"default": "gen_random_uuid()"
 				},
-				"full_path": {
-					"name": "full_path",
-					"type": "text",
-					"primaryKey": false,
-					"notNull": true
-				},
 				"name": {
 					"name": "name",
 					"type": "text",
@@ -488,14 +482,6 @@
 					"nullsNotDistinct": false,
 					"columns": [
 						"linked_folder_id"
-					]
-				},
-				"repository_creator_id_full_path_unique": {
-					"name": "repository_creator_id_full_path_unique",
-					"nullsNotDistinct": false,
-					"columns": [
-						"creator_id",
-						"full_path"
 					]
 				}
 			},

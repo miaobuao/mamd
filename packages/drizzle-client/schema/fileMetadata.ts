@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm'
-import { index, integer, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
+import { bigint, index, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
 import { FileTable } from './file'
 
 export const FileMetadataTable = pgTable(
@@ -8,7 +8,7 @@ export const FileMetadataTable = pgTable(
 		fileId: uuid('file_id').primaryKey().references(() => FileTable.id, { onDelete: 'cascade' }),
 		mimeType: text('mime_type').notNull(),
 		sha256: varchar('sha256', { length: 64 }).notNull(),
-		size: integer('size').notNull(),
+		size: bigint('size', { mode: 'number' }).notNull(),
 		birthtime: timestamp('birthtime').notNull(),
 		mtime: timestamp('mtime').notNull(),
 	},
