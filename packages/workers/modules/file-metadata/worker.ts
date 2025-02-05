@@ -20,11 +20,11 @@ export async function startFileMetadataWorker() {
 }
 
 export async function handler(content: FileMetadataConsumeContent) {
-	if (content.isFile) {
-		await handleFile(content)
+	if (content.isDir) {
+		await handleFolder(content)
 	}
 	else {
-		await handleFolder(content)
+		await handleFile(content)
 	}
 }
 

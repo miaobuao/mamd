@@ -7,7 +7,7 @@ export const VisibleRepositoryTable = pgTable(
 	'visible_repository',
 	{
 		userId: uuid('user_id').references(() => UserTable.id, { onDelete: 'cascade' }),
-		repositoryId: uuid('repository_id').references(() => RepositoryTable.id, { onDelete: 'cascade' }),
+		repositoryId: uuid('repository_id').references(() => RepositoryTable.id, { onDelete: 'cascade' }).notNull(),
 		ctime: timestamp('created_at').defaultNow(),
 		mtime: timestamp('modified_at').defaultNow().$onUpdate(() => new Date()),
 	},

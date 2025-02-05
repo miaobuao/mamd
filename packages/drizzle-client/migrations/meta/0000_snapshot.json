@@ -1,5 +1,5 @@
 {
-	"id": "b26fc57c-cbd6-424c-8e8f-d128e31e96af",
+	"id": "9fd2e752-48e9-4d23-98c3-4a30710174cc",
 	"prevId": "00000000-0000-0000-0000-000000000000",
 	"version": "7",
 	"dialect": "postgresql",
@@ -31,7 +31,7 @@
 					"name": "repository_id",
 					"type": "uuid",
 					"primaryKey": false,
-					"notNull": false
+					"notNull": true
 				},
 				"parent_id": {
 					"name": "parent_id",
@@ -243,7 +243,7 @@
 					"name": "repository_id",
 					"type": "uuid",
 					"primaryKey": false,
-					"notNull": false
+					"notNull": true
 				},
 				"parent_id": {
 					"name": "parent_id",
@@ -587,7 +587,7 @@
 					"name": "repository_id",
 					"type": "uuid",
 					"primaryKey": false,
-					"notNull": false
+					"notNull": true
 				},
 				"created_at": {
 					"name": "created_at",

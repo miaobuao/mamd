@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { consola } from 'consola'
 import { FileTable, FolderTable, RepositoryTable, useDrizzleClient } from 'drizzle-client'
-import { and, eq } from 'drizzle-orm'
+import { and, eq, or } from 'drizzle-orm'
 import { isJunk } from 'junk'
 import { isNil } from 'lodash-es'
 import config from '../config'
@@ -15,14 +15,49 @@ export async function startRepositoryScannerWorker() {
 	for await (const content of scannerTask.consume()) {
 		handler(content)
 			.catch(consola.error)
+		removeRest(content.repositoryId)
+			.catch(consola.error)
 	}
 }
 
-async function handler({ repositoryId, repositoryPath, basePath }: ScannerConsumeContent) {
+async function removeRest(repositoryId: string) {
 	const repository = await db.query.RepositoryTable.findFirst({
 		where: eq(RepositoryTable.id, repositoryId),
 		with: {
 			folders: true,
+			files: true,
+			linkedFolder: true,
+		},
+	})
+	if (!repository || !repository.linkedFolder)
+		return
+	const filesPath = new Set(repository.files.map((f) => f.fullPath))
+	const foldersPath = new Set(repository.folders.map((f) => f.fullPath))
+	for await (const entry of directoryIterator(repository.linkedFolder.fullPath)) {
+		if (entry.isDir) {
+			foldersPath.delete(entry.fullPath)
+		}
+		else {
+			filesPath.delete(entry.fullPath)
+		}
+	}
+	await db.delete(FileTable)
+		.where(and(
+			eq(FileTable.repositoryId, repositoryId),
+			or(...filesPath.values().map((path) => eq(FileTable.fullPath, path))),
+		))
+
+	await db.delete(FolderTable)
+		.where(and(
+			eq(FolderTable.repositoryId, repositoryId),
+			or(...foldersPath.values().map((path) => eq(FolderTable.fullPath, path))),
+		))
+}
+
+async function handler({ repositoryId, repositoryPath }: ScannerConsumeContent) {
+	const repository = await db.query.RepositoryTable.findFirst({
+		where: eq(RepositoryTable.id, repositoryId),
+		with: {
 			linkedFolder: true,
 		},
 	})
@@ -37,18 +72,19 @@ async function handler({ repositoryId, repositoryPath, basePath }: ScannerConsum
 				parentId: null,
 				fullPath: repositoryPath,
 				creatorId: repository.creatorId,
+				repositoryId,
 			})
 			.returning({ id: FolderTable.id })
 		linkedFolderId = folder.id
 	}
 	fileMetadataTask.publish({
-		isFile: false,
+		isDir: true,
 		id: linkedFolderId!,
 		path: repositoryPath,
 	})
 	let parentFolderId = linkedFolderId!
 	let parentFolderPath = ''
-	for await (const entry of directoryIterator(basePath ?? repositoryPath)) {
+	for await (const entry of directoryIterator(repositoryPath)) {
 		if (!entry.isDir && isJunk(path.basename(entry.fullPath))) {
 			continue
 		}
@@ -87,7 +123,7 @@ async function handler({ repositoryId, repositoryPath, basePath }: ScannerConsum
 				folder = _folder
 			}
 			await fileMetadataTask.publish({
-				isFile: false,
+				isDir: true,
 				id: folder.id,
 				path: entry.fullPath,
 			})
@@ -117,7 +153,7 @@ async function handler({ repositoryId, repositoryPath, basePath }: ScannerConsum
 				file = _file
 			}
 			await fileMetadataTask.publish({
-				isFile: true,
+				isDir: false,
 				id: file.id,
 				path: entry.fullPath,
 			})

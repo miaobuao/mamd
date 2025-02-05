@@ -4,13 +4,13 @@ export const FILE_METADATA_SUBJECT = 'file-metadata'
 export const FILE_METADATA_QUEUE_NAME = 'file-metadata'
 
 export interface FileTask {
-	isFile: true
+	isDir: false
 	id: string
 	path: string
 }
 
 export interface FolderTask {
-	isFile: false
+	isDir: true
 	id: string
 	path: string
 }

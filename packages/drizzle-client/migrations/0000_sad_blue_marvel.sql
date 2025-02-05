@@ -2,7 +2,7 @@ CREATE TABLE "file" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"full_path" text NOT NULL,
-	"repository_id" uuid,
+	"repository_id" uuid NOT NULL,
 	"parent_id" uuid,
 	"creator_id" uuid,
 	CONSTRAINT "file_repository_id_full_path_unique" UNIQUE("repository_id","full_path")
@@ -21,7 +21,7 @@ CREATE TABLE "folder" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"full_path" text NOT NULL,
-	"repository_id" uuid,
+	"repository_id" uuid NOT NULL,
 	"parent_id" uuid,
 	"creator_id" uuid,
 	CONSTRAINT "folder_repository_id_full_path_unique" UNIQUE("repository_id","full_path")
@@ -58,7 +58,7 @@ CREATE TABLE "user" (
 --> statement-breakpoint
 CREATE TABLE "visible_repository" (
 	"user_id" uuid,
-	"repository_id" uuid,
+	"repository_id" uuid NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"modified_at" timestamp DEFAULT now()
 );
