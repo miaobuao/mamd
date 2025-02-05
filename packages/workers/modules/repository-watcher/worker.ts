@@ -1,10 +1,12 @@
 import chokidar from 'chokidar'
 import consola from 'consola'
-import { noop } from 'lodash-es'
-import { usePrismaClient } from 'prisma-client-js'
+import { RepositoryTable, useDrizzleClient } from 'drizzle-client'
+import { eq } from 'drizzle-orm'
+import { isNil, noop } from 'lodash-es'
+import config from '../config'
 import { type RepositoryWatcherConsumeContent, repositoryWatcherRestartTask, repositoryWatcherStartTask, repositoryWatcherStopTask } from './task'
 
-const db = usePrismaClient()
+const db = useDrizzleClient(config.databaseUrl)
 
 export async function startRepositoryWatcherWorker() {
 	return await Promise.all([
@@ -20,15 +22,16 @@ async function handleStartTask() {
 			.catch(consola.error)
 	}
 	async function handler({ repositoryId }: RepositoryWatcherConsumeContent) {
-		const repository = await db.repository.findUniqueOrThrow({
-			where: {
-				id: repositoryId,
-			},
-			select: {
-				path: true,
+		const repository = await db.query.RepositoryTable.findFirst({
+			where: eq(RepositoryTable.id, repositoryId),
+			with: {
+				linkedFolder: true,
 			},
 		})
-		const watcher = chokidar.watch(repository.path, {
+		if (isNil(repository?.linkedFolder)) {
+			return
+		}
+		const watcher = chokidar.watch(repository.linkedFolder.fullPath, {
 			ignoreInitial: true,
 		})
 		watcher.on('link', (path) => {
@@ -47,16 +50,4 @@ async function handleRestartTask() {
 	for await (const message of repositoryWatcherRestartTask.consume()) {
 		noop(message)
 	}
-}
-
-async function _repositoryExists(repositoryId: number) {
-	const repository = await db.repository.findUnique({
-		where: {
-			id: repositoryId,
-		},
-		select: {
-			path: true,
-		},
-	})
-	return !!repository
 }

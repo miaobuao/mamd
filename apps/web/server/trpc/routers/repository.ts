@@ -87,7 +87,6 @@ export const RepositoryRouter = router({
 		const res = await db.transaction(async (tx) => {
 			const [ repository ] = await tx.insert(RepositoryTable).values({
 				name: input.name,
-				fullPath: input.path,
 				creatorId: userInfo.id,
 			}).returning({ id: RepositoryTable.id })
 			await tx.insert(VisibleRepositoryTable)
@@ -126,24 +125,27 @@ export const RepositoryRouter = router({
 			where: eq(RepositoryTable.id, input.repositoryUuid),
 			columns: {
 				id: true,
-				fullPath: true,
+			},
+			with: {
+				linkedFolder: true,
 			},
 		})
-		if (!repository) {
+		if (!repository || !repository.linkedFolder) {
 			throw new BadRequestErrorWithI18n(i18n.error.repositoryNotExists)
 		}
 		await scannerTask.publish({
 			repositoryId: repository.id,
-			repositoryPath: repository.fullPath,
+			repositoryPath: repository.linkedFolder.fullPath,
 		})
 	}),
 })
 
 export async function repositoryExists(db: DrizzleCilent, path: string) {
-	return !!(await db.query.RepositoryTable.findFirst({
-		where: eq(RepositoryTable.fullPath, path),
-		columns: {
-			id: true,
-		},
-	}))
+	const res = await db
+		.select()
+		.from(RepositoryTable)
+		.innerJoin(FolderTable, eq(FolderTable.repositoryId, RepositoryTable.id))
+		.where(eq(FolderTable.fullPath, path))
+		.limit(1)
+	return res.length > 0
 }

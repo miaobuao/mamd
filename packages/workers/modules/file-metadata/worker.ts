@@ -1,11 +1,13 @@
+import { createReadStream } from 'node:fs'
 import * as fs from 'node:fs/promises'
 import { consola } from 'consola'
 import { FileMetadataTable, FileTable, FolderMetadataTable, useDrizzleClient } from 'drizzle-client'
 import { eq } from 'drizzle-orm'
-import { fileTypeFromBuffer } from 'file-type'
+import { fileTypeFromStream } from 'file-type'
+import { isBinaryFile } from 'isbinaryfile'
 import { lookup as lookupMimeType } from 'mime-types'
 import config from '../config'
-import { bufferToHash } from '../utils'
+import { readableToHash } from '../utils'
 import { type FileMetadataConsumeContent, fileMetadataTask, type FileTask, type FolderTask } from './task'
 
 const db = useDrizzleClient(config.databaseUrl)
@@ -34,13 +36,23 @@ async function handleFile(content: FileTask) {
 			.where(eq(FileTable.id, content.id))
 		return
 	}
-	const buffer = await fs.readFile(content.path)
-	const fileType = await fileTypeFromBuffer(buffer)
-	const mimeType = fileType?.mime ?? lookupMimeType(content.path)
+	const fileType = await fileTypeFromStream(
+		// @ts-expect-error - TS Error
+		createReadStream(content.path),
+	)
+	let mimeType = fileType?.mime ?? lookupMimeType(content.path)
 	if (!mimeType) {
-		return
+		if (await isBinaryFile(content.path)) {
+			mimeType = 'application/octet-stream'
+		}
+		else {
+			mimeType = 'text/plain'
+		}
 	}
-	const hasher = await bufferToHash(buffer, 'sha256')
+	const hasher = await readableToHash(
+		createReadStream(content.path),
+		'sha256',
+	)
 	const sha256 = hasher.digest('hex')
 	const { mtime, birthtime } = fileStat
 	await db.insert(FileMetadataTable).values({
