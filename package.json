@@ -33,6 +33,7 @@
 	},
 	"devDependencies": {
 		"@antfu/eslint-config": "^3.8.0",
+		"bun": "^1.2.2",
 		"dotenv-cli": "^7.4.2",
 		"eslint": "9.14.0",
 		"eslint-plugin-format": "^0.1.2",
@@ -41,7 +42,6 @@
 		"npm-run-all2": "^7.0.1",
 		"pm2": "^5.4.2",
 		"rimraf": "^6.0.1",
-		"tsup": "^8.3.5",
 		"turbo": "latest"
 	}
 }

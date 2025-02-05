@@ -2,9 +2,24 @@ import chokidar from 'chokidar'
 import consola from 'consola'
 import { RepositoryTable, useDrizzleClient } from 'drizzle-client'
 import { eq } from 'drizzle-orm'
-import { isNil, noop } from 'lodash-es'
+import { isNil } from 'lodash-es'
+import { Subject } from 'rxjs'
 import config from '../config'
-import { type RepositoryWatcherConsumeContent, repositoryWatcherRestartTask, repositoryWatcherStartTask, repositoryWatcherStopTask } from './task'
+import {
+	type RepositoryWatcherConsumeContent,
+
+	repositoryWatcherStartTask,
+	repositoryWatcherStopTask,
+} from './task'
+
+enum WorkerEvent {
+	stop,
+}
+
+const events = new Subject<{
+	repositoryId: string
+	event: WorkerEvent
+}>()
 
 const db = useDrizzleClient(config.databaseUrl)
 
@@ -12,7 +27,6 @@ export async function startRepositoryWatcherWorker() {
 	return await Promise.all([
 		handleStartTask(),
 		handleStopTask(),
-		handleRestartTask(),
 	])
 }
 
@@ -37,17 +51,23 @@ async function handleStartTask() {
 		watcher.on('link', (path) => {
 			consola.info(`link: ${path}`)
 		})
+		const subscriber = events.subscribe({
+			async next(value) {
+				switch (value.event) {
+					case WorkerEvent.stop:
+						await watcher.close()
+						subscriber.unsubscribe()
+				}
+			},
+		})
 	}
 }
 
 async function handleStopTask() {
 	for await (const message of repositoryWatcherStopTask.consume()) {
-		noop(message)
-	}
-}
-
-async function handleRestartTask() {
-	for await (const message of repositoryWatcherRestartTask.consume()) {
-		noop(message)
+		events.next({
+			...message,
+			event: WorkerEvent.stop,
+		})
 	}
 }
