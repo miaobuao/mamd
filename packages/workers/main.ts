@@ -1,7 +1,9 @@
 import { startFileMetadataWorker } from './modules/file-metadata/worker'
-import { startRepoScannerWorker } from './modules/repo-scanner/worker'
+import { startRepositoryScannerWorker } from './modules/repo-scanner/worker'
+import { startRepositoryWatcherWorker } from './modules/repository-watcher/worker'
 
 Promise.all([
 	startFileMetadataWorker(),
-	startRepoScannerWorker(),
+	startRepositoryScannerWorker(),
+	startRepositoryWatcherWorker(),
 ])

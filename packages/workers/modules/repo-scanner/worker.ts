@@ -11,7 +11,7 @@ import { type ScannerConsumeContent, scannerTask } from './task'
 
 const db = useDrizzleClient(config.databaseUrl)
 
-export async function startRepoScannerWorker() {
+export async function startRepositoryScannerWorker() {
 	for await (const content of scannerTask.consume()) {
 		handler(content)
 			.catch(consola.error)
