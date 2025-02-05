@@ -33,6 +33,7 @@ async function removeRest(repositoryId: string) {
 		return
 	const filesPath = new Set(repository.files.map((f) => f.fullPath))
 	const foldersPath = new Set(repository.folders.map((f) => f.fullPath))
+	foldersPath.delete(repository.linkedFolder.fullPath)
 	for await (const entry of directoryIterator(repository.linkedFolder.fullPath)) {
 		if (entry.isDir) {
 			foldersPath.delete(entry.fullPath)
@@ -41,6 +42,8 @@ async function removeRest(repositoryId: string) {
 			filesPath.delete(entry.fullPath)
 		}
 	}
+	consola.log('delete files: ', filesPath)
+	consola.log('delete folders: ', foldersPath)
 	await db.delete(FileTable)
 		.where(and(
 			eq(FileTable.repositoryId, repositoryId),
