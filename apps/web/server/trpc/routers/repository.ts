@@ -1,5 +1,6 @@
 import type { DrizzleCilent } from 'drizzle-client'
 import * as fs from 'node:fs/promises'
+import { basename } from 'node:path'
 import { scannerTask } from '@repo/workers'
 import { BadRequestErrorWithI18n } from '~~/server/utils/error'
 import { FolderTable, RepositoryTable, VisibleRepositoryTable } from 'drizzle-client'
@@ -52,7 +53,7 @@ export const RepositoryRouter = router({
 		uuid: z.string().uuid(),
 	})).query(async ({ ctx: { db, userInfo }, input: { uuid: repositoryUuid } }) => {
 		// TODO: handle error: not found
-		const [ res ] = await db
+		const res = await db
 			.select({
 				uuid: RepositoryTable.id,
 				name: RepositoryTable.name,
@@ -67,7 +68,7 @@ export const RepositoryRouter = router({
 			.innerJoin(RepositoryTable, eq(RepositoryTable.id, VisibleRepositoryTable.repositoryId))
 			.where(eq(RepositoryTable.id, repositoryUuid))
 			.innerJoin(FolderTable, eq(RepositoryTable.linkedFolderId, FolderTable.id))
-		return res
+		return res.at(0)
 	}),
 
 	create: adminProcedure.input(CreateRepositoryFormValidator).mutation(async ({ ctx: { db, userInfo }, input }) => {
@@ -86,7 +87,7 @@ export const RepositoryRouter = router({
 		const res = await db.transaction(async (tx) => {
 			const [ repository ] = await tx.insert(RepositoryTable).values({
 				name: input.name,
-				path: input.path,
+				fullPath: input.path,
 				creatorId: userInfo.id,
 			}).returning({ id: RepositoryTable.id })
 			await tx.insert(VisibleRepositoryTable)
@@ -95,11 +96,13 @@ export const RepositoryRouter = router({
 					userId: userInfo.id,
 				})
 			const [ folder ] = await tx.insert(FolderTable).values({
-				name: input.name,
+				name: basename(input.path),
+				fullPath: input.path,
 				repositoryId: repository.id,
 				creatorId: userInfo.id,
 			}).returning({
 				id: FolderTable.id,
+				name: FolderTable.name,
 			})
 			await tx.update(RepositoryTable).set({
 				linkedFolderId: folder.id,
@@ -109,7 +112,7 @@ export const RepositoryRouter = router({
 				name: input.name,
 				linkedFolder: {
 					uuid: folder.id,
-					name: input.name,
+					name: folder.name,
 				},
 			}
 		})
@@ -123,7 +126,7 @@ export const RepositoryRouter = router({
 			where: eq(RepositoryTable.id, input.repositoryUuid),
 			columns: {
 				id: true,
-				path: true,
+				fullPath: true,
 			},
 		})
 		if (!repository) {
@@ -131,14 +134,14 @@ export const RepositoryRouter = router({
 		}
 		await scannerTask.publish({
 			repositoryId: repository.id,
-			repositoryPath: repository.path,
+			repositoryPath: repository.fullPath,
 		})
 	}),
 })
 
 export async function repositoryExists(db: DrizzleCilent, path: string) {
 	return !!(await db.query.RepositoryTable.findFirst({
-		where: eq(RepositoryTable.path, path),
+		where: eq(RepositoryTable.fullPath, path),
 		columns: {
 			id: true,
 		},

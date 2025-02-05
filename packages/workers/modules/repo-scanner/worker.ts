@@ -35,6 +35,7 @@ async function handler({ repositoryId, repositoryPath, basePath }: ScannerConsum
 			.values({
 				name: path.basename(repositoryPath),
 				parentId: null,
+				fullPath: repositoryPath,
 				creatorId: repository.creatorId,
 			})
 			.returning({ id: FolderTable.id })
@@ -64,6 +65,7 @@ async function handler({ repositoryId, repositoryPath, basePath }: ScannerConsum
 					name,
 					parentId: parentFolderId,
 					repositoryId,
+					fullPath: entry.fullPath,
 					creatorId: repository.creatorId,
 				})
 				.onConflictDoNothing()
@@ -94,6 +96,7 @@ async function handler({ repositoryId, repositoryPath, basePath }: ScannerConsum
 			let [ file ] = await db.insert(FileTable).values({
 				repositoryId,
 				parentId: parentFolderId,
+				fullPath: entry.fullPath,
 				creatorId: repository.creatorId,
 				name,
 			}).onConflictDoNothing().returning({ id: FileTable.id })

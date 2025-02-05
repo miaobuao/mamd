@@ -1,5 +1,5 @@
 {
-	"id": "6677a4fb-5e81-4a3e-8361-4c5553a6217e",
+	"id": "9c7b6646-2cce-4102-916d-2b5dabb4ea5a",
 	"prevId": "00000000-0000-0000-0000-000000000000",
 	"version": "7",
 	"dialect": "postgresql",
@@ -17,6 +17,12 @@
 				},
 				"name": {
 					"name": "name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"full_path": {
+					"name": "full_path",
 					"type": "text",
 					"primaryKey": false,
 					"notNull": true
@@ -41,11 +47,23 @@
 				}
 			},
 			"indexes": {
-				"file_name_index": {
-					"name": "file_name_index",
+				"file_name_full_path_repository_id_index": {
+					"name": "file_name_full_path_repository_id_index",
 					"columns": [
 						{
 							"expression": "name",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "full_path",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "repository_id",
 							"isExpression": false,
 							"asc": true,
 							"nulls": "last"
@@ -100,13 +118,12 @@
 			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {
-				"file_repository_id_parent_id_name_unique": {
-					"name": "file_repository_id_parent_id_name_unique",
+				"file_repository_id_full_path_unique": {
+					"name": "file_repository_id_full_path_unique",
 					"nullsNotDistinct": false,
 					"columns": [
 						"repository_id",
-						"parent_id",
-						"name"
+						"full_path"
 					]
 				}
 			},
@@ -216,6 +233,12 @@
 					"primaryKey": false,
 					"notNull": true
 				},
+				"full_path": {
+					"name": "full_path",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
 				"repository_id": {
 					"name": "repository_id",
 					"type": "uuid",
@@ -236,11 +259,23 @@
 				}
 			},
 			"indexes": {
-				"folder_name_index": {
-					"name": "folder_name_index",
+				"folder_name_full_path_repository_id_index": {
+					"name": "folder_name_full_path_repository_id_index",
 					"columns": [
 						{
 							"expression": "name",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "full_path",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "repository_id",
 							"isExpression": false,
 							"asc": true,
 							"nulls": "last"
@@ -295,13 +330,12 @@
 			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {
-				"folder_repository_id_parent_id_name_unique": {
-					"name": "folder_repository_id_parent_id_name_unique",
+				"folder_repository_id_full_path_unique": {
+					"name": "folder_repository_id_full_path_unique",
 					"nullsNotDistinct": false,
 					"columns": [
 						"repository_id",
-						"parent_id",
-						"name"
+						"full_path"
 					]
 				}
 			},
@@ -379,8 +413,8 @@
 					"notNull": true,
 					"default": "gen_random_uuid()"
 				},
-				"path": {
-					"name": "path",
+				"full_path": {
+					"name": "full_path",
 					"type": "text",
 					"primaryKey": false,
 					"notNull": true
@@ -418,23 +452,7 @@
 					"default": "now()"
 				}
 			},
-			"indexes": {
-				"repository_path_index": {
-					"name": "repository_path_index",
-					"columns": [
-						{
-							"expression": "path",
-							"isExpression": false,
-							"asc": true,
-							"nulls": "last"
-						}
-					],
-					"isUnique": false,
-					"concurrently": false,
-					"method": "btree",
-					"with": {}
-				}
-			},
+			"indexes": {},
 			"foreignKeys": {
 				"repository_creator_id_user_id_fk": {
 					"name": "repository_creator_id_user_id_fk",
@@ -465,25 +483,19 @@
 			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {
-				"repository_path_unique": {
-					"name": "repository_path_unique",
-					"nullsNotDistinct": false,
-					"columns": [
-						"path"
-					]
-				},
-				"repository_name_unique": {
-					"name": "repository_name_unique",
-					"nullsNotDistinct": false,
-					"columns": [
-						"name"
-					]
-				},
 				"repository_linked_folder_id_unique": {
 					"name": "repository_linked_folder_id_unique",
 					"nullsNotDistinct": false,
 					"columns": [
 						"linked_folder_id"
+					]
+				},
+				"repository_creator_id_full_path_unique": {
+					"name": "repository_creator_id_full_path_unique",
+					"nullsNotDistinct": false,
+					"columns": [
+						"creator_id",
+						"full_path"
 					]
 				}
 			},
