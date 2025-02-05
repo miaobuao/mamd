@@ -1,5 +1,5 @@
-import { FileTable, FolderTable, RepositoryTable, VisibleRepositoryTable } from 'drizzle-client'
-import { eq } from 'drizzle-orm'
+import { FolderTable, RepositoryTable, VisibleRepositoryTable } from 'drizzle-client'
+import { and, eq } from 'drizzle-orm'
 import { isNil } from 'lodash-es'
 import { z } from 'zod'
 import { protectedProcedure, router } from '../trpc'
@@ -26,34 +26,23 @@ export const fsRouter = router({
 
 		folderUuid ??= visibleRepository.folder.id
 
-		const SubFoldersTable = db
-			.select()
-			.from(FolderTable)
-			.as('SubFolders')
-		const folders = await db
-			.select({
-				id: SubFoldersTable.id,
-				name: SubFoldersTable.name,
-			})
-			.from(FolderTable)
-			.where(eq(FolderTable.id, folderUuid))
-			.innerJoin(SubFoldersTable, eq(SubFoldersTable.id, FolderTable.parentId))
-		const SubFilesTable = db
-			.select()
-			.from(FileTable)
-			.as('SubFiles')
-		const files = await db
-			.select({
-				id: SubFilesTable.id,
-				name: SubFilesTable.name,
-			})
-			.from(FolderTable)
-			.where(eq(FolderTable.id, folderUuid))
-			.innerJoin(SubFilesTable, eq(SubFilesTable.parentId, FolderTable.id))
-		return [
-			...folders.map((d) => ({ ...d, isFile: false })),
-			...files.map((d) => ({ ...d, isFile: true })),
-		]
+		const subs = await db.query.FolderTable.findFirst({
+			where: and(
+				eq(FolderTable.id, folderUuid),
+				eq(FolderTable.repositoryId, repositoryUuid),
+			),
+			with: {
+				subFiles: true,
+				subFolders: true,
+			},
+		})
+
+		return subs
+			? [
+				...subs.subFolders.map((d) => ({ id: d.id, name: d.name, isFile: false })),
+				...subs.subFiles.map((d) => ({ id: d.id, name: d.name, isFile: true })),
+			]
+			: []
 	}),
 
 	getFolder: protectedProcedure.input(z.object({
@@ -78,5 +67,7 @@ export const fsRouter = router({
 				eq(FolderTable.id, RepositoryTable.linkedFolderId),
 			)
 			.where(eq(FolderTable.id, folderUuid))
+			.limit(1)
+			.then((d) => d.at(0))
 	}),
 })

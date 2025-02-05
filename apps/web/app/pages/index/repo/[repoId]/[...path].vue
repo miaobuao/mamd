@@ -12,7 +12,7 @@ const repositoryStore = useRepositoryStore()
 
 const items = ref<FileOrFolder[]>([])
 const repositoryUuid = computed(() => route.params.repoId as string)
-const repository = ref<Repository>()
+const repository = ref<Repository | null | undefined>()
 
 watch(repositoryUuid, (uuid) => {
 	useAsyncData(() => repositoryStore.queryRepository(uuid))
@@ -54,7 +54,7 @@ watch([ repository, currentPath ], ([ repository, currentPath ]) => {
 		items.value = entries.data.value
 		items.value.forEach((item) => {
 			if (!item.isFile) {
-				uuidMapStore.upsertFolder(repositoryUuid.value, item.uuid, {
+				uuidMapStore.upsertFolder(repositoryUuid.value, item.id, {
 					name: item.name,
 				})
 			}
@@ -103,8 +103,8 @@ watch([ repository, currentPath ], ([ repository, currentPath ]) => {
 			</DropdownMenu>
 		</header>
 		<main class="gap-2 sm:gap-4 grid">
-			<template v-for="item, i in items" :key="i">
-				<NuxtLink :to="`${route.fullPath}/${item.uuid}`">
+			<template v-for="item in items" :key="item.id">
+				<NuxtLink :to="`${route.fullPath}/${item.id}`">
 					<RepositoryFile v-if="item.isFile" :entry="item" class="text-sm" />
 					<RepositoryFolder v-else :entry="item" />
 				</NuxtLink>

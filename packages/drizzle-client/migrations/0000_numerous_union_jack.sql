@@ -1,10 +1,11 @@
 CREATE TABLE "file" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
+	"full_path" text NOT NULL,
 	"repository_id" uuid,
 	"parent_id" uuid,
 	"creator_id" uuid,
-	CONSTRAINT "file_repository_id_parent_id_name_unique" UNIQUE("repository_id","parent_id","name")
+	CONSTRAINT "file_repository_id_full_path_unique" UNIQUE("repository_id","full_path")
 );
 --> statement-breakpoint
 CREATE TABLE "file_metadata" (
@@ -19,10 +20,11 @@ CREATE TABLE "file_metadata" (
 CREATE TABLE "folder" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
+	"full_path" text NOT NULL,
 	"repository_id" uuid,
 	"parent_id" uuid,
 	"creator_id" uuid,
-	CONSTRAINT "folder_repository_id_parent_id_name_unique" UNIQUE("repository_id","parent_id","name")
+	CONSTRAINT "folder_repository_id_full_path_unique" UNIQUE("repository_id","full_path")
 );
 --> statement-breakpoint
 CREATE TABLE "folder_metadata" (
@@ -35,15 +37,14 @@ CREATE TABLE "folder_metadata" (
 --> statement-breakpoint
 CREATE TABLE "repository" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"path" text NOT NULL,
+	"full_path" text NOT NULL,
 	"name" text NOT NULL,
 	"creator_id" uuid,
 	"linked_folder_id" uuid,
 	"created_at" timestamp DEFAULT now(),
 	"modified_at" timestamp DEFAULT now(),
-	CONSTRAINT "repository_path_unique" UNIQUE("path"),
-	CONSTRAINT "repository_name_unique" UNIQUE("name"),
-	CONSTRAINT "repository_linked_folder_id_unique" UNIQUE("linked_folder_id")
+	CONSTRAINT "repository_linked_folder_id_unique" UNIQUE("linked_folder_id"),
+	CONSTRAINT "repository_creator_id_full_path_unique" UNIQUE("creator_id","full_path")
 );
 --> statement-breakpoint
 CREATE TABLE "user" (
@@ -76,9 +77,8 @@ ALTER TABLE "repository" ADD CONSTRAINT "repository_creator_id_user_id_fk" FOREI
 ALTER TABLE "repository" ADD CONSTRAINT "repository_linked_folder_id_folder_id_fk" FOREIGN KEY ("linked_folder_id") REFERENCES "public"."folder"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "visible_repository" ADD CONSTRAINT "visible_repository_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "visible_repository" ADD CONSTRAINT "visible_repository_repository_id_repository_id_fk" FOREIGN KEY ("repository_id") REFERENCES "public"."repository"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-CREATE INDEX "file_name_index" ON "file" USING btree ("name");--> statement-breakpoint
+CREATE INDEX "file_name_full_path_repository_id_index" ON "file" USING btree ("name","full_path","repository_id");--> statement-breakpoint
 CREATE INDEX "file_metadata_sha256_mime_type_index" ON "file_metadata" USING btree ("sha256","mime_type");--> statement-breakpoint
-CREATE INDEX "folder_name_index" ON "folder" USING btree ("name");--> statement-breakpoint
-CREATE INDEX "repository_path_index" ON "repository" USING btree ("path");--> statement-breakpoint
+CREATE INDEX "folder_name_full_path_repository_id_index" ON "folder" USING btree ("name","full_path","repository_id");--> statement-breakpoint
 CREATE INDEX "user_username_index" ON "user" USING btree ("username");--> statement-breakpoint
 CREATE UNIQUE INDEX "repo_user_idx" ON "visible_repository" USING btree ("repository_id","user_id");
