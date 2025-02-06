@@ -1,58 +1,41 @@
 <script setup lang="ts">
 import type { FileOrFolder } from '~/components/repository/File.vue'
-import { last } from 'lodash-es'
 import { CircleUser, LogOut, Search } from 'lucide-vue-next'
 
 const { $trpc } = useNuxtApp()
 const auth = useAuthStore()
-const uuidMapStore = useUuidMapStore()
 const route = useRoute()
 const repositoryStore = useRepositoryStore()
 
-const items = ref<FileOrFolder[]>([])
+const items = ref<FileOrFolder[]>()
 const repositoryUuid = computed(() => route.params.repoId as string)
-const repository = ref<Repository | null | undefined>()
+const repository = ref(
+	await useAsyncData(() => repositoryStore.queryRepository(repositoryUuid.value))
+		.then((d) => d.data.value),
+)
 
 watch(repositoryUuid, (uuid) => {
 	useAsyncData(() => repositoryStore.queryRepository(uuid))
 		.then((d) => {
 			repository.value = d.data.value
 		})
-}, {
-	immediate: true,
 })
 
 const currentPath = computed(() => {
-	let path
-	if (Array.isArray(route.params.path)) {
-		path = route.params.path
-	}
-	else {
-		path = [ route.params.path ]
-	}
+	const path = Array.isArray(route.params.path)
+		? route.params.path
+		: [ route.params.path ]
 	return path.filter(Boolean) as string[]
 })
 
-watch([ repository, currentPath ], ([ repository, currentPath ]) => {
-	if (!repository)
+watch([ repository, currentPath ], async () => {
+	if (!repository.value)
 		return
-	const currentPathStr = currentPath.join('/')
-	$trpc.fs.listAllFromPath.useQuery({
-		repositoryId: repository.uuid,
+	const currentPathStr = currentPath.value.join('/')
+	items.value = await $trpc.fs.listAllFromPath.useQuery({
+		repositoryId: repository.value.uuid,
 		path: currentPathStr,
-	}).then((entries) => {
-		if (!entries.data.value) {
-			return
-		}
-		items.value = entries.data.value
-		items.value.forEach((item) => {
-			if (item.isDir) {
-				uuidMapStore.upsertFolder(repositoryUuid.value, item.id, {
-					name: item.name,
-				})
-			}
-		})
-	})
+	}).then((entries) => entries.data.value ?? [])
 }, {
 	immediate: true,
 })
@@ -104,7 +87,7 @@ watch([ repository, currentPath ], ([ repository, currentPath ]) => {
 			</template>
 		</main>
 		<div class="fixed bottom-0 right-0 m-8">
-			<RepositoryUploadButton :repository-uuid="repositoryUuid" :folder-uuid="last(currentPath)!" />
+			<RepositoryUploadButton :repository-uuid="repositoryUuid" :folder-uuid="currentPath.at(-1)!" />
 		</div>
 	</div>
 </template>
