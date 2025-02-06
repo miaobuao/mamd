@@ -1,65 +1,41 @@
 <script setup lang="ts">
-import { last } from 'lodash-es'
-import { CircleUser, LogOut, Search } from 'lucide-vue-next'
 import type { FileOrFolder } from '~/components/repository/File.vue'
+import { CircleUser, LogOut, Search } from 'lucide-vue-next'
 
 const { $trpc } = useNuxtApp()
 const auth = useAuthStore()
-const uuidMapStore = useUuidMapStore()
 const route = useRoute()
-const router = useRouter()
 const repositoryStore = useRepositoryStore()
 
-const items = ref<FileOrFolder[]>([])
+const items = ref<FileOrFolder[]>()
 const repositoryUuid = computed(() => route.params.repoId as string)
-const repository = ref<Repository | null | undefined>()
+const repository = ref(
+	await useAsyncData(() => repositoryStore.queryRepository(repositoryUuid.value))
+		.then((d) => d.data.value),
+)
 
 watch(repositoryUuid, (uuid) => {
 	useAsyncData(() => repositoryStore.queryRepository(uuid))
 		.then((d) => {
 			repository.value = d.data.value
 		})
-}, {
-	immediate: true,
 })
 
 const currentPath = computed(() => {
-	let path
-	if (Array.isArray(route.params.path)) {
-		path = route.params.path
-	}
-	else {
-		path = [ route.params.path ]
-	}
+	const path = Array.isArray(route.params.path)
+		? route.params.path
+		: [ route.params.path ]
 	return path.filter(Boolean) as string[]
 })
 
-watch([ repository, currentPath ], ([ repository, currentPath ]) => {
-	if (!repository)
+watch([ repository, currentPath ], async () => {
+	if (!repository.value)
 		return
-	if (currentPath.length === 0) {
-		const linkedFolder = repository.linkedFolder?.uuid
-		if (linkedFolder) {
-			router.replace(`${route.fullPath}/${linkedFolder}`)
-			return
-		}
-	}
-	$trpc.fs.listAll.useQuery({
-		repositoryUuid: repository.uuid,
-		folderUuid: last(currentPath),
-	}).then((entries) => {
-		if (!entries.data.value) {
-			return
-		}
-		items.value = entries.data.value
-		items.value.forEach((item) => {
-			if (!item.isFile) {
-				uuidMapStore.upsertFolder(repositoryUuid.value, item.id, {
-					name: item.name,
-				})
-			}
-		})
-	})
+	const currentPathStr = currentPath.value.join('/')
+	items.value = await $trpc.fs.listAllFromPath.useQuery({
+		repositoryId: repository.value.uuid,
+		path: currentPathStr,
+	}).then((entries) => entries.data.value ?? [])
 }, {
 	immediate: true,
 })
@@ -73,7 +49,7 @@ watch([ repository, currentPath ], ([ repository, currentPath ]) => {
 				v-if="repository"
 				class="hidden sm:block"
 				:repository="repository"
-				:path="route.params.path"
+				:path="currentPath"
 			/>
 			<div class="relative ml-auto flex-1 md:grow-0">
 				<Search class="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -104,14 +80,14 @@ watch([ repository, currentPath ], ([ repository, currentPath ]) => {
 		</header>
 		<main class="gap-2 sm:gap-4 grid">
 			<template v-for="item in items" :key="item.id">
-				<NuxtLink :to="`${route.fullPath}/${item.id}`">
-					<RepositoryFile v-if="item.isFile" :entry="item" class="text-sm" />
-					<RepositoryFolder v-else :entry="item" />
+				<NuxtLink :to="`${route.fullPath}/${encodeURIComponent(item.name)}`">
+					<RepositoryFolder v-if="item.isDir" :entry="item" />
+					<RepositoryFile v-else :entry="item" class="text-sm" />
 				</NuxtLink>
 			</template>
 		</main>
 		<div class="fixed bottom-0 right-0 m-8">
-			<RepositoryUploadButton :repository-uuid="repositoryUuid" :folder-uuid="last(currentPath)!" />
+			<RepositoryUploadButton :repository-uuid="repositoryUuid" :folder-uuid="currentPath.at(-1)!" />
 		</div>
 	</div>
 </template>

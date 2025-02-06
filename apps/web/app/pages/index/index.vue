@@ -8,7 +8,7 @@ const repositoryStore = useRepositoryStore()
 			v-for=" repository in repositoryStore.repositories"
 			:key="repository.id"
 		>
-			<NuxtLink :to="`/repo/${repository.uuid}/${repository.linkedFolder?.uuid}`">
+			<NuxtLink :to="`/repo/${repository.uuid}/`">
 				<RepositoryInfoCard
 					:repository="repository"
 				/>

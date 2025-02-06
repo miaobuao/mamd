@@ -1,3 +1,4 @@
+import path from 'node:path'
 import { FolderTable, RepositoryTable, VisibleRepositoryTable } from 'drizzle-client'
 import { and, eq } from 'drizzle-orm'
 import { isNil } from 'lodash-es'
@@ -39,8 +40,52 @@ export const fsRouter = router({
 
 		return subs
 			? [
-				...subs.subFolders.map((d) => ({ id: d.id, name: d.name, isFile: false })),
-				...subs.subFiles.map((d) => ({ id: d.id, name: d.name, isFile: true })),
+				...subs.subFolders.map((d) => ({ id: d.id, name: d.name, isDir: true })),
+				...subs.subFiles.map((d) => ({ id: d.id, name: d.name, isDir: false })),
+			]
+			: []
+	}),
+
+	listAllFromPath: protectedProcedure.input(
+		z.object({
+			repositoryId: z.string().uuid(),
+			path: z.string().default(''),
+		}),
+	).query(async ({ input, ctx: { db, userInfo } }) => {
+		const [ root ] = await db
+			.select({
+				folderId: FolderTable.id,
+				root: FolderTable.fullPath,
+			})
+			.from(VisibleRepositoryTable)
+			.$dynamic()
+			.where(and(
+				eq(VisibleRepositoryTable.userId, userInfo.id),
+				eq(VisibleRepositoryTable.repositoryId, input.repositoryId),
+			))
+			.innerJoin(RepositoryTable, eq(RepositoryTable.id, VisibleRepositoryTable.repositoryId))
+			.innerJoin(FolderTable, eq(FolderTable.id, RepositoryTable.linkedFolderId))
+		if (isNil(root)) {
+			throw new ForbiddenErrorWithI18n(i18n.error.repositoryNotExists)
+		}
+		const fullPath = path.join(root.root, input.path)
+		const folder = await db
+			.query
+			.FolderTable
+			.findFirst({
+				where: and(
+					eq(FolderTable.repositoryId, input.repositoryId),
+					eq(FolderTable.fullPath, fullPath),
+				),
+				with: {
+					subFolders: true,
+					subFiles: true,
+				},
+			})
+		return folder
+			? [
+				...folder.subFolders.map((d) => ({ id: d.id, name: d.name, isDir: true })),
+				...folder.subFiles.map((d) => ({ id: d.id, name: d.name, isDir: false })),
 			]
 			: []
 	}),
