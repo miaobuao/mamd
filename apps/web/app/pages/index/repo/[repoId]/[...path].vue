@@ -1,13 +1,12 @@
 <script setup lang="ts">
+import type { FileOrFolder } from '~/components/repository/File.vue'
 import { last } from 'lodash-es'
 import { CircleUser, LogOut, Search } from 'lucide-vue-next'
-import type { FileOrFolder } from '~/components/repository/File.vue'
 
 const { $trpc } = useNuxtApp()
 const auth = useAuthStore()
 const uuidMapStore = useUuidMapStore()
 const route = useRoute()
-const router = useRouter()
 const repositoryStore = useRepositoryStore()
 
 const items = ref<FileOrFolder[]>([])
@@ -37,23 +36,17 @@ const currentPath = computed(() => {
 watch([ repository, currentPath ], ([ repository, currentPath ]) => {
 	if (!repository)
 		return
-	if (currentPath.length === 0) {
-		const linkedFolder = repository.linkedFolder?.uuid
-		if (linkedFolder) {
-			router.replace(`${route.fullPath}/${linkedFolder}`)
-			return
-		}
-	}
-	$trpc.fs.listAll.useQuery({
-		repositoryUuid: repository.uuid,
-		folderUuid: last(currentPath),
+	const currentPathStr = currentPath.join('/')
+	$trpc.fs.listAllFromPath.useQuery({
+		repositoryId: repository.uuid,
+		path: currentPathStr,
 	}).then((entries) => {
 		if (!entries.data.value) {
 			return
 		}
 		items.value = entries.data.value
 		items.value.forEach((item) => {
-			if (!item.isFile) {
+			if (item.isDir) {
 				uuidMapStore.upsertFolder(repositoryUuid.value, item.id, {
 					name: item.name,
 				})
@@ -73,7 +66,7 @@ watch([ repository, currentPath ], ([ repository, currentPath ]) => {
 				v-if="repository"
 				class="hidden sm:block"
 				:repository="repository"
-				:path="route.params.path"
+				:path="currentPath"
 			/>
 			<div class="relative ml-auto flex-1 md:grow-0">
 				<Search class="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -104,9 +97,9 @@ watch([ repository, currentPath ], ([ repository, currentPath ]) => {
 		</header>
 		<main class="gap-2 sm:gap-4 grid">
 			<template v-for="item in items" :key="item.id">
-				<NuxtLink :to="`${route.fullPath}/${item.id}`">
-					<RepositoryFile v-if="item.isFile" :entry="item" class="text-sm" />
-					<RepositoryFolder v-else :entry="item" />
+				<NuxtLink :to="`${route.fullPath}/${encodeURIComponent(item.name)}`">
+					<RepositoryFolder v-if="item.isDir" :entry="item" />
+					<RepositoryFile v-else :entry="item" class="text-sm" />
 				</NuxtLink>
 			</template>
 		</main>
