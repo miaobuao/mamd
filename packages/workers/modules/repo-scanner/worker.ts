@@ -31,30 +31,35 @@ async function removeRest(repositoryId: string) {
 	})
 	if (!repository || !repository.linkedFolder)
 		return
-	const filesPath = new Set(repository.files.map((f) => f.fullPath))
-	const foldersPath = new Set(repository.folders.map((f) => f.fullPath))
-	foldersPath.delete(repository.linkedFolder.fullPath)
+	const filesPathSet = new Set(repository.files.map((f) => f.fullPath))
+	const foldersPathSet = new Set(repository.folders.map((f) => f.fullPath))
+	foldersPathSet.delete(repository.linkedFolder.fullPath)
 	for await (const entry of directoryIterator(repository.linkedFolder.fullPath)) {
 		if (entry.isDir) {
-			foldersPath.delete(entry.fullPath)
+			foldersPathSet.delete(entry.fullPath)
 		}
 		else {
-			filesPath.delete(entry.fullPath)
+			filesPathSet.delete(entry.fullPath)
 		}
 	}
-	consola.log('delete files: ', filesPath)
-	consola.log('delete folders: ', foldersPath)
-	await db.delete(FileTable)
-		.where(and(
-			eq(FileTable.repositoryId, repositoryId),
-			or(...filesPath.values().map((path) => eq(FileTable.fullPath, path))),
-		))
-
-	await db.delete(FolderTable)
-		.where(and(
-			eq(FolderTable.repositoryId, repositoryId),
-			or(...foldersPath.values().map((path) => eq(FolderTable.fullPath, path))),
-		))
+	consola.log('delete files: ', filesPathSet)
+	consola.log('delete folders: ', foldersPathSet)
+	const filesPath = [ ...filesPathSet ]
+	const foldersPath = [ ...foldersPathSet ]
+	if (filesPath.length > 0) {
+		await db.delete(FileTable)
+			.where(and(
+				eq(FileTable.repositoryId, repositoryId),
+				or(...filesPath.map((path) => eq(FileTable.fullPath, path))),
+			))
+	}
+	if (foldersPath.length > 0) {
+		await db.delete(FolderTable)
+			.where(and(
+				eq(FolderTable.repositoryId, repositoryId),
+				or(...foldersPath.values().map((path) => eq(FolderTable.fullPath, path))),
+			))
+	}
 }
 
 async function handler({ repositoryId, repositoryPath }: ScannerConsumeContent) {
