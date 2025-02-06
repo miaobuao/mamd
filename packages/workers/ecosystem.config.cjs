@@ -13,7 +13,7 @@ module.exports = {
 				DATABASE_URL: process.env.DATABASE_URL,
 			},
 			watch,
-			ignore_watch: [ 'node_modules' ],
+			ignore_watch: [ 'node_modules', 'modules' ],
 			instances: Math.min(1, os.cpus().length),
 		},
 	],

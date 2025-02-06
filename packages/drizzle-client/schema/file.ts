@@ -11,7 +11,7 @@ export const FileTable = pgTable(
 		id: uuid('id').primaryKey().defaultRandom(),
 		name: text('name').notNull(),
 		fullPath: text('full_path').notNull(),
-		repositoryId: uuid('repository_id').references(() => RepositoryTable.id, { onDelete: 'cascade' }),
+		repositoryId: uuid('repository_id').references(() => RepositoryTable.id, { onDelete: 'cascade' }).notNull(),
 		parentId: uuid('parent_id').references(() => FolderTable.id, { onDelete: 'cascade' }),
 		creatorId: uuid('creator_id').references(() => UserTable.id),
 	},
