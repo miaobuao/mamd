@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { FileOrFolder } from '~/components/repository/File.vue'
-import { CircleUser, LogOut, Search } from 'lucide-vue-next'
+import { ChevronsRight, Home, ListTree, Redo2, Search } from 'lucide-vue-next'
+import { makeRepoUrl } from '~/components/repository/utils'
 
 const { $trpc } = useNuxtApp()
-const auth = useAuthStore()
 const route = useRoute()
 const repositoryStore = useRepositoryStore()
 
@@ -44,7 +44,28 @@ watch([ repository, currentPath ], async () => {
 <template>
 	<div>
 		<header class="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-transparent backdrop-blur-sm px-4 sm:h-auto sm:border-0 sm:shadow-sm sm:px-6 sm:py-2">
-			<NavSheet />
+			<DropdownMenu>
+				<DropdownMenuTrigger as-child>
+					<Button size="icon" variant="outline" class="sm:hidden">
+						<ListTree class="size-5" />
+					</Button>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent align="end" class="mx-2 max-w-[calc(100vw-1rem)] max-h-[calc(100vh-60px)] overflow-auto">
+					<template v-for="path, i in [ repository?.name, ...currentPath ]" :key="i">
+						<DropdownMenuSeparator v-if="i > 0" />
+						<NuxtLink :to="i === 0 ? makeRepoUrl(repository!.uuid) : makeRepoUrl(repository!.uuid, ...currentPath.slice(0, i))">
+							<DropdownMenuLabel class="flex items-center gap-2">
+								<Home v-if="i === 0" />
+								<ChevronsRight v-else-if="i === currentPath.length" />
+								<Redo2 v-else />
+								<div class="flex-1 truncate">
+									{{ path }}
+								</div>
+							</DropdownMenuLabel>
+						</NuxtLink>
+					</template>
+				</DropdownMenuContent>
+			</DropdownMenu>
 			<RepositoryBreadcrumb
 				v-if="repository"
 				class="hidden sm:block"
@@ -59,24 +80,7 @@ watch([ repository, currentPath ], async () => {
 					class="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
 				/>
 			</div>
-			<DropdownMenu>
-				<DropdownMenuTrigger as-child>
-					<Button variant="secondary" size="icon" class="rounded-full flex sm:hidden">
-						<CircleUser class="h-5 w-5" />
-						<span class="sr-only">Toggle user menu</span>
-					</Button>
-				</DropdownMenuTrigger>
-				<DropdownMenuContent align="end">
-					<DropdownMenuLabel>{{ auth.userInfo?.username }}</DropdownMenuLabel>
-					<DropdownMenuSeparator />
-					<a class="w-full" @click="auth.logout">
-						<DropdownMenuItem>
-							<LogOut class="mr-2 h-4 w-4" />
-							{{ $text.logout() }}
-						</DropdownMenuItem>
-					</a>
-				</DropdownMenuContent>
-			</DropdownMenu>
+			<NavSheet side="right" class="sm:hidden" />
 		</header>
 		<main class="gap-2 sm:gap-4 grid">
 			<template v-for="item in items" :key="item.id">
