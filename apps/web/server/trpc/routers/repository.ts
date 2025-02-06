@@ -3,7 +3,7 @@ import * as fs from 'node:fs/promises'
 import { basename } from 'node:path'
 import { scannerTask } from '@repo/workers'
 import { BadRequestErrorWithI18n } from '~~/server/utils/error'
-import { FolderTable, RepositoryTable, VisibleRepositoryTable } from 'drizzle-client'
+import { FolderTable, RepositoryTable, UserTable, VisibleRepositoryTable } from 'drizzle-client'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { CreateRepositoryFormValidator } from '~/utils/validator'
@@ -31,22 +31,31 @@ export const RepositoryRouter = router({
 	listVisibleRepository: protectedProcedure.query(async ({ ctx: { db, userInfo } }): Promise<{
 		uuid: string
 		name: string
+		creator: {
+			id: string
+			username: string
+		}
 		linkedFolder: { uuid: string, name: string }
 	}[]> => {
-		const visibleRepositories = await db
-			.select()
+		const res = await db
+			.select({
+				uuid: RepositoryTable.id,
+				name: RepositoryTable.name,
+				creator: {
+					id: UserTable.id,
+					username: UserTable.username,
+				},
+				linkedFolder: {
+					uuid: FolderTable.id,
+					name: FolderTable.name,
+				},
+			})
 			.from(VisibleRepositoryTable)
 			.where(eq(VisibleRepositoryTable.userId, userInfo.id))
 			.innerJoin(RepositoryTable, eq(RepositoryTable.id, VisibleRepositoryTable.repositoryId))
 			.innerJoin(FolderTable, eq(RepositoryTable.linkedFolderId, FolderTable.id))
-		return visibleRepositories.map((repo) => ({
-			uuid: repo.repository.id,
-			name: repo.repository.name,
-			linkedFolder: {
-				uuid: repo.folder.id,
-				name: repo.folder.name,
-			},
-		}))
+			.innerJoin(UserTable, eq(RepositoryTable.creatorId, UserTable.id))
+		return res
 	}),
 
 	getRepository: protectedProcedure.input(z.object({
@@ -57,6 +66,10 @@ export const RepositoryRouter = router({
 			.select({
 				uuid: RepositoryTable.id,
 				name: RepositoryTable.name,
+				creator: {
+					id: UserTable.id,
+					username: UserTable.username,
+				},
 				linkedFolder: {
 					uuid: FolderTable.id,
 					name: FolderTable.name,
@@ -68,6 +81,7 @@ export const RepositoryRouter = router({
 			.innerJoin(RepositoryTable, eq(RepositoryTable.id, VisibleRepositoryTable.repositoryId))
 			.where(eq(RepositoryTable.id, repositoryUuid))
 			.innerJoin(FolderTable, eq(RepositoryTable.linkedFolderId, FolderTable.id))
+			.innerJoin(UserTable, eq(RepositoryTable.creatorId, UserTable.id))
 		return res.at(0)
 	}),
 
@@ -109,6 +123,10 @@ export const RepositoryRouter = router({
 			return {
 				uuid: repository.id,
 				name: input.name,
+				creator: {
+					id: userInfo.id,
+					username: userInfo.username,
+				},
 				linkedFolder: {
 					uuid: folder.id,
 					name: folder.name,

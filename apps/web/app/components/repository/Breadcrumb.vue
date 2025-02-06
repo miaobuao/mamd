@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { ClassValue } from 'clsx'
 import { Home } from 'lucide-vue-next'
-import { Breadcrumb } from '~/components/ui/breadcrumb'
 import { makeRepoUrl } from './utils'
 
 const props = defineProps<{
