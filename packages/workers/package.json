@@ -7,7 +7,7 @@
 		"dev:deploy": "pm2 start ./ecosystem.config.cjs",
 		"dev:build": "bun build ./modules/main.ts --target node --outdir=dist --watch",
 		"dev": "run-p dev:build dev:deploy",
-		"postinstall": "run-p build:*",
+		"postinstall": "run-p build",
 		"clean": "rimraf node_modules"
 	},
 	"devDependencies": {
