@@ -1,4 +1,5 @@
-import { type JWTPayload as BaseJwtPayload, jwtVerify, SignJWT } from 'jose'
+import type { JWTPayload as BaseJwtPayload } from 'jose'
+import { jwtVerify, SignJWT } from 'jose'
 
 export async function signToken(
 	payload: JwtPayloadData,

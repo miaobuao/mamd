@@ -1,4 +1,5 @@
-import { type DrizzleCilent, useDrizzleClient } from 'drizzle-client'
+import type { DrizzleCilent } from 'drizzle-client'
+import { useDrizzleClient } from 'drizzle-client'
 
 declare module 'h3' {
 	interface H3EventContext {
