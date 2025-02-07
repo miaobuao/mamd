@@ -16,14 +16,10 @@ export const ossRoute = router({
 			uuid: z.string().uuid(),
 			chunkIdx: z.number().int(),
 		}))
-		.mutation(async ({ input: { uuid, chunkIdx }, ctx }) => {
+		.mutation(async ({ input: { uuid, chunkIdx } }) => {
+			const config = useRuntimeConfig()
 			const signedUrl = await oss.presignedPutObject(BUCKET.TMP_UPLOAD, `${uuid}/${chunkIdx}`, 10 * 60)
-			const originUrl = new URL(ctx.event.headers.get('origin')!)
-			const url = new URL(signedUrl)
-			url.pathname = `/api/oss${url.pathname}`
-			url.protocol = originUrl.protocol
-			url.host = originUrl.host
-			return url.toString()
+			return config.MINIO_PROXY_PATH + removeOriginInUrl(signedUrl)
 		}),
 	uploadEnded: protectedProcedure
 		.input(z.object({
