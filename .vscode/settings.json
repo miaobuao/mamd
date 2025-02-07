@@ -45,5 +45,11 @@
 		"pcss",
 		"postcss"
 	],
-	"vue.autoInsert.dotValue": false
+	"vue.autoInsert.dotValue": false,
+	"files.exclude": {
+		"**/.turbo": true,
+		"**/.husky": true,
+		"**/.nuxt": true,
+		"**/.pnpm-store": true
+	}
 }
