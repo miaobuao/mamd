@@ -2,11 +2,9 @@ import type { DrizzleCilent } from 'drizzle-client'
 import * as fs from 'node:fs/promises'
 import { basename } from 'node:path'
 import { scannerTask } from '@repo/workers'
-import { BadRequestErrorWithI18n } from '~~/server/utils/error'
 import { FolderTable, RepositoryTable, UserTable, VisibleRepositoryTable } from 'drizzle-client'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
-import { CreateRepositoryFormValidator } from '~/utils/validator'
 import { adminProcedure, protectedProcedure, router } from '../trpc'
 
 export const RepositoryRouter = router({

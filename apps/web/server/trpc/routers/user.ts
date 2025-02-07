@@ -1,7 +1,6 @@
 import { UserTable } from 'drizzle-client'
 import { eq } from 'drizzle-orm'
 import { isNil } from 'lodash-es'
-import { CreateUserInputValidator, UserLoginSubmitFormValidator, UserRegisterSubmitDataValidator } from '~/utils/validator'
 import { checkAdminAccountExists } from '../middleware/check-admin-user'
 import { adminProcedure, protectedProcedure, publicProcedure, router } from '../trpc'
 

@@ -1,8 +1,7 @@
 import type { inferProcedureOutput } from '@trpc/server'
-import type { AppRouter } from '~~/server/trpc/routers'
 import type { TypeOf } from 'zod'
+import type { AppRouter } from '~~/server/trpc/routers'
 import { debounce } from 'lodash-es'
-import type { CreateRepositoryFormValidator } from '~/utils/validator'
 
 export type Repository = inferProcedureOutput<AppRouter['repository']['listVisibleRepository']>[number]
 
