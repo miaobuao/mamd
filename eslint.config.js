@@ -17,5 +17,6 @@ export default antfu({
 		'vue/array-bracket-spacing': [ 'error', 'always' ],
 		'vue/html-indent': [ 'error', 'tab' ],
 		'antfu/no-top-level-await': 'off',
+		'ts/no-empty-object-type': 'off',
 	},
 })
