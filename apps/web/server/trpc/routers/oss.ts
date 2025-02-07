@@ -33,7 +33,7 @@ export const ossRoute = router({
 			repositoryUuid: z.string().uuid(),
 		}))
 		.mutation(async ({ input, ctx: { db } }) => {
-			const dir = await getFolderAbsolutePath(db, { uuid: input.repositoryUuid }, { uuid: input.folderUuid })
+			const dir = await getFolderAbsolutePath(db, input.repositoryUuid, input.folderUuid)
 			const filePath = path.resolve(dir, input.fileName)
 			const items = await oss.listObjects(BUCKET.TMP_UPLOAD, input.uuid, true)
 				.toArray()
@@ -61,5 +61,8 @@ export const ossRoute = router({
 				tasks.push(limit(() => pipeline(obj, writeStream)))
 			}
 			await Promise.all(tasks)
+			await Promise.all(
+				items.map((item) => oss.removeObject(BUCKET.TMP_UPLOAD, item.name!)),
+			)
 		}),
 })
