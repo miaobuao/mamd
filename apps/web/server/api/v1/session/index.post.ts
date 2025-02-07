@@ -2,17 +2,20 @@ import { UserTable } from 'drizzle-client'
 import { eq } from 'drizzle-orm'
 import { isNil } from 'lodash-es'
 
-export default defineEventHandler<{
-	body: {
-		username: string
-		password: string
-		remember?: boolean
-	}
-}, Promise<{
+export default defineEventHandler<
+	{
+		body: {
+			username: string
+			password: string
+			remember?: boolean
+		}
+	},
+	Promise<{
 		id: string
 		isAdmin: boolean
 		username: string
-	}>>(async (event) => {
+	}>
+>(async (event) => {
 	const input = await readBody(event)
 	const user = await event.context.db.query.UserTable.findFirst({
 		where: eq(UserTable.username, input.username),
