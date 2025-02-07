@@ -1,14 +1,11 @@
+import type { TypeOf } from 'zod'
 import { UserTable } from 'drizzle-client'
 import { eq } from 'drizzle-orm'
 import { isNil } from 'lodash-es'
 
 export default defineEventHandler<
 	{
-		body: {
-			username: string
-			password: string
-			remember?: boolean
-		}
+		body: TypeOf<typeof UserLoginSubmitFormValidator>
 	},
 	Promise<{
 		id: string
