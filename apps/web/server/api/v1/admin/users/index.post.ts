@@ -4,7 +4,7 @@
 import type { TypeOf } from 'zod'
 import { UserTable } from 'drizzle-client'
 import { eq } from 'drizzle-orm'
-import { AssertUserIsAdmin } from '../middleware/assert-user-is-admin'
+import { AssertUserIsAdmin } from '../../middleware/assert-user-is-admin'
 
 export default defineEventHandler<
 	{
