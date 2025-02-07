@@ -91,28 +91,50 @@ export const fsRouter = router({
 	}),
 
 	getFolder: protectedProcedure.input(z.object({
-		repositoryUuid: z.string().uuid(),
-		folderUuid: z.string().uuid(),
-	})).query(async ({ ctx: { db, userInfo }, input: { folderUuid, repositoryUuid } }) => {
+		repositoryId: z.string().uuid(),
+		path: z.string().optional(),
+	})).query(async ({ ctx: { db, userInfo }, input }) => {
 		// TODO: handle not found
-		return await db
+		if (!input.path) {
+			return await db
+				.select({
+					id: FolderTable.id,
+					name: FolderTable.name,
+					fullPath: FolderTable.fullPath,
+				})
+				.from(VisibleRepositoryTable)
+				.$dynamic()
+				.where(eq(VisibleRepositoryTable.userId, userInfo.id))
+				.where(eq(VisibleRepositoryTable.repositoryId, input.repositoryId))
+				.innerJoin(RepositoryTable, eq(RepositoryTable.id, VisibleRepositoryTable.repositoryId))
+				.innerJoin(FolderTable, eq(FolderTable.id, RepositoryTable.linkedFolderId))
+				.then((d) => d.at(0))
+		}
+		const rootFolder = await db
 			.select({
-				name: FolderTable.name,
+				fullPath: FolderTable.fullPath,
 			})
 			.from(VisibleRepositoryTable)
 			.$dynamic()
 			.where(eq(VisibleRepositoryTable.userId, userInfo.id))
-			.innerJoin(
-				RepositoryTable,
-				eq(RepositoryTable.id, VisibleRepositoryTable.repositoryId),
-			)
-			.where(eq(RepositoryTable.id, repositoryUuid))
-			.innerJoin(
-				FolderTable,
-				eq(FolderTable.id, RepositoryTable.linkedFolderId),
-			)
-			.where(eq(FolderTable.id, folderUuid))
-			.limit(1)
+			.where(eq(VisibleRepositoryTable.repositoryId, input.repositoryId))
+			.innerJoin(RepositoryTable, eq(RepositoryTable.id, VisibleRepositoryTable.repositoryId))
+			.innerJoin(FolderTable, eq(FolderTable.repositoryId, RepositoryTable.linkedFolderId))
 			.then((d) => d.at(0))
+		if (!rootFolder?.fullPath) {
+			throw new ForbiddenErrorWithI18n(i18n.error.pathNotExists)
+		}
+		const fullPath = path.join(rootFolder.fullPath, input.path)
+		return await db.query.FolderTable.findFirst({
+			where: and(
+				eq(FolderTable.repositoryId, input.repositoryId),
+				eq(FolderTable.fullPath, fullPath),
+			),
+			columns: {
+				id: true,
+				name: true,
+				fullPath: true,
+			},
+		})
 	}),
 })
