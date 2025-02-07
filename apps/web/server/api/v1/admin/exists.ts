@@ -2,9 +2,9 @@ import { UserTable } from 'drizzle-client'
 import { eq } from 'drizzle-orm'
 
 export default defineEventHandler<{}, Promise< {
-	hasAdmin: boolean
+	exists: boolean
 }>>(async (event) => {
-	const hasAdmin = await event.context.db.query.UserTable.findFirst({
+	const exists = await event.context.db.query.UserTable.findFirst({
 		where: eq(UserTable.isAdmin, true),
 		columns: {
 			id: true,
@@ -12,5 +12,5 @@ export default defineEventHandler<{}, Promise< {
 	}).then((user) => {
 		return !!user
 	})
-	return { hasAdmin }
+	return { exists }
 })
