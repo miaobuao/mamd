@@ -22,7 +22,7 @@
 		"db:migrate": "dotenv -e .env -- pnpm --filter drizzle-client migrate",
 		"db:studio": "dotenv -e .env -- pnpm --filter drizzle-client studio",
 		"clean": "run-s clean:all clean:root",
-		"clean:all": "turbo clean",
+		"clean:all": "turbo clean --force",
 		"clean:root": "rimraf node_modules"
 	},
 	"dependencies": {

@@ -1,5 +1,4 @@
 import process from 'node:process'
-import { isNil } from 'lodash-es'
 
 const config = {
 	// JWT
@@ -10,7 +9,7 @@ const config = {
 	// MINIO
 	MINIO_PROXY_PATH: process.env.MINIO_PROXY_PATH || '/api/oss',
 	MINIO_ENDPOINT: process.env.MINIO_ENDPOINT!,
-	MINIO_API_PORT: isNil(process.env.MINIO_API_PORT) ? undefined : Number.parseInt(process.env.MINIO_API_PORT!),
+	MINIO_API_PORT: process.env.MINIO_API_PORT!,
 	MINIO_ACCESS_KEY: process.env.MINIO_ACCESS_KEY!,
 	MINIO_SECRET_KEY: process.env.MINIO_SECRET_KEY!,
 	MINIO_USE_SSL: process.env.MINIO_USE_SSL?.toLowerCase() === 'true',
@@ -18,7 +17,6 @@ const config = {
 	DATABASE_URL: process.env.DATABASE_URL!,
 }
 
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
 	future: {
 		compatibilityVersion: 4,
@@ -69,7 +67,7 @@ export default defineNuxtConfig({
 
 	devtools: { enabled: true },
 
-	compatibilityDate: '2024-11-13',
+	compatibilityDate: '2025-02-08',
 
 	runtimeConfig: config,
 })

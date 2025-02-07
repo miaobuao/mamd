@@ -8,7 +8,7 @@ export function useMinioClient() {
 		const config = useRuntimeConfig()
 		minioClient = new Minio.Client({
 			endPoint: config.MINIO_ENDPOINT,
-			port: config.MINIO_API_PORT,
+			port: Number.parseInt(config.MINIO_API_PORT),
 			useSSL: config.MINIO_USE_SSL,
 			accessKey: config.MINIO_ACCESS_KEY,
 			secretKey: config.MINIO_SECRET_KEY,
