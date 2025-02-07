@@ -1,6 +1,23 @@
 import process from 'node:process'
 import { isNil } from 'lodash-es'
 
+const config = {
+	// JWT
+	JWT_SECRET: process.env.JWT_SECRET!,
+	JWT_ISSUER: process.env.JWT_ISSUER!,
+	OAUTH_JWT_EXPIRES_IN: process.env.OAUTH_JWT_EXPIRES_IN!,
+
+	// MINIO
+	MINIO_PROXY_PATH: process.env.MINIO_PROXY_PATH || '/api/oss',
+	MINIO_ENDPOINT: process.env.MINIO_ENDPOINT!,
+	MINIO_API_PORT: isNil(process.env.MINIO_API_PORT) ? undefined : Number.parseInt(process.env.MINIO_API_PORT!),
+	MINIO_ACCESS_KEY: process.env.MINIO_ACCESS_KEY!,
+	MINIO_SECRET_KEY: process.env.MINIO_SECRET_KEY!,
+	MINIO_USE_SSL: process.env.MINIO_USE_SSL?.toLowerCase() === 'true',
+
+	DATABASE_URL: process.env.DATABASE_URL!,
+}
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
 	future: {
@@ -23,6 +40,13 @@ export default defineNuxtConfig({
 	nitro: {
 		experimental: {
 			wasm: true,
+		},
+		devProxy: {
+			[config.MINIO_PROXY_PATH]: {
+				target: `${config.MINIO_USE_SSL ? 'https' : 'http'}://${config.MINIO_ENDPOINT}:${config.MINIO_API_PORT}`,
+				prependPath: true,
+				changeOrigin: true,
+			},
 		},
 	},
 
@@ -47,19 +71,5 @@ export default defineNuxtConfig({
 
 	compatibilityDate: '2024-11-13',
 
-	runtimeConfig: {
-		// JWT
-		JWT_SECRET: process.env.JWT_SECRET!,
-		JWT_ISSUER: process.env.JWT_ISSUER!,
-		OAUTH_JWT_EXPIRES_IN: process.env.OAUTH_JWT_EXPIRES_IN!,
-
-		// MINIO
-		MINIO_ENDPOINT: process.env.MINIO_ENDPOINT!,
-		MINIO_API_PORT: isNil(process.env.MINIO_API_PORT) ? undefined : Number.parseInt(process.env.MINIO_API_PORT!),
-		MINIO_ACCESS_KEY: process.env.MINIO_ACCESS_KEY!,
-		MINIO_SECRET_KEY: process.env.MINIO_SECRET_KEY!,
-		MINIO_USE_SSL: isNil(process.env.MINIO_USE_SSL) ? undefined : process.env.MINIO_USE_SSL.toLowerCase() === 'true',
-
-		DATABASE_URL: process.env.DATABASE_URL!,
-	},
+	runtimeConfig: config,
 })

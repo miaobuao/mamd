@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { FileOrFolder } from '~/components/repository/File.vue'
+import { computedAsync } from '@vueuse/core'
 import { ChevronsRight, Home, ListTree, Redo2, Search } from 'lucide-vue-next'
 import { makeRepoUrl } from '~/components/repository/utils'
 
@@ -39,6 +40,17 @@ watch([ repository, currentPath ], async () => {
 }, {
 	immediate: true,
 })
+
+const currentFolder = computedAsync(async () => {
+	if (!repository.value) {
+		return
+	}
+	const folder = await $trpc.fs.getFolder.useQuery({
+		repositoryId: repository.value?.uuid,
+		path: currentPath.value.join('/'),
+	})
+	return folder.data.value
+}, null)
 </script>
 
 <template>
@@ -90,8 +102,8 @@ watch([ repository, currentPath ], async () => {
 				</NuxtLink>
 			</template>
 		</main>
-		<div class="fixed bottom-0 right-0 m-8">
-			<RepositoryUploadButton :repository-uuid="repositoryUuid" :folder-uuid="currentPath.at(-1)!" />
+		<div v-if="currentFolder" class="fixed bottom-0 right-0 m-8">
+			<RepositoryUploadButton :repository-uuid="repositoryUuid" :folder-uuid="currentFolder.id" />
 		</div>
 	</div>
 </template>
