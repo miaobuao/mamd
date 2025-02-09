@@ -11,7 +11,7 @@ export const RepositoryTable = pgTable(
 		id: uuid().primaryKey().defaultRandom(),
 		name: text().notNull(),
 		creatorId: uuid().references(() => UserTable.id, { onDelete: 'no action' }).notNull(),
-		linkedFolderId: uuid().unique().references(() => FolderTable.id, { onDelete: 'set null' }),
+		linkedFolderId: uuid().references(() => FolderTable.id, { onDelete: 'set null' }),
 		ctime: timestamp().defaultNow().notNull(),
 		mtime: timestamp().defaultNow().$onUpdate(() => new Date()).notNull(),
 	},

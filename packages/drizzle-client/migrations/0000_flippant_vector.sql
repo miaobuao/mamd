@@ -33,8 +33,7 @@ CREATE TABLE "repository" (
 	"creator_id" uuid NOT NULL,
 	"linked_folder_id" uuid,
 	"ctime" timestamp DEFAULT now() NOT NULL,
-	"mtime" timestamp DEFAULT now() NOT NULL,
-	CONSTRAINT "repository_linkedFolderId_unique" UNIQUE("linked_folder_id")
+	"mtime" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "user" (

@@ -1,5 +1,5 @@
 {
-	"id": "6c677ead-f8dd-415f-942c-be00918bdce3",
+	"id": "7e8440d9-d57c-4924-af11-d7f1cecaa4d9",
 	"prevId": "00000000-0000-0000-0000-000000000000",
 	"version": "7",
 	"dialect": "postgresql",
@@ -417,15 +417,7 @@
 				}
 			},
 			"compositePrimaryKeys": {},
-			"uniqueConstraints": {
-				"repository_linkedFolderId_unique": {
-					"name": "repository_linkedFolderId_unique",
-					"nullsNotDistinct": false,
-					"columns": [
-						"linked_folder_id"
-					]
-				}
-			},
+			"uniqueConstraints": {},
 			"policies": {},
 			"checkConstraints": {},
 			"isRLSEnabled": false

@@ -1,5 +1,5 @@
 import type { ScannerConsumeContent } from './task'
-import path from 'node:path'
+import path, { dirname } from 'node:path'
 import { consola } from 'consola'
 import { FileTable, FolderTable, RepositoryTable, useDrizzleClient } from 'drizzle-client'
 import { and, eq, or } from 'drizzle-orm'
@@ -99,8 +99,16 @@ async function handler({ repositoryId, repositoryPath }: ScannerConsumeContent) 
 		}
 		const relativeParentPath = path.relative(repositoryPath, path.dirname(entry.fullPath))
 		if (relativeParentPath !== parentFolderPath) {
-			const parts = relativeParentPath.split(path.sep)
-			parentFolderId = await queryFolder(linkedFolderId!, parts)
+			const parentFolder = await db.query.FolderTable.findFirst({
+				where: and(
+					eq(FolderTable.repositoryId, repositoryId),
+					eq(FolderTable.fullPath, dirname(entry.fullPath)),
+				),
+				columns: {
+					id: true,
+				},
+			})
+			parentFolderId = parentFolder!.id
 			parentFolderPath = relativeParentPath
 		}
 		const name = path.basename(entry.fullPath)
@@ -168,19 +176,4 @@ async function handler({ repositoryId, repositoryPath }: ScannerConsumeContent) 
 			})
 		}
 	}
-}
-
-export async function queryFolder(rootFolderId: string, parts: string[]) {
-	parts = [ ...parts ]
-	while (parts.length > 0) {
-		const part = parts.shift()!
-		const root = await db.query.FolderTable.findFirst({
-			where: and(
-				eq(FolderTable.parentId, rootFolderId),
-				eq(FolderTable.name, part),
-			),
-		})
-		rootFolderId = root!.id
-	}
-	return rootFolderId
 }
