@@ -1,7 +1,7 @@
 import type { RepositoryModel } from './repository.entity'
 import { FolderTable, RepositoryTable, UserTable, VisibleRepositoryTable } from 'drizzle-client'
 import { eq } from 'drizzle-orm'
-import { AssertSessionValid } from '../middleware/assert-session-valid'
+import { AssertSessionValid } from '~~/server/middleware/assert-session-valid'
 
 export default defineEventHandler<{}, Promise<RepositoryModel[]>>({
 	onRequest: [ AssertSessionValid ],

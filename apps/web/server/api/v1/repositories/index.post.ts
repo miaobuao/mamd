@@ -5,7 +5,7 @@ import * as fs from 'node:fs/promises'
 import { basename } from 'node:path'
 import { FolderTable, RepositoryTable, VisibleRepositoryTable } from 'drizzle-client'
 import { eq } from 'drizzle-orm'
-import { AssertUserIsAdmin } from '../middleware/assert-user-is-admin'
+import { AssertUserIsAdmin } from '~~/server/middleware/assert-user-is-admin'
 
 export async function repositoryExists(db: DrizzleCilent, path: string) {
 	const res = await db

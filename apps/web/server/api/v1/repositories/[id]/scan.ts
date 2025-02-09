@@ -1,7 +1,7 @@
 import { scannerTask } from '@repo/workers'
 import { RepositoryTable } from 'drizzle-client'
 import { eq } from 'drizzle-orm'
-import { AssertUserIsAdmin } from '../../middleware/assert-user-is-admin'
+import { AssertUserIsAdmin } from '~~/server/middleware/assert-user-is-admin'
 
 export default defineEventHandler({
 	onRequest: [ AssertUserIsAdmin ],
