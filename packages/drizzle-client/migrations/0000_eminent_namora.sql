@@ -40,8 +40,8 @@ CREATE TABLE "repository" (
 	"name" text NOT NULL,
 	"creator_id" uuid,
 	"linked_folder_id" uuid,
-	"created_at" timestamp DEFAULT now(),
-	"modified_at" timestamp DEFAULT now(),
+	"ctime" timestamp DEFAULT now(),
+	"mtime" timestamp DEFAULT now(),
 	CONSTRAINT "repository_linked_folder_id_unique" UNIQUE("linked_folder_id")
 );
 --> statement-breakpoint
@@ -49,9 +49,9 @@ CREATE TABLE "user" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"username" text NOT NULL,
 	"password" text NOT NULL,
-	"is_admin" boolean DEFAULT false,
-	"created_at" timestamp DEFAULT now(),
-	"modified_at" timestamp DEFAULT now(),
+	"is_admin" boolean DEFAULT false NOT NULL,
+	"ctime" timestamp DEFAULT now(),
+	"mtime" timestamp DEFAULT now(),
 	"is_deleted" boolean DEFAULT false,
 	CONSTRAINT "user_username_unique" UNIQUE("username")
 );
@@ -59,8 +59,8 @@ CREATE TABLE "user" (
 CREATE TABLE "visible_repository" (
 	"user_id" uuid,
 	"repository_id" uuid NOT NULL,
-	"created_at" timestamp DEFAULT now(),
-	"modified_at" timestamp DEFAULT now()
+	"ctime" timestamp DEFAULT now() NOT NULL,
+	"mtime" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 ALTER TABLE "file" ADD CONSTRAINT "file_repository_id_repository_id_fk" FOREIGN KEY ("repository_id") REFERENCES "public"."repository"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -79,4 +79,6 @@ CREATE INDEX "file_name_full_path_repository_id_index" ON "file" USING btree ("n
 CREATE INDEX "file_metadata_sha256_mime_type_index" ON "file_metadata" USING btree ("sha256","mime_type");--> statement-breakpoint
 CREATE INDEX "folder_name_full_path_repository_id_index" ON "folder" USING btree ("name","full_path","repository_id");--> statement-breakpoint
 CREATE INDEX "user_username_index" ON "user" USING btree ("username");--> statement-breakpoint
-CREATE UNIQUE INDEX "repo_user_idx" ON "visible_repository" USING btree ("repository_id","user_id");
+CREATE UNIQUE INDEX "repo_user_idx" ON "visible_repository" USING btree ("repository_id","user_id");--> statement-breakpoint
+CREATE VIEW "public"."repository_creator_view" AS (select "user"."username", "user"."is_admin", "user"."is_deleted", "user"."id" as "user_id", "repository"."name", "repository"."linked_folder_id", "repository"."creator_id", "repository"."ctime", "repository"."mtime", "repository"."id" as "repository_id" from "user" inner join "repository" on "repository"."creator_id" = "user"."id");--> statement-breakpoint
+CREATE VIEW "public"."user_visible_repository_view" AS (select "user"."username", "user"."is_admin", "user"."is_deleted", "user"."id" as "user_id", "repository"."name", "repository"."linked_folder_id", "repository"."creator_id", "repository"."ctime", "repository"."mtime", "repository"."id" as "repository_id" from "user" inner join "visible_repository" on "user"."id" = "visible_repository"."user_id" inner join "repository" on "repository"."id" = "visible_repository"."repository_id");

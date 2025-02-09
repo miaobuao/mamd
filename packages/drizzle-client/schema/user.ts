@@ -12,8 +12,8 @@ export const UserTable = pgTable(
 		username: text('username').unique().notNull(),
 		password: text('password').notNull(),
 		isAdmin: boolean('is_admin').default(false).notNull(),
-		ctime: timestamp('created_at').defaultNow(),
-		mtime: timestamp('modified_at').defaultNow().$onUpdate(() => new Date()),
+		ctime: timestamp().defaultNow(),
+		mtime: timestamp().defaultNow().$onUpdate(() => new Date()),
 		isDeleted: boolean('is_deleted').default(false),
 	},
 	(t) => [

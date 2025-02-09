@@ -8,8 +8,8 @@ export const VisibleRepositoryTable = pgTable(
 	{
 		userId: uuid('user_id').references(() => UserTable.id, { onDelete: 'cascade' }),
 		repositoryId: uuid('repository_id').references(() => RepositoryTable.id, { onDelete: 'cascade' }).notNull(),
-		ctime: timestamp('created_at').defaultNow(),
-		mtime: timestamp('modified_at').defaultNow().$onUpdate(() => new Date()),
+		ctime: timestamp().defaultNow().notNull(),
+		mtime: timestamp().defaultNow().$onUpdate(() => new Date()).notNull(),
 	},
 	(t) => [
 		uniqueIndex('repo_user_idx').on(t.repositoryId, t.userId),

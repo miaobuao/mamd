@@ -1,5 +1,5 @@
 {
-	"id": "9fd2e752-48e9-4d23-98c3-4a30710174cc",
+	"id": "1591f231-d36b-4707-98e3-910913a4275b",
 	"prevId": "00000000-0000-0000-0000-000000000000",
 	"version": "7",
 	"dialect": "postgresql",
@@ -431,15 +431,15 @@
 					"primaryKey": false,
 					"notNull": false
 				},
-				"created_at": {
-					"name": "created_at",
+				"ctime": {
+					"name": "ctime",
 					"type": "timestamp",
 					"primaryKey": false,
 					"notNull": false,
 					"default": "now()"
 				},
-				"modified_at": {
-					"name": "modified_at",
+				"mtime": {
+					"name": "mtime",
 					"type": "timestamp",
 					"primaryKey": false,
 					"notNull": false,
@@ -516,18 +516,18 @@
 					"name": "is_admin",
 					"type": "boolean",
 					"primaryKey": false,
-					"notNull": false,
+					"notNull": true,
 					"default": false
 				},
-				"created_at": {
-					"name": "created_at",
+				"ctime": {
+					"name": "ctime",
 					"type": "timestamp",
 					"primaryKey": false,
 					"notNull": false,
 					"default": "now()"
 				},
-				"modified_at": {
-					"name": "modified_at",
+				"mtime": {
+					"name": "mtime",
 					"type": "timestamp",
 					"primaryKey": false,
 					"notNull": false,
@@ -589,18 +589,18 @@
 					"primaryKey": false,
 					"notNull": true
 				},
-				"created_at": {
-					"name": "created_at",
+				"ctime": {
+					"name": "ctime",
 					"type": "timestamp",
 					"primaryKey": false,
-					"notNull": false,
+					"notNull": true,
 					"default": "now()"
 				},
-				"modified_at": {
-					"name": "modified_at",
+				"mtime": {
+					"name": "mtime",
 					"type": "timestamp",
 					"primaryKey": false,
-					"notNull": false,
+					"notNull": true,
 					"default": "now()"
 				}
 			},
@@ -667,7 +667,24 @@
 	"sequences": {},
 	"roles": {},
 	"policies": {},
-	"views": {},
+	"views": {
+		"public.repository_creator_view": {
+			"columns": {},
+			"definition": "select \"user\".\"username\", \"user\".\"is_admin\", \"user\".\"is_deleted\", \"user\".\"id\" as \"user_id\", \"repository\".\"name\", \"repository\".\"linked_folder_id\", \"repository\".\"creator_id\", \"repository\".\"ctime\", \"repository\".\"mtime\", \"repository\".\"id\" as \"repository_id\" from \"user\" inner join \"repository\" on \"repository\".\"creator_id\" = \"user\".\"id\"",
+			"name": "repository_creator_view",
+			"schema": "public",
+			"isExisting": false,
+			"materialized": false
+		},
+		"public.user_visible_repository_view": {
+			"columns": {},
+			"definition": "select \"user\".\"username\", \"user\".\"is_admin\", \"user\".\"is_deleted\", \"user\".\"id\" as \"user_id\", \"repository\".\"name\", \"repository\".\"linked_folder_id\", \"repository\".\"creator_id\", \"repository\".\"ctime\", \"repository\".\"mtime\", \"repository\".\"id\" as \"repository_id\" from \"user\" inner join \"visible_repository\" on \"user\".\"id\" = \"visible_repository\".\"user_id\" inner join \"repository\" on \"repository\".\"id\" = \"visible_repository\".\"repository_id\"",
+			"name": "user_visible_repository_view",
+			"schema": "public",
+			"isExisting": false,
+			"materialized": false
+		}
+	},
 	"_meta": {
 		"columns": {},
 		"schemas": {},
