@@ -4,9 +4,9 @@ import { Loader2, MoreHorizontal } from 'lucide-vue-next'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 
-const { $text } = useNuxtApp()
+const { $text, $api } = useNuxtApp()
 // 查询模块 : 接收后端接口查询数据库结果
-const { data: users, status, refresh } = useApi('/api/v1/admin/users')
+const { data: users, status, refresh } = $api('/api/v1/admin/users')
 // 添加模块 : web端添加用户并在user页面呈现
 const createUserFormSchema = toTypedSchema(CreateUserInputValidator)
 const form = useForm({
@@ -18,7 +18,7 @@ const visible = ref(false) // 添加用户界面开关
 const onSubmit = form.handleSubmit(async (values) => { // 添加用户按钮逻辑
 	loading.value = true
 	try {
-		await useApi('/api/v1/admin/users', {
+		await $api('/api/v1/admin/users', {
 			method: 'post',
 			body: values,
 		})

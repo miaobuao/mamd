@@ -10,6 +10,7 @@ const props = defineProps<{
 	repository: RepositoryModel
 }>()
 
+const { $api } = useNuxtApp()
 const expanded = ref(false)
 
 async function uploadFile() {
@@ -19,7 +20,7 @@ async function uploadFile() {
 	})
 	const targetFullPath = path.join(props.folder.fullPath, file.name)
 	const targetRelativePath = path.relative(props.repository.linkedFolder.fullPath, targetFullPath)
-	await useApi(`/api/v1/repositories/${props.repository.id}/files/${targetRelativePath}`)
+	await $api(`/api/v1/repositories/${props.repository.id}/files/${targetRelativePath}`)
 }
 </script>
 

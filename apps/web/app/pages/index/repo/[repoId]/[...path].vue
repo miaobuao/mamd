@@ -5,6 +5,7 @@ import { ChevronsRight, Home, ListTree, Redo2, Search } from 'lucide-vue-next'
 import { isNotNil } from 'ramda'
 import { makeRepoUrl } from '~/components/repository/utils'
 
+const { $api } = useNuxtApp()
 const route = useRoute()
 const repositoryStore = useRepositoryStore()
 
@@ -33,7 +34,7 @@ const currentFolder = computedAsync(async () => {
 		return
 	}
 	const currentPathStr = currentPath.value.join('/')
-	const { data: { value } } = await useApi<FolderModel>(`/api/v1/repositories/${repository.value.id}/folders/${currentPathStr}`)
+	const { data: { value } } = await $api<FolderModel>(`/api/v1/repositories/${repository.value.id}/folders/${currentPathStr}`)
 	return value
 }, null)
 
@@ -92,8 +93,8 @@ const items = computed(() => [
 				</NuxtLink>
 			</template>
 		</main>
-		<div v-if="currentFolder" class="fixed bottom-0 right-0 m-8">
-			<RepositoryUploadButton :repository-uuid="repositoryUuid" :folder-uuid="currentFolder.id" />
+		<div v-if="currentFolder && repository" class="fixed bottom-0 right-0 m-8">
+			<RepositoryUploadButton :repository="repository" :folder="currentFolder" />
 		</div>
 	</div>
 </template>

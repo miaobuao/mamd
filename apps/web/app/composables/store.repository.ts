@@ -4,6 +4,7 @@ import type { RepositoryModel } from '~~/shared/models/v1/repository'
 export type Repository = RepositoryModel
 
 export const useRepositoryStore = defineStore('repository', () => {
+	const { $api } = useNuxtApp()
 	const repositories = reactive<Repository[]>([])
 
 	LogoutSubject.subscribe(() => {
@@ -17,7 +18,7 @@ export const useRepositoryStore = defineStore('repository', () => {
 		if (found) {
 			return found
 		}
-		const repository = await useApi(`/api/v1/repositories/${id}`)
+		const repository = await $api(`/api/v1/repositories/${id}`)
 		if (repository.data.value) {
 			appendRepository(repository.data.value)
 		}
@@ -43,7 +44,7 @@ export const useRepositoryStore = defineStore('repository', () => {
 	}
 
 	async function createRepository(repo: TypeOf<typeof CreateRepositoryFormValidator>) {
-		const { data: { value } } = await useApi(`/api/v1/repositories`, {
+		const { data: { value } } = await $api(`/api/v1/repositories`, {
 			method: 'POST',
 			body: repo,
 		})
@@ -55,7 +56,7 @@ export const useRepositoryStore = defineStore('repository', () => {
 	}
 
 	async function refreshRepositoriesList() {
-		const { data: { value } } = await useApi('/api/v1/repositories')
+		const { data: { value } } = await $api('/api/v1/repositories')
 		repositories.splice(0, repositories.length, ...(value ?? []))
 		return Array.from(repositories)
 	}

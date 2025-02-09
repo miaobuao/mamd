@@ -4,7 +4,7 @@ import { Loader2 } from 'lucide-vue-next'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 
-const { $text } = useNuxtApp()
+const { $text, $api } = useNuxtApp()
 const route = useRoute()
 const loading = ref(false)
 
@@ -19,7 +19,7 @@ const onSubmit = form.handleSubmit(async ({ confirmPassword, password, username 
 		return
 	}
 	loading.value = true
-	useApi('/api/v1/admin/init', {
+	$api('/api/v1/admin/init', {
 		method: 'post',
 		body: {
 			username,

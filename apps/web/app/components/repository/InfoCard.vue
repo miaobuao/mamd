@@ -7,8 +7,10 @@ defineEmits<{
 	(e: 'click', repository: Repository): void
 }>()
 
+const { $api } = useNuxtApp()
+
 async function startScan() {
-	return await useApi(`/api/v1/repositories/${props.repository.id}/scan`)
+	return await $api(`/api/v1/repositories/${props.repository.id}/scan`)
 }
 </script>
 

@@ -2,7 +2,7 @@ const LOGIN_ROUTE = '/login'
 const REGISTER_ROUTE = '/register'
 
 export default defineNuxtRouteMiddleware(async (to) => {
-	const { $pinia } = useNuxtApp()
+	const { $pinia, $api } = useNuxtApp()
 	const auth = useAuthStore($pinia)
 
 	if (auth.isAuth) {
@@ -21,7 +21,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 		return
 	}
 
-	const { data: { value: admin } } = await useApi('/api/v1/admin/exists')
+	const { data: { value: admin } } = await $api('/api/v1/admin/exists')
 
 	if (admin?.exists) {
 		if (to.path === LOGIN_ROUTE) {

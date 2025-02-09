@@ -10,6 +10,7 @@ export interface UserInfo {
 export const LogoutSubject = new Subject<void>()
 
 export const useAuthStore = defineStore('auth', () => {
+	const { $api } = useNuxtApp()
 	const userInfo = ref<UserInfo>()
 
 	function updateUserInfo(info?: UserInfo) {
@@ -17,7 +18,7 @@ export const useAuthStore = defineStore('auth', () => {
 	}
 
 	function auth() {
-		return useApi('/api/v1/session')
+		return $api('/api/v1/session')
 			.then(({ data }) => {
 				updateUserInfo(data.value)
 				return data.value
@@ -32,7 +33,7 @@ export const useAuthStore = defineStore('auth', () => {
 			sessionStorage.clear()
 			localStorage.clear()
 		}
-		return useApi('/api/v1/session', { method: 'delete' }).then(() => {
+		return $api('/api/v1/session', { method: 'delete' }).then(() => {
 			if (isClient) {
 				window.open('/')
 				window.close()
