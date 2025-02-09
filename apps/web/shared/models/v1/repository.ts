@@ -8,5 +8,6 @@ export interface RepositoryModel {
 	linkedFolder: {
 		id: string
 		name: string
+		fullPath: string
 	}
 }

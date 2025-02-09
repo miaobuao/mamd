@@ -8,12 +8,12 @@ import { UserTable } from './user'
 export const FileTable = pgTable(
 	'file',
 	{
-		id: uuid('id').primaryKey().defaultRandom(),
-		name: text('name').notNull(),
-		fullPath: text('full_path').notNull(),
-		repositoryId: uuid('repository_id').references(() => RepositoryTable.id, { onDelete: 'cascade' }).notNull(),
-		parentId: uuid('parent_id').references(() => FolderTable.id, { onDelete: 'cascade' }),
-		creatorId: uuid('creator_id').references(() => UserTable.id),
+		id: uuid().primaryKey().defaultRandom(),
+		name: text().notNull(),
+		fullPath: text().notNull(),
+		repositoryId: uuid().references(() => RepositoryTable.id, { onDelete: 'cascade' }).notNull(),
+		parentId: uuid().references(() => FolderTable.id, { onDelete: 'cascade' }),
+		creatorId: uuid().references(() => UserTable.id),
 	},
 	(t) => [
 		unique().on(t.repositoryId, t.fullPath),

@@ -1,5 +1,5 @@
 {
-	"id": "1591f231-d36b-4707-98e3-910913a4275b",
+	"id": "6c677ead-f8dd-415f-942c-be00918bdce3",
 	"prevId": "00000000-0000-0000-0000-000000000000",
 	"version": "7",
 	"dialect": "postgresql",
@@ -118,8 +118,8 @@
 			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {
-				"file_repository_id_full_path_unique": {
-					"name": "file_repository_id_full_path_unique",
+				"file_repositoryId_fullPath_unique": {
+					"name": "file_repositoryId_fullPath_unique",
 					"nullsNotDistinct": false,
 					"columns": [
 						"repository_id",
@@ -330,8 +330,8 @@
 			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {
-				"folder_repository_id_full_path_unique": {
-					"name": "folder_repository_id_full_path_unique",
+				"folder_repositoryId_fullPath_unique": {
+					"name": "folder_repositoryId_fullPath_unique",
 					"nullsNotDistinct": false,
 					"columns": [
 						"repository_id",
@@ -339,65 +339,6 @@
 					]
 				}
 			},
-			"policies": {},
-			"checkConstraints": {},
-			"isRLSEnabled": false
-		},
-		"public.folder_metadata": {
-			"name": "folder_metadata",
-			"schema": "",
-			"columns": {
-				"folder_id": {
-					"name": "folder_id",
-					"type": "uuid",
-					"primaryKey": true,
-					"notNull": true
-				},
-				"file_count": {
-					"name": "file_count",
-					"type": "integer",
-					"primaryKey": false,
-					"notNull": false,
-					"default": 0
-				},
-				"folder_count": {
-					"name": "folder_count",
-					"type": "integer",
-					"primaryKey": false,
-					"notNull": false,
-					"default": 0
-				},
-				"birthtime": {
-					"name": "birthtime",
-					"type": "timestamp",
-					"primaryKey": false,
-					"notNull": true
-				},
-				"mtime": {
-					"name": "mtime",
-					"type": "timestamp",
-					"primaryKey": false,
-					"notNull": true
-				}
-			},
-			"indexes": {},
-			"foreignKeys": {
-				"folder_metadata_folder_id_folder_id_fk": {
-					"name": "folder_metadata_folder_id_folder_id_fk",
-					"tableFrom": "folder_metadata",
-					"tableTo": "folder",
-					"columnsFrom": [
-						"folder_id"
-					],
-					"columnsTo": [
-						"id"
-					],
-					"onDelete": "cascade",
-					"onUpdate": "no action"
-				}
-			},
-			"compositePrimaryKeys": {},
-			"uniqueConstraints": {},
 			"policies": {},
 			"checkConstraints": {},
 			"isRLSEnabled": false
@@ -423,7 +364,7 @@
 					"name": "creator_id",
 					"type": "uuid",
 					"primaryKey": false,
-					"notNull": false
+					"notNull": true
 				},
 				"linked_folder_id": {
 					"name": "linked_folder_id",
@@ -435,14 +376,14 @@
 					"name": "ctime",
 					"type": "timestamp",
 					"primaryKey": false,
-					"notNull": false,
+					"notNull": true,
 					"default": "now()"
 				},
 				"mtime": {
 					"name": "mtime",
 					"type": "timestamp",
 					"primaryKey": false,
-					"notNull": false,
+					"notNull": true,
 					"default": "now()"
 				}
 			},
@@ -477,8 +418,8 @@
 			},
 			"compositePrimaryKeys": {},
 			"uniqueConstraints": {
-				"repository_linked_folder_id_unique": {
-					"name": "repository_linked_folder_id_unique",
+				"repository_linkedFolderId_unique": {
+					"name": "repository_linkedFolderId_unique",
 					"nullsNotDistinct": false,
 					"columns": [
 						"linked_folder_id"
@@ -519,26 +460,26 @@
 					"notNull": true,
 					"default": false
 				},
+				"is_deleted": {
+					"name": "is_deleted",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": true,
+					"default": false
+				},
 				"ctime": {
 					"name": "ctime",
 					"type": "timestamp",
 					"primaryKey": false,
-					"notNull": false,
+					"notNull": true,
 					"default": "now()"
 				},
 				"mtime": {
 					"name": "mtime",
 					"type": "timestamp",
 					"primaryKey": false,
-					"notNull": false,
+					"notNull": true,
 					"default": "now()"
-				},
-				"is_deleted": {
-					"name": "is_deleted",
-					"type": "boolean",
-					"primaryKey": false,
-					"notNull": false,
-					"default": false
 				}
 			},
 			"indexes": {
@@ -581,7 +522,7 @@
 					"name": "user_id",
 					"type": "uuid",
 					"primaryKey": false,
-					"notNull": false
+					"notNull": true
 				},
 				"repository_id": {
 					"name": "repository_id",
@@ -605,8 +546,8 @@
 				}
 			},
 			"indexes": {
-				"repo_user_idx": {
-					"name": "repo_user_idx",
+				"visible_repository_repository_id_user_id_index": {
+					"name": "visible_repository_repository_id_user_id_index",
 					"columns": [
 						{
 							"expression": "repository_id",

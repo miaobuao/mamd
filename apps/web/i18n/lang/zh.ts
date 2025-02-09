@@ -50,11 +50,13 @@ export default {
 		loginFailed: '登录失败',
 		pathIsNotDirectory: '路径不是目录',
 		pathNotExists: '路径不存在',
+		folderNotExists: '文件夹不存在',
 		permissionDenied: '权限不足',
 		registerFailed: '注册失败',
 		repositoryAlreadyExists: '存储库已存在',
 		repositoryNotExists: '存储库不存在',
 		usernameHasBeenRegistered: '该用户名已被注册',
 		createUserFailed: '创建用户失败',
+		fileAlreadyExists: '文件已存在',
 	},
 } as const

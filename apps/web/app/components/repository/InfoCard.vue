@@ -6,11 +6,9 @@ const props = defineProps<{
 defineEmits<{
 	(e: 'click', repository: Repository): void
 }>()
-const { $trpc } = useNuxtApp()
+
 async function startScan() {
-	$trpc.repository.scan.mutate({
-		repositoryUuid: props.repository.uuid,
-	})
+	return await useApi(`/api/v1/repositories/${props.repository.id}/scan`)
 }
 </script>
 

@@ -1,39 +1,31 @@
-import type { inferProcedureOutput } from '@trpc/server'
 import type { TypeOf } from 'zod'
-import type { AppRouter } from '~~/server/trpc/routers'
-import { debounce } from 'lodash-es'
+import type { RepositoryModel } from '~~/shared/models/v1/repository'
 
-export type Repository = inferProcedureOutput<AppRouter['repository']['listVisibleRepository']>[number]
+export type Repository = RepositoryModel
 
 export const useRepositoryStore = defineStore('repository', () => {
-	const { $trpc } = useNuxtApp()
-
 	const repositories = reactive<Repository[]>([])
 
 	LogoutSubject.subscribe(() => {
 		repositories.splice(0, repositories.length)
 	})
 
-	$trpc.repository.listVisibleRepository.useQuery().then(({ data }) => {
-		if (data.value) {
-			repositories.splice(0, repositories.length, ...data.value)
-		}
-	})
+	refreshRepositoriesList()
 
-	async function queryRepository(uuid: string) {
-		const found = repositories.find((v) => v.uuid === uuid)
+	async function queryRepository(id: string) {
+		const found = repositories.find((v) => v.id === id)
 		if (found) {
 			return found
 		}
-		const repository = await $trpc.repository.getRepository.useQuery({ uuid })
+		const repository = await useApi(`/api/v1/repositories/${id}`)
 		if (repository.data.value) {
 			appendRepository(repository.data.value)
 		}
 		return repository.data.value
 	}
 
-	function removeRepository(uuid: string) {
-		const idx = repositories.findIndex((v) => v.uuid === uuid)
+	function removeRepository(id: string) {
+		const idx = repositories.findIndex((v) => v.id === id)
 		if (idx === -1) {
 			return
 		}
@@ -41,7 +33,7 @@ export const useRepositoryStore = defineStore('repository', () => {
 	}
 
 	function appendRepository(repository: Repository) {
-		const idx = repositories.findIndex((v) => v.uuid === repository.uuid)
+		const idx = repositories.findIndex((v) => v.id === repository.id)
 		if (idx === -1) {
 			repositories.push(repository)
 		}
@@ -51,17 +43,22 @@ export const useRepositoryStore = defineStore('repository', () => {
 	}
 
 	async function createRepository(repo: TypeOf<typeof CreateRepositoryFormValidator>) {
-		const res = await $trpc.repository.create.mutate(repo)
-		appendRepository(res)
-		return res
+		const { data: { value } } = await useApi(`/api/v1/repositories`, {
+			method: 'POST',
+			body: repo,
+		})
+		if (!value) {
+			return
+		}
+		appendRepository(value)
+		return value
 	}
 
-	const pullRepositories = debounce(() => {
-		return $trpc.repository.listVisibleRepository.query().then((res) => {
-			repositories.splice(0, repositories.length, ...res)
-			return Array.from(repositories)
-		})
-	}, 500, { leading: true })
+	async function refreshRepositoriesList() {
+		const { data: { value } } = await useApi('/api/v1/repositories')
+		repositories.splice(0, repositories.length, ...(value ?? []))
+		return Array.from(repositories)
+	}
 
 	return {
 		repositories: computed(() => [ ...repositories ]),
@@ -69,6 +66,6 @@ export const useRepositoryStore = defineStore('repository', () => {
 		removeRepository,
 		appendRepository,
 		createRepository,
-		pullRepositories,
+		refreshRepositoriesList,
 	}
 })

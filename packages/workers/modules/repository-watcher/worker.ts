@@ -1,3 +1,4 @@
+import type { RepositoryWatcherConsumeContent } from './task'
 import { dirname } from 'node:path'
 import chokidar from 'chokidar'
 import consola from 'consola'
@@ -9,7 +10,6 @@ import { Subject } from 'rxjs'
 import config from '../config'
 import { fileMetadataTask } from '../file-metadata/task'
 import {
-	type RepositoryWatcherConsumeContent,
 	repositoryWatcherStartTask,
 	repositoryWatcherStopTask,
 } from './task'

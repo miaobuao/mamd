@@ -50,11 +50,13 @@ export default {
 		loginFailed: 'Login failed',
 		pathIsNotDirectory: 'Path is not a directory',
 		pathNotExists: 'Path not exists',
+		folderNotExists: 'Folder not exists',
 		permissionDenied: 'Permission denied',
 		registerFailed: 'Register failed',
 		repositoryAlreadyExists: 'Repository already exists',
 		repositoryNotExists: 'Repository not exists',
 		usernameHasBeenRegistered: 'This username has been registered',
 		createUserFailed: 'Create user failed',
+		fileAlreadyExists: 'File already exists',
 	},
 } as const

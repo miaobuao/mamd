@@ -5,12 +5,12 @@ import { FileTable } from './file'
 export const FileMetadataTable = pgTable(
 	'file_metadata',
 	{
-		fileId: uuid('file_id').primaryKey().references(() => FileTable.id, { onDelete: 'cascade' }),
-		mimeType: text('mime_type').notNull(),
-		sha256: varchar('sha256', { length: 64 }).notNull(),
-		size: bigint('size', { mode: 'number' }).notNull(),
-		birthtime: timestamp('birthtime').notNull(),
-		mtime: timestamp('mtime').notNull(),
+		fileId: uuid().primaryKey().references(() => FileTable.id, { onDelete: 'cascade' }),
+		mimeType: text().notNull(),
+		sha256: varchar({ length: 64 }).notNull(),
+		size: bigint({ mode: 'number' }).notNull(),
+		birthtime: timestamp().notNull(),
+		mtime: timestamp().notNull(),
 	},
 	(t) => [
 		index().on(t.sha256, t.mimeType),

@@ -1,39 +1,25 @@
 <script setup lang="ts">
+import type { FolderModel } from '~~/shared/models/v1/folder'
+import type { RepositoryModel } from '~~/shared/models/v1/repository'
+import path from 'node:path'
 import { fileOpen } from 'browser-fs-access'
 import { FileUp, FolderPlus, Plus } from 'lucide-vue-next'
 
 const props = defineProps<{
-	repositoryUuid: string
-	folderUuid: string
+	folder: FolderModel
+	repository: RepositoryModel
 }>()
-
-const { $trpc } = useNuxtApp()
 
 const expanded = ref(false)
 
-async function handleSelectFile() {
+async function uploadFile() {
 	const file = await fileOpen({
 		mimeTypes: [ '*/*' ],
 		description: 'Select a file',
 	})
-
-	const uuid = globalThis.crypto.randomUUID()
-	const uploader = new SingleFileUploader(
-		file,
-		10,
-		idx => $trpc.oss.assignUploadUrl.mutate({
-			uuid,
-			chunkIdx: idx,
-		}),
-	)
-	uploader.start().then(() =>
-		$trpc.oss.uploadEnded.mutate({
-			uuid,
-			fileName: file.name,
-			folderUuid: props.folderUuid,
-			repositoryUuid: props.repositoryUuid,
-		}),
-	)
+	const targetFullPath = path.join(props.folder.fullPath, file.name)
+	const targetRelativePath = path.relative(props.repository.linkedFolder.fullPath, targetFullPath)
+	await useApi(`/api/v1/repositories/${props.repository.id}/files/${targetRelativePath}`)
 }
 </script>
 
@@ -54,7 +40,7 @@ async function handleSelectFile() {
 			<div class="floating-button">
 				<FolderPlus class="size-6" />
 			</div>
-			<div class="floating-button" @click="handleSelectFile">
+			<div class="floating-button" @click="uploadFile">
 				<FileUp class="size-6" />
 			</div>
 		</div>

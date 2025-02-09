@@ -1,12 +1,12 @@
 import { scannerTask } from '@repo/workers'
 import { RepositoryTable } from 'drizzle-client'
 import { eq } from 'drizzle-orm'
-import { AssertUserIsAdmin } from '~~/server/middleware/assert-user-is-admin'
+import { AssertSessionValid } from '~~/server/api/v1/middleware/assert-session-valid'
 
 export default defineEventHandler({
-	onRequest: [ AssertUserIsAdmin ],
+	onRequest: [ AssertSessionValid ],
 	async handler(event) {
-		const repositoryId = event.context.params!.id!
+		const { repositoryId } = getRouterParams(event)
 		const repository = await event.context.db.query.RepositoryTable.findFirst({
 			where: eq(RepositoryTable.id, repositoryId),
 			columns: {

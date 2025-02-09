@@ -2,7 +2,7 @@ import { isClient } from '@vueuse/core'
 import { Subject } from 'rxjs'
 
 export interface UserInfo {
-	uuid: string
+	id: string
 	username: string
 	isAdmin: boolean
 }
@@ -10,20 +10,17 @@ export interface UserInfo {
 export const LogoutSubject = new Subject<void>()
 
 export const useAuthStore = defineStore('auth', () => {
-	const { $trpc } = useNuxtApp()
-
 	const userInfo = ref<UserInfo>()
 
-	function updateUserInfo(info: UserInfo) {
+	function updateUserInfo(info?: UserInfo) {
 		userInfo.value = info
 	}
 
 	function auth() {
-		return $trpc.user.auth
-			.mutate()
-			.then((info) => {
-				updateUserInfo(info)
-				return info
+		return useApi('/api/v1/session')
+			.then(({ data }) => {
+				updateUserInfo(data.value)
+				return data.value
 			})
 			.catch(() => null)
 	}
@@ -35,7 +32,7 @@ export const useAuthStore = defineStore('auth', () => {
 			sessionStorage.clear()
 			localStorage.clear()
 		}
-		return $trpc.user.logout.mutate().then(() => {
+		return useApi('/api/v1/session', { method: 'delete' }).then(() => {
 			if (isClient) {
 				window.open('/')
 				window.close()

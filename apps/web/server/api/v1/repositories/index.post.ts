@@ -1,11 +1,11 @@
 import type { DrizzleCilent } from 'drizzle-client'
 import type { TypeOf } from 'zod'
-import type { RepositoryModel } from './repository.entity'
+import type { RepositoryModel } from '~~/shared/models/v1/repository'
 import * as fs from 'node:fs/promises'
 import { basename } from 'node:path'
 import { FolderTable, RepositoryTable, VisibleRepositoryTable } from 'drizzle-client'
 import { eq } from 'drizzle-orm'
-import { AssertUserIsAdmin } from '~~/server/middleware/assert-user-is-admin'
+import { AssertUserIsAdmin } from '~~/server/api/v1/middleware/assert-user-is-admin'
 
 export async function repositoryExists(db: DrizzleCilent, path: string) {
 	const res = await db
@@ -71,6 +71,7 @@ export default defineEventHandler<
 				linkedFolder: {
 					id: folder.id,
 					name: folder.name,
+					fullPath: input.path,
 				},
 			}
 		})

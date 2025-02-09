@@ -4,7 +4,7 @@ import { Loader2 } from 'lucide-vue-next'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 
-const { $trpc, $text, $router } = useNuxtApp()
+const { $text, $router } = useNuxtApp()
 const route = useRoute()
 const loading = ref(false)
 const auth = useAuthStore()
@@ -16,8 +16,11 @@ const form = useForm({
 const onSubmit = form.handleSubmit(async (values) => {
 	loading.value = true
 	try {
-		const userInfo = await $trpc.user.login.mutate(values)
-		auth.updateUserInfo(userInfo)
+		const userInfo = await useApi('/api/v1/session', {
+			method: 'post',
+			body: values,
+		})
+		auth.updateUserInfo(userInfo.data.value)
 		$router.replace(typeof route.query.from === 'string' ? route.query.from : '/')
 		nextTick(() => {
 			toast($text.successfullyLoggedIn())

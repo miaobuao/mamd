@@ -1,3 +1,4 @@
+import type { ScannerConsumeContent } from './task'
 import path from 'node:path'
 import { consola } from 'consola'
 import { FileTable, FolderTable, RepositoryTable, useDrizzleClient } from 'drizzle-client'
@@ -7,7 +8,7 @@ import { isNil } from 'lodash-es'
 import config from '../config'
 import { fileMetadataTask } from '../file-metadata/task'
 import { directoryIterator } from '../utils'
-import { type ScannerConsumeContent, scannerTask } from './task'
+import { scannerTask } from './task'
 
 const db = useDrizzleClient(config.databaseUrl)
 

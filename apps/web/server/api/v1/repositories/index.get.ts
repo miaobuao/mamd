@@ -1,7 +1,7 @@
-import type { RepositoryModel } from './repository.entity'
+import type { RepositoryModel } from '~~/shared/models/v1/repository'
 import { FolderTable, RepositoryTable, UserTable, VisibleRepositoryTable } from 'drizzle-client'
 import { eq } from 'drizzle-orm'
-import { AssertSessionValid } from '~~/server/middleware/assert-session-valid'
+import { AssertSessionValid } from '~~/server/api/v1/middleware/assert-session-valid'
 
 export default defineEventHandler<{}, Promise<RepositoryModel[]>>({
 	onRequest: [ AssertSessionValid ],
@@ -17,6 +17,7 @@ export default defineEventHandler<{}, Promise<RepositoryModel[]>>({
 				linkedFolder: {
 					id: FolderTable.id,
 					name: FolderTable.name,
+					fullPath: FolderTable.fullPath,
 				},
 			})
 			.from(VisibleRepositoryTable)

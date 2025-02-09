@@ -1,14 +1,15 @@
+import type { FileMetadataConsumeContent, FileTask } from './task'
 import { createReadStream } from 'node:fs'
 import * as fs from 'node:fs/promises'
 import { consola } from 'consola'
-import { FileMetadataTable, FileTable, FolderMetadataTable, useDrizzleClient } from 'drizzle-client'
+import { FileMetadataTable, FileTable, useDrizzleClient } from 'drizzle-client'
 import { eq } from 'drizzle-orm'
 import { fileTypeFromStream } from 'file-type'
 import { isBinaryFile } from 'isbinaryfile'
 import { lookup as lookupMimeType } from 'mime-types'
 import config from '../config'
 import { readableToHash } from '../utils'
-import { type FileMetadataConsumeContent, fileMetadataTask, type FileTask, type FolderTask } from './task'
+import { fileMetadataTask } from './task'
 
 const db = useDrizzleClient(config.databaseUrl)
 
@@ -20,10 +21,7 @@ export async function startFileMetadataWorker() {
 }
 
 export async function handler(content: FileMetadataConsumeContent) {
-	if (content.isDir) {
-		await handleFolder(content)
-	}
-	else {
+	if (!content.isDir) {
 		await handleFile(content)
 	}
 }
@@ -70,21 +68,6 @@ async function handleFile(content: FileTask) {
 			size: fileStat.size,
 			mimeType,
 			sha256,
-		},
-	})
-}
-
-async function handleFolder(content: FolderTask) {
-	const { mtime, birthtime } = await fs.lstat(content.path)
-	await db.insert(FolderMetadataTable).values({
-		folderId: content.id,
-		mtime,
-		birthtime,
-	}).onConflictDoUpdate({
-		target: FolderMetadataTable.folderId,
-		set: {
-			mtime,
-			birthtime,
 		},
 	})
 }

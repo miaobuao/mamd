@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import type { FileOrFolder } from '~/components/repository/File.vue'
+import type { FolderModel } from '~~/shared/models/v1/folder'
 import { computedAsync } from '@vueuse/core'
 import { ChevronsRight, Home, ListTree, Redo2, Search } from 'lucide-vue-next'
+import { isNotNil } from 'ramda'
 import { makeRepoUrl } from '~/components/repository/utils'
 
-const { $trpc } = useNuxtApp()
 const route = useRoute()
 const repositoryStore = useRepositoryStore()
 
-const items = ref<FileOrFolder[]>()
 const repositoryUuid = computed(() => route.params.repoId as string)
 const repository = ref(
 	await useAsyncData(() => repositoryStore.queryRepository(repositoryUuid.value))
@@ -29,28 +28,19 @@ const currentPath = computed(() => {
 	return path.filter(Boolean) as string[]
 })
 
-watch([ repository, currentPath ], async () => {
-	if (!repository.value)
-		return
-	const currentPathStr = currentPath.value.join('/')
-	items.value = await $trpc.fs.listAllFromPath.useQuery({
-		repositoryId: repository.value.uuid,
-		path: currentPathStr,
-	}).then((entries) => entries.data.value ?? [])
-}, {
-	immediate: true,
-})
-
 const currentFolder = computedAsync(async () => {
 	if (!repository.value) {
 		return
 	}
-	const folder = await $trpc.fs.getFolder.useQuery({
-		repositoryId: repository.value?.uuid,
-		path: currentPath.value.join('/'),
-	})
-	return folder.data.value
+	const currentPathStr = currentPath.value.join('/')
+	const { data: { value } } = await useApi<FolderModel>(`/api/v1/repositories/${repository.value.id}/folders/${currentPathStr}`)
+	return value
 }, null)
+
+const items = computed(() => [
+	currentFolder.value?.files.map((d) => ({ ...d, isDir: false })) ?? [],
+	currentFolder.value?.folders.map((d) => ({ ...d, isDir: false })),
+].flat(2).filter(isNotNil))
 </script>
 
 <template>
@@ -65,7 +55,7 @@ const currentFolder = computedAsync(async () => {
 				<DropdownMenuContent align="end" class="mx-2 max-w-[calc(100vw-1rem)] max-h-[calc(100vh-60px)] overflow-auto">
 					<template v-for="path, i in [ repository?.name, ...currentPath ]" :key="i">
 						<DropdownMenuSeparator v-if="i > 0" />
-						<NuxtLink :to="i === 0 ? makeRepoUrl(repository!.uuid) : makeRepoUrl(repository!.uuid, ...currentPath.slice(0, i))">
+						<NuxtLink :to="i === 0 ? makeRepoUrl(repository!.id) : makeRepoUrl(repository!.id, ...currentPath.slice(0, i))">
 							<DropdownMenuLabel class="flex items-center gap-2">
 								<Home v-if="i === 0" />
 								<ChevronsRight v-else-if="i === currentPath.length" />
