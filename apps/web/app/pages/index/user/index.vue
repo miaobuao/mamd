@@ -11,8 +11,8 @@ const { data: users, status, refresh } = $trpc.user.listUsers.useQuery()
 const createUserFormSchema = toTypedSchema(CreateUserInputValidator)
 const formCreateUser = useForm({ validationSchema: createUserFormSchema })
 
-const editUserFormSchema = toTypedSchema(EditUserInputValidator)
-const formUpdateUser = useForm({ validationSchema: editUserFormSchema })
+// const editUserFormSchema = toTypedSchema(EditUserInputValidator)
+// const formUpdateUser = useForm({ validationSchema: editUserFormSchema })
 
 const loading = ref(false) // 添加用户界面按钮加载状态开关
 const createVisible = ref(false) // 添加用户界面开关
@@ -38,24 +38,24 @@ const onSubmit = formCreateUser.handleSubmit(async (values) => { // 添加用户
 	}
 })
 
-const onUpdate = formUpdateUser.handleSubmit(async (values) => { // 更新用户按钮逻辑
-	values.uuid = uuid.value
-	loading.value = true
-	try {
-		await $trpc.user.editUser.mutate(values)
-		nextTick(() => {
-			toast($text.successfullyUpdatedUser())
-		})
-	}
-	catch {
-		toast($text.error.updateUserFailed())
-	}
-	finally {
-		loading.value = false
-		updateVisible.value = false
-		refresh()
-	}
-})
+// const onUpdate = formUpdateUser.handleSubmit(async (values) => { // 更新用户按钮逻辑
+// 	values.uuid = uuid.value
+// 	loading.value = true
+// 	try {
+// 		await $trpc.user.editUser.mutate(values)
+// 		nextTick(() => {
+// 			toast($text.successfullyUpdatedUser())
+// 		})
+// 	}
+// 	catch {
+// 		toast($text.error.updateUserFailed())
+// 	}
+// 	finally {
+// 		loading.value = false
+// 		updateVisible.value = false
+// 		refresh()
+// 	}
+// })
 
 async function deleteUser(uuid: string) {
 	await $trpc.user.deleteUser.mutate({ uuid })
@@ -64,7 +64,7 @@ async function deleteUser(uuid: string) {
 </script>
 
 <template>
-	<main class="flex flex-col min-h-screen gap-y-2 p-4 bg-muted/40 ml-6">
+	<section class="flex flex-col min-h-screen gap-y-2 p-4 bg-muted/40 ml-6">
 		<section class="flex justify-end">
 			<Dialog v-model:open="createVisible">
 				<DialogTrigger as-child>
@@ -77,8 +77,54 @@ async function deleteUser(uuid: string) {
 						<DialogTitle>{{ $text.createUser() }}</DialogTitle>
 						<DialogDescription>{{ $text.createUserDescription() }}</DialogDescription>
 					</DialogHeader>
+					<form @submit.prevent="onSubmit">
+						<FormField v-slot="{ componentField }" name="username" :control="formCreateUser">
+							<FormItem>
+								<FormLabel>{{ $text.username() }}</FormLabel>
+								<FormControl>
+									<Input v-bind="componentField" />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						</FormField>
+						<FormField v-slot="{ componentField }" name="password" :control="formCreateUser">
+							<FormItem>
+								<FormLabel>{{ $text.password() }}</FormLabel>
+								<FormControl>
+									<Input type="password" v-bind="componentField" />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						</FormField>
+						<FormField v-slot="{ value, handleChange }" name="isAdmin" :control="formCreateUser">
+							<FormItem class="mt-4">
+								<div class="flex items-center space-x-2">
+									<FormLabel>{{ $text.isManager() }}</FormLabel>
+									<FormControl>
+										<Switch :checked="value" @update:checked="handleChange" />
+									</FormControl>
+								</div>
+							</FormItem>
+						</FormField>
+						<DialogFooter>
+							<Button type="submit" :disabled="loading">
+								<Loader2 v-show="loading" class="w-4 h-4 mr-2 animate-spin" />
+								{{ $text.create() }}
+							</Button>
+						</DialogFooter>
+					</form>
+				</DialogContent>
+			</Dialog>
+		</section>
+		<section class="flex justify-end">
+			<Dialog v-model:open="updateVisible">
+				<DialogContent class="sm:max-w-[425px]">
+					<DialogHeader>
+						<DialogTitle>{{ $text.updateUser() }}</DialogTitle>
+						<DialogDescription>{{ $text.updateUserDescription() }}</DialogDescription>
+					</DialogHeader>
 
-					<form @submit="onSubmit">
+					<form>
 						<FormField v-slot="{ componentField }" name="username">
 							<FormItem>
 								<FormLabel>{{ $text.username() }}</FormLabel>
@@ -92,7 +138,16 @@ async function deleteUser(uuid: string) {
 							<FormItem>
 								<FormLabel>{{ $text.password() }}</FormLabel>
 								<FormControl>
-									<Input type="password" v-bind="componentField" />
+									<Input v-bind="componentField" v-model="passwordExist" type="password" />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						</FormField>
+						<FormField v-if="passwordExist" v-slot="{ componentField }" name="confirmPassword">
+							<FormItem>
+								<FormLabel>{{ $text.confirmPassword() }}</FormLabel>
+								<FormControl>
+									<Input v-bind="componentField" type="password" />
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -111,68 +166,13 @@ async function deleteUser(uuid: string) {
 						<DialogFooter>
 							<Button type="submit" :disabled="loading">
 								<Loader2 v-show="loading" class="w-4 h-4 mr-2 animate-spin" />
-								{{ $text.create() }}
+								{{ $text.updateUser() }}
 							</Button>
 						</DialogFooter>
 					</form>
 				</DialogContent>
 			</Dialog>
 		</section>
-		<Dialog v-model:open="updateVisible">
-			<DialogContent class="sm:max-w-[425px]">
-				<DialogHeader>
-					<DialogTitle>{{ $text.updateUser() }}</DialogTitle>
-					<DialogDescription>{{ $text.updateUserDescription() }}</DialogDescription>
-				</DialogHeader>
-
-				<form @submit="onUpdate">
-					<FormField v-slot="{ componentField }" name="username">
-						<FormItem>
-							<FormLabel>{{ $text.username() }}</FormLabel>
-							<FormControl>
-								<Input v-bind="componentField" />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					</FormField>
-					<FormField v-slot="{ componentField }" name="password">
-						<FormItem>
-							<FormLabel>{{ $text.password() }}</FormLabel>
-							<FormControl>
-								<Input v-bind="componentField" v-model="passwordExist" type="password" />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					</FormField>
-					<FormField v-if="passwordExist" v-slot="{ componentField }" name="confirmPassword">
-						<FormItem>
-							<FormLabel>{{ $text.confirmPassword() }}</FormLabel>
-							<FormControl>
-								<Input v-bind="componentField" type="password" />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					</FormField>
-					<FormField v-slot="{ value, handleChange }" name="isAdmin">
-						<FormItem class="mt-4">
-							<div class="flex items-center space-x-2">
-								<FormLabel>{{ $text.isManager() }}</FormLabel>
-								<FormControl>
-									<Switch id="isAdmin" :checked="value" @update:checked="handleChange" />
-								</FormControl>
-							</div>
-							<FormMessage />
-						</FormItem>
-					</FormField>
-					<DialogFooter>
-						<Button type="submit" :disabled="loading">
-							<Loader2 v-show="loading" class="w-4 h-4 mr-2 animate-spin" />
-							{{ $text.updateUser() }}
-						</Button>
-					</DialogFooter>
-				</form>
-			</DialogContent>
-		</Dialog>
 		<Card>
 			<!-- Title and SubTitle -->
 			<CardHeader>
@@ -225,7 +225,7 @@ async function deleteUser(uuid: string) {
 									alt="{{$text.atavar()}}"
 									class="aspect-square rounded-md object-cover"
 									height="64"
-									src="https://github.com/radix-vue.png"
+									src="https://images.kimbleex.top/THEME/anzhiyu/MainWebPage/Avatar.avif"
 									width="64"
 								>
 							</TableCell>
@@ -274,5 +274,5 @@ async function deleteUser(uuid: string) {
 				</div>
 			</CardFooter>
 		</Card>
-	</main>
+	</section>
 </template>

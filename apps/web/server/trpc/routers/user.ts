@@ -102,6 +102,7 @@ export const UserRouter = router({
 						username: input.username,
 						password: hashPassword,
 						isAdmin: input.isAdmin,
+						// isDeleted: false,
 					},
 				})
 				.catch(
