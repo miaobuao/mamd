@@ -8,12 +8,12 @@ import { VisibleRepositoryTable } from './visibleRepository'
 export const RepositoryTable = pgTable(
 	'repository',
 	{
-		id: uuid('id').primaryKey().defaultRandom(),
-		name: text('name').notNull(),
-		creatorId: uuid('creator_id').references(() => UserTable.id, { onDelete: 'no action' }),
-		linkedFolderId: uuid('linked_folder_id').unique().references(() => FolderTable.id, { onDelete: 'set null' }),
-		ctime: timestamp('created_at').defaultNow(),
-		mtime: timestamp('modified_at').defaultNow().$onUpdate(() => new Date()),
+		id: uuid().primaryKey().defaultRandom(),
+		name: text().notNull(),
+		creatorId: uuid().references(() => UserTable.id, { onDelete: 'no action' }).notNull(),
+		linkedFolderId: uuid().references(() => FolderTable.id, { onDelete: 'set null' }),
+		ctime: timestamp().defaultNow().notNull(),
+		mtime: timestamp().defaultNow().$onUpdate(() => new Date()).notNull(),
 	},
 )
 

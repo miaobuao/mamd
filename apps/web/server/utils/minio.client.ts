@@ -5,7 +5,6 @@ let minioClient: Minio.Client | undefined
 
 export function useMinioClient() {
 	if (isNil(minioClient)) {
-		const config = useRuntimeConfig()
 		minioClient = new Minio.Client({
 			endPoint: config.MINIO_ENDPOINT,
 			port: config.MINIO_API_PORT,

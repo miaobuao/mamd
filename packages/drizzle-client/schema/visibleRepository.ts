@@ -6,13 +6,13 @@ import { UserTable } from './user'
 export const VisibleRepositoryTable = pgTable(
 	'visible_repository',
 	{
-		userId: uuid('user_id').references(() => UserTable.id, { onDelete: 'cascade' }),
-		repositoryId: uuid('repository_id').references(() => RepositoryTable.id, { onDelete: 'cascade' }).notNull(),
-		ctime: timestamp('created_at').defaultNow(),
-		mtime: timestamp('modified_at').defaultNow().$onUpdate(() => new Date()),
+		userId: uuid().references(() => UserTable.id, { onDelete: 'cascade' }).notNull(),
+		repositoryId: uuid().references(() => RepositoryTable.id, { onDelete: 'cascade' }).notNull(),
+		ctime: timestamp().defaultNow().notNull(),
+		mtime: timestamp().defaultNow().$onUpdate(() => new Date()).notNull(),
 	},
 	(t) => [
-		uniqueIndex('repo_user_idx').on(t.repositoryId, t.userId),
+		uniqueIndex().on(t.repositoryId, t.userId),
 	],
 )
 
