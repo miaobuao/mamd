@@ -29,7 +29,9 @@ const currentPath = computed(() => {
 	return path.filter(Boolean) as string[]
 })
 
-watch([ repository, currentPath ], async () => {
+const folderVersion = ref(0)
+
+watch([ repository, currentPath, folderVersion ], async () => {
 	if (!repository.value)
 		return
 	const currentPathStr = currentPath.value.join('/')
@@ -103,7 +105,7 @@ const currentFolder = computedAsync(async () => {
 			</template>
 		</main>
 		<div v-if="currentFolder" class="fixed bottom-0 right-0 m-8">
-			<RepositoryUploadButton :repository-uuid="repositoryUuid" :folder-uuid="currentFolder.id" />
+			<RepositoryUploadButton :repository-uuid="repositoryUuid" :folder-uuid="currentFolder.id" @after-upload="++folderVersion" />
 		</div>
 	</div>
 </template>

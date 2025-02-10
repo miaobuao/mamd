@@ -7,6 +7,10 @@ const props = defineProps<{
 	folderUuid: string
 }>()
 
+const emits = defineEmits<{
+	(e: 'afterUpload'): void
+}>()
+
 const { $trpc } = useNuxtApp()
 
 const expanded = ref(false)
@@ -32,6 +36,8 @@ async function handleSelectFile() {
 			fileName: file.name,
 			folderUuid: props.folderUuid,
 			repositoryUuid: props.repositoryUuid,
+		}).then(() => {
+			emits('afterUpload')
 		}),
 	)
 }

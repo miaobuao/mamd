@@ -1,8 +1,10 @@
 import type { BucketItem } from 'minio'
 import { createWriteStream } from 'node:fs'
 import * as fs from 'node:fs/promises'
-import path from 'node:path'
+import path, { basename } from 'node:path'
 import { pipeline } from 'node:stream/promises'
+import { fileMetadataTask } from '@repo/workers'
+import { FileTable } from 'drizzle-client'
 import pLimit from 'p-limit'
 import { z } from 'zod'
 import { getFolderAbsolutePath } from '~~/server/utils/fs'
@@ -27,7 +29,7 @@ export const ossRoute = router({
 			folderUuid: z.string().uuid(),
 			repositoryUuid: z.string().uuid(),
 		}))
-		.mutation(async ({ input, ctx: { db } }) => {
+		.mutation(async ({ input, ctx: { db, userInfo } }) => {
 			const dir = await getFolderAbsolutePath(db, input.repositoryUuid, input.folderUuid)
 			const filePath = path.resolve(dir, input.fileName)
 			const items = await oss.listObjects(BUCKET.TMP_UPLOAD, input.uuid, true)
@@ -59,5 +61,17 @@ export const ossRoute = router({
 			await Promise.all(
 				items.map((item) => oss.removeObject(BUCKET.TMP_UPLOAD, item.name!)),
 			)
+			const [ insertRes ] = await db.insert(FileTable).values({
+				name: basename(input.fileName),
+				fullPath: filePath,
+				creatorId: userInfo.id,
+				repositoryId: input.repositoryUuid,
+				parentId: input.folderUuid,
+			}).returning({ id: FileTable.id })
+			await fileMetadataTask.publish({
+				id: insertRes.id,
+				isDir: false,
+				path: filePath,
+			})
 		}),
 })
