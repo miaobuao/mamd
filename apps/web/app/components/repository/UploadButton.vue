@@ -20,8 +20,8 @@ async function handleSelectFile() {
 	const uuid = globalThis.crypto.randomUUID()
 	const uploader = new SingleFileUploader(
 		file,
-		10,
-		idx => $trpc.oss.assignUploadUrl.mutate({
+		Math.floor(file.size / (128 * 1024 * 1024)),
+		(idx) => $trpc.oss.assignUploadUrl.mutate({
 			uuid,
 			chunkIdx: idx,
 		}),

@@ -15,7 +15,7 @@ export async function createContext(event: H3Event) {
 			const token = await signToken(payload.data)
 			setCookie(event, 'auth-token', token, {
 				httpOnly: true,
-				maxAge: secs(useRuntimeConfig().OAUTH_JWT_EXPIRES_IN),
+				maxAge: secs(config.OAUTH_JWT_EXPIRES_IN),
 			})
 		}
 		return {

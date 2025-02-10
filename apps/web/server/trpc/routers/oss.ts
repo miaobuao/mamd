@@ -17,7 +17,6 @@ export const ossRoute = router({
 			chunkIdx: z.number().int(),
 		}))
 		.mutation(async ({ input: { uuid, chunkIdx } }) => {
-			const config = useRuntimeConfig()
 			const signedUrl = await oss.presignedPutObject(BUCKET.TMP_UPLOAD, `${uuid}/${chunkIdx}`, 10 * 60)
 			return config.MINIO_PROXY_PATH + removeOriginInUrl(signedUrl)
 		}),

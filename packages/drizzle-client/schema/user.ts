@@ -8,13 +8,13 @@ import { VisibleRepositoryTable } from './visibleRepository'
 export const UserTable = pgTable(
 	'user',
 	{
-		id: uuid('id').primaryKey().defaultRandom(),
-		username: text('username').unique().notNull(),
-		password: text('password').notNull(),
-		isAdmin: boolean('is_admin').default(false),
-		ctime: timestamp('created_at').defaultNow(),
-		mtime: timestamp('modified_at').defaultNow().$onUpdate(() => new Date()),
-		isDeleted: boolean('is_deleted').default(false),
+		id: uuid().primaryKey().defaultRandom(),
+		username: text().unique().notNull(),
+		password: text().notNull(),
+		isAdmin: boolean().default(false).notNull(),
+		isDeleted: boolean().default(false).notNull(),
+		ctime: timestamp().defaultNow().notNull(),
+		mtime: timestamp().defaultNow().$onUpdate(() => new Date()).notNull(),
 	},
 	(t) => [
 		index().on(t.username),

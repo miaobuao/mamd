@@ -3,9 +3,10 @@ import postgres from 'postgres'
 import * as fileSchema from './schema/file'
 import * as fileMetadataSchema from './schema/fileMetadata'
 import * as folderSchema from './schema/folder'
-import * as folderMetadataSchema from './schema/folderMetadata'
 import * as repositorySchema from './schema/repository'
+import * as repositoryCreatorView from './schema/repositoryCreatorView'
 import * as userSchema from './schema/user'
+import * as userVisibleRepositoryView from './schema/userVisibleRepositoryView'
 import * as visibleRepositorySchema from './schema/visibleRepository'
 
 export function useDrizzleClient(databaseUrl: string) {
@@ -16,11 +17,13 @@ export function useDrizzleClient(databaseUrl: string) {
 			...fileSchema,
 			...fileMetadataSchema,
 			...folderSchema,
-			...folderMetadataSchema,
 			...repositorySchema,
 			...userSchema,
 			...visibleRepositorySchema,
+			...repositoryCreatorView,
+			...userVisibleRepositoryView,
 		},
+		casing: 'snake_case',
 	})
 	return db
 }
@@ -30,7 +33,8 @@ export type DrizzleCilent = Awaited<ReturnType<typeof useDrizzleClient>>
 export * from './schema/file'
 export * from './schema/fileMetadata'
 export * from './schema/folder'
-export * from './schema/folderMetadata'
 export * from './schema/repository'
+export * from './schema/repositoryCreatorView'
 export * from './schema/user'
+export * from './schema/userVisibleRepositoryView'
 export * from './schema/visibleRepository'
