@@ -39,7 +39,7 @@ export const EditUserInputValidator = z.object({
 	username: z.string().min(2).optional(),
 	password: z.string().min(6).optional(),
 	confirmPassword: z.string().min(6).optional(),
-	isAdmin: z.boolean(),
+	isAdmin: z.boolean().optional(),
 }).refine((input) => {
 	return input.password === input.confirmPassword
 }, {})
