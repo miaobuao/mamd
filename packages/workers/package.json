@@ -19,7 +19,6 @@
 		"junk": "^4.0.1",
 		"mime-types": "^2.1.35",
 		"nats": "^2.29.1",
-		"repository-fs": "workspace: *",
 		"rxjs": "^7.8.1"
 	}
 }

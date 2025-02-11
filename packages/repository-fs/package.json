@@ -1,7 +1,0 @@
-{
-	"name": "repository-fs",
-	"main": "./index.ts",
-	"peerDependencies": {
-		"drizzle-client": "workspace: *"
-	}
-}

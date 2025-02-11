@@ -1,15 +1,16 @@
+import type { RepositoryWatcherConsumeContent } from './task'
 import { dirname } from 'node:path'
 import chokidar from 'chokidar'
 import consola from 'consola'
 import { RepositoryTable, useDrizzleClient } from 'drizzle-client'
 import { eq } from 'drizzle-orm'
 import { isNil } from 'lodash-es'
-import { RepositoryFileSytem } from 'repository-fs'
 import { Subject } from 'rxjs'
+import { RepositoryFileSytem } from '../../utils/repository-fs'
 import config from '../config'
 import { fileMetadataTask } from '../file-metadata/task'
 import {
-	type RepositoryWatcherConsumeContent,
+
 	repositoryWatcherStartTask,
 	repositoryWatcherStopTask,
 } from './task'
