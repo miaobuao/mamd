@@ -31,11 +31,11 @@ export const CreateRepositoryFormValidator = z.object({
 })
 
 export const DeleteUserInputValidator = z.object({
-	uuid: z.string(),
+	id: z.string(),
 })
 
 export const EditUserInputValidator = z.object({
-	uuid: z.string(),
+	id: z.string(),
 	username: z.string().min(2).optional(),
 	password: z.string().min(6).optional(),
 	confirmPassword: z.string().min(6).optional(),

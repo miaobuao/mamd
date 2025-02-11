@@ -125,7 +125,7 @@ export const UserRouter = router({
 		.mutation(async ({ input, ctx: { db } }) => {
 			await db.update(UserTable)
 				.set({ isDeleted: true })
-				.where(eq(UserTable.id, input.uuid))
+				.where(eq(UserTable.id, input.id))
 		}),
 
 	editUser: adminProcedure
@@ -137,6 +137,6 @@ export const UserRouter = router({
 					isAdmin: input.isAdmin,
 					...(input.password ? { password: await bcryptEncrypt(input.password) } : {}),
 				})
-				.where(eq(UserTable.id, input.uuid))
+				.where(eq(UserTable.id, input.id))
 		}),
 })
