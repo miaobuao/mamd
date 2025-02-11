@@ -16,8 +16,8 @@ export function secs(str: string) {
 	if (!matched || (matched[4] && matched[1]))
 		throw new TypeError('Invalid time period format')
 
-	const value = Number.parseFloat(matched[2])
-	const unit = matched[3].toLowerCase()
+	const value = Number.parseFloat(matched[2]!)
+	const unit = matched[3]!.toLowerCase()
 
 	let numericDate: number
 

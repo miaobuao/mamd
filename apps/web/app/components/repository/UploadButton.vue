@@ -7,6 +7,10 @@ const props = defineProps<{
 	folderUuid: string
 }>()
 
+const emits = defineEmits<{
+	(e: 'afterUpload'): void
+}>()
+
 const { $trpc } = useNuxtApp()
 
 const expanded = ref(false)
@@ -20,8 +24,8 @@ async function handleSelectFile() {
 	const uuid = globalThis.crypto.randomUUID()
 	const uploader = new SingleFileUploader(
 		file,
-		10,
-		idx => $trpc.oss.assignUploadUrl.mutate({
+		Math.floor(file.size / (128 * 1024 * 1024)),
+		(idx) => $trpc.oss.assignUploadUrl.mutate({
 			uuid,
 			chunkIdx: idx,
 		}),
@@ -32,6 +36,8 @@ async function handleSelectFile() {
 			fileName: file.name,
 			folderUuid: props.folderUuid,
 			repositoryUuid: props.repositoryUuid,
+		}).then(() => {
+			emits('afterUpload')
 		}),
 	)
 }

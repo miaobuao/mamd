@@ -1,3 +1,5 @@
+name: mamd
+
 services:
   postgres:
     image: postgres:latest

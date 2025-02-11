@@ -1,29 +1,73 @@
-import path from 'node:path'
+import type { ScannerConsumeContent } from './task'
+import path, { dirname } from 'node:path'
 import { consola } from 'consola'
-import { usePrismaClient } from 'prisma-client-js'
+import { FileTable, FolderTable, RepositoryTable, useDrizzleClient } from 'drizzle-client'
+import { and, eq, or } from 'drizzle-orm'
+import { isJunk } from 'junk'
+import { isNil } from 'lodash-es'
+import config from '../config'
 import { fileMetadataTask } from '../file-metadata/task'
 import { directoryIterator } from '../utils'
-import { type ScannerConsumeContent, scannerTask } from './task'
+import { scannerTask } from './task'
 
-const db = usePrismaClient()
+const db = useDrizzleClient(config.databaseUrl)
 
-for await (const content of scannerTask.consume()) {
-	handler(content)
-		.catch(consola.error)
+export async function startRepositoryScannerWorker() {
+	for await (const content of scannerTask.consume()) {
+		handler(content)
+			.catch(consola.error)
+		removeRest(content.repositoryId)
+			.catch(consola.error)
+	}
 }
 
-async function handler({ repositoryId, repositoryPath, basePath }: ScannerConsumeContent) {
-	const repository = await db.repository.findFirst({
-		where: {
-			id: repositoryId,
+async function removeRest(repositoryId: string) {
+	const repository = await db.query.RepositoryTable.findFirst({
+		where: eq(RepositoryTable.id, repositoryId),
+		with: {
+			folders: true,
+			files: true,
+			linkedFolder: true,
 		},
-		select: {
-			linkedFolder: {
-				select: {
-					id: true,
-				},
-			},
-			creatorId: true,
+	})
+	if (!repository || !repository.linkedFolder)
+		return
+	const filesPathSet = new Set(repository.files.map((f) => f.fullPath))
+	const foldersPathSet = new Set(repository.folders.map((f) => f.fullPath))
+	foldersPathSet.delete(repository.linkedFolder.fullPath)
+	for await (const entry of directoryIterator(repository.linkedFolder.fullPath)) {
+		if (entry.isDir) {
+			foldersPathSet.delete(entry.fullPath)
+		}
+		else {
+			filesPathSet.delete(entry.fullPath)
+		}
+	}
+	consola.log('delete files: ', filesPathSet)
+	consola.log('delete folders: ', foldersPathSet)
+	const filesPath = [ ...filesPathSet ]
+	const foldersPath = [ ...foldersPathSet ]
+	if (filesPath.length > 0) {
+		await db.delete(FileTable)
+			.where(and(
+				eq(FileTable.repositoryId, repositoryId),
+				or(...filesPath.map((path) => eq(FileTable.fullPath, path))),
+			))
+	}
+	if (foldersPath.length > 0) {
+		await db.delete(FolderTable)
+			.where(and(
+				eq(FolderTable.repositoryId, repositoryId),
+				or(...foldersPath.values().map((path) => eq(FolderTable.fullPath, path))),
+			))
+	}
+}
+
+async function handler({ repositoryId, repositoryPath }: ScannerConsumeContent) {
+	const repository = await db.query.RepositoryTable.findFirst({
+		where: eq(RepositoryTable.id, repositoryId),
+		with: {
+			linkedFolder: true,
 		},
 	})
 	if (!repository)
@@ -31,93 +75,105 @@ async function handler({ repositoryId, repositoryPath, basePath }: ScannerConsum
 	const { linkedFolder } = repository
 	let linkedFolderId = linkedFolder?.id
 	if (!linkedFolder) {
-		const folder = await db.folder.create({
-			data: {
+		const [ folder ] = await db.insert(FolderTable)
+			.values({
 				name: path.basename(repositoryPath),
 				parentId: null,
+				fullPath: repositoryPath,
 				creatorId: repository.creatorId,
-			},
-		})
+				repositoryId,
+			})
+			.returning({ id: FolderTable.id })
 		linkedFolderId = folder.id
 	}
 	fileMetadataTask.publish({
-		isFile: false,
+		isDir: true,
 		id: linkedFolderId!,
 		path: repositoryPath,
 	})
 	let parentFolderId = linkedFolderId!
 	let parentFolderPath = ''
-	for await (const entry of directoryIterator(basePath ?? repositoryPath)) {
+	for await (const entry of directoryIterator(repositoryPath)) {
+		if (!entry.isDir && isJunk(path.basename(entry.fullPath))) {
+			continue
+		}
 		const relativeParentPath = path.relative(repositoryPath, path.dirname(entry.fullPath))
 		if (relativeParentPath !== parentFolderPath) {
-			const parts = relativeParentPath.split(path.sep)
-			parentFolderId = await queryFolder(linkedFolderId!, parts)
+			const parentFolder = await db.query.FolderTable.findFirst({
+				where: and(
+					eq(FolderTable.repositoryId, repositoryId),
+					eq(FolderTable.fullPath, dirname(entry.fullPath)),
+				),
+				columns: {
+					id: true,
+				},
+			})
+			parentFolderId = parentFolder!.id
 			parentFolderPath = relativeParentPath
 		}
 		const name = path.basename(entry.fullPath)
 		if (entry.isDir) {
-			const _folder = await db.folder.upsert({
-				where: {
-					repositoryId_parentId_name: {
-						repositoryId,
-						parentId: parentFolderId,
-						name,
-					},
-				},
-				update: {},
-				create: {
+			let [ folder ] = await db.insert(FolderTable)
+				.values({
 					name,
 					parentId: parentFolderId,
 					repositoryId,
+					fullPath: entry.fullPath,
 					creatorId: repository.creatorId,
-				},
-			})
+				})
+				.onConflictDoNothing()
+				.returning({ id: FolderTable.id })
+			if (isNil(folder)) {
+				const _folder = await db.query.FolderTable.findFirst({
+					where: and(
+						eq(FolderTable.repositoryId, repositoryId),
+						eq(FolderTable.parentId, parentFolderId),
+						eq(FolderTable.name, name),
+					),
+					columns: {
+						id: true,
+					},
+				})
+				if (!_folder) {
+					continue
+				}
+				folder = _folder
+			}
 			await fileMetadataTask.publish({
-				isFile: false,
-				id: _folder.id,
+				isDir: true,
+				id: folder.id,
 				path: entry.fullPath,
 			})
 		}
 		else {
-			const _file = await db.file.upsert({
-				where: {
-					repositoryId_parentId_name: {
-						repositoryId,
-						parentId: parentFolderId,
-						name,
+			let [ file ] = await db.insert(FileTable).values({
+				repositoryId,
+				parentId: parentFolderId,
+				fullPath: entry.fullPath,
+				creatorId: repository.creatorId,
+				name,
+			}).onConflictDoNothing().returning({ id: FileTable.id })
+			if (isNil(file)) {
+				const _file = await db.query.FileTable.findFirst({
+					where: and(
+						eq(FileTable.repositoryId, repositoryId),
+						eq(FileTable.parentId, parentFolderId),
+						eq(FileTable.name, name),
+					),
+					columns: {
+						id: true,
 					},
-				},
-				update: {},
-				create: {
-					repositoryId,
-					parentId: parentFolderId,
-					creatorId: repository.creatorId,
-					name,
-				},
-			})
+				})
+				if (!_file) {
+					continue
+				}
+				file = _file
+			}
 			await fileMetadataTask.publish({
-				isFile: true,
-				id: _file.id,
+				isDir: false,
+				id: file.id,
 				path: entry.fullPath,
 			})
 		}
 	}
-}
-
-export async function queryFolder(rootFolderId: number, parts: string[]) {
-	parts = [ ...parts ]
-	while (parts.length > 0) {
-		const part = parts.shift()!
-		const root = await db.folder.findFirst({
-			where: {
-				parentId: rootFolderId,
-				name: part,
-			},
-			select: {
-				id: true,
-			},
-		})
-		rootFolderId = root!.id
-	}
-	return rootFolderId
 }

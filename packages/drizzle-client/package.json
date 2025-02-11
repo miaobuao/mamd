@@ -1,0 +1,13 @@
+{
+	"name": "drizzle-client",
+	"main": "./index.ts",
+	"scripts": {
+		"generate": "drizzle-kit generate",
+		"migrate": "drizzle-kit migrate",
+		"studio": "drizzle-kit studio"
+	},
+	"devDependencies": {
+		"postgres": "^3.4.5",
+		"tsx": "^4.19.2"
+	}
+}

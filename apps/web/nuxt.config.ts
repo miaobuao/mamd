@@ -1,4 +1,11 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+import process from 'node:process'
+import { isNil } from 'lodash-es'
+
+const MINIO_PROXY_PATH = process.env.MINIO_PROXY_PATH || '/api/oss'
+const MINIO_USE_SSL = process.env.MINIO_USE_SSL?.toLowerCase() === 'true'
+const MINIO_ENDPOINT = process.env.MINIO_ENDPOINT!
+const MINIO_API_PORT = isNil(process.env.MINIO_API_PORT) ? undefined : Number.parseInt(process.env.MINIO_API_PORT!)
+
 export default defineNuxtConfig({
 	future: {
 		compatibilityVersion: 4,
@@ -21,6 +28,13 @@ export default defineNuxtConfig({
 		experimental: {
 			wasm: true,
 		},
+		devProxy: {
+			[MINIO_PROXY_PATH]: {
+				target: `${MINIO_USE_SSL ? 'https' : 'http'}://${MINIO_ENDPOINT}:${MINIO_API_PORT}`,
+				prependPath: true,
+				changeOrigin: true,
+			},
+		},
 	},
 
 	i18n: {
@@ -42,7 +56,6 @@ export default defineNuxtConfig({
 
 	devtools: { enabled: true },
 
-	compatibilityDate: '2024-11-13',
+	compatibilityDate: '2025-02-11',
 
-	runtimeConfig: {},
 })

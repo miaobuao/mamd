@@ -1,6 +1,5 @@
 import { isNil } from 'lodash-es'
 import * as Minio from 'minio'
-import { config } from './config'
 
 let minioClient: Minio.Client | undefined
 

@@ -1,0 +1,626 @@
+{
+	"id": "3d440740-1d2c-4198-a49b-d707ec506ea0",
+	"prevId": "00000000-0000-0000-0000-000000000000",
+	"version": "7",
+	"dialect": "postgresql",
+	"tables": {
+		"public.file": {
+			"name": "file",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
+				},
+				"name": {
+					"name": "name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"full_path": {
+					"name": "full_path",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"repository_id": {
+					"name": "repository_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"parent_id": {
+					"name": "parent_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"creator_id": {
+					"name": "creator_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": false
+				}
+			},
+			"indexes": {
+				"file_name_full_path_repository_id_index": {
+					"name": "file_name_full_path_repository_id_index",
+					"columns": [
+						{
+							"expression": "name",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "full_path",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "repository_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {
+				"file_repository_id_repository_id_fk": {
+					"name": "file_repository_id_repository_id_fk",
+					"tableFrom": "file",
+					"tableTo": "repository",
+					"columnsFrom": [
+						"repository_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"file_parent_id_folder_id_fk": {
+					"name": "file_parent_id_folder_id_fk",
+					"tableFrom": "file",
+					"tableTo": "folder",
+					"columnsFrom": [
+						"parent_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"file_creator_id_user_id_fk": {
+					"name": "file_creator_id_user_id_fk",
+					"tableFrom": "file",
+					"tableTo": "user",
+					"columnsFrom": [
+						"creator_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"file_repositoryId_fullPath_unique": {
+					"name": "file_repositoryId_fullPath_unique",
+					"nullsNotDistinct": false,
+					"columns": [
+						"repository_id",
+						"full_path"
+					]
+				}
+			},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.file_metadata": {
+			"name": "file_metadata",
+			"schema": "",
+			"columns": {
+				"file_id": {
+					"name": "file_id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"mime_type": {
+					"name": "mime_type",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"sha256": {
+					"name": "sha256",
+					"type": "varchar(64)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"size": {
+					"name": "size",
+					"type": "bigint",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"birthtime": {
+					"name": "birthtime",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"mtime": {
+					"name": "mtime",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {
+				"file_metadata_sha256_mime_type_index": {
+					"name": "file_metadata_sha256_mime_type_index",
+					"columns": [
+						{
+							"expression": "sha256",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "mime_type",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {
+				"file_metadata_file_id_file_id_fk": {
+					"name": "file_metadata_file_id_file_id_fk",
+					"tableFrom": "file_metadata",
+					"tableTo": "file",
+					"columnsFrom": [
+						"file_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.folder": {
+			"name": "folder",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
+				},
+				"name": {
+					"name": "name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"full_path": {
+					"name": "full_path",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"repository_id": {
+					"name": "repository_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"parent_id": {
+					"name": "parent_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"creator_id": {
+					"name": "creator_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": false
+				}
+			},
+			"indexes": {
+				"folder_name_full_path_repository_id_index": {
+					"name": "folder_name_full_path_repository_id_index",
+					"columns": [
+						{
+							"expression": "name",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "full_path",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "repository_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {
+				"folder_repository_id_repository_id_fk": {
+					"name": "folder_repository_id_repository_id_fk",
+					"tableFrom": "folder",
+					"tableTo": "repository",
+					"columnsFrom": [
+						"repository_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"folder_parent_id_folder_id_fk": {
+					"name": "folder_parent_id_folder_id_fk",
+					"tableFrom": "folder",
+					"tableTo": "folder",
+					"columnsFrom": [
+						"parent_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"folder_creator_id_user_id_fk": {
+					"name": "folder_creator_id_user_id_fk",
+					"tableFrom": "folder",
+					"tableTo": "user",
+					"columnsFrom": [
+						"creator_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"folder_repositoryId_fullPath_unique": {
+					"name": "folder_repositoryId_fullPath_unique",
+					"nullsNotDistinct": false,
+					"columns": [
+						"repository_id",
+						"full_path"
+					]
+				}
+			},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.repository": {
+			"name": "repository",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
+				},
+				"name": {
+					"name": "name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"creator_id": {
+					"name": "creator_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"linked_folder_id": {
+					"name": "linked_folder_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"ctime": {
+					"name": "ctime",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"mtime": {
+					"name": "mtime",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"repository_creator_id_user_id_fk": {
+					"name": "repository_creator_id_user_id_fk",
+					"tableFrom": "repository",
+					"tableTo": "user",
+					"columnsFrom": [
+						"creator_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				},
+				"repository_linked_folder_id_folder_id_fk": {
+					"name": "repository_linked_folder_id_folder_id_fk",
+					"tableFrom": "repository",
+					"tableTo": "folder",
+					"columnsFrom": [
+						"linked_folder_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "set null",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.user": {
+			"name": "user",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "uuid",
+					"primaryKey": true,
+					"notNull": true,
+					"default": "gen_random_uuid()"
+				},
+				"username": {
+					"name": "username",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"password": {
+					"name": "password",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"is_admin": {
+					"name": "is_admin",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": true,
+					"default": false
+				},
+				"is_deleted": {
+					"name": "is_deleted",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": true,
+					"default": false
+				},
+				"ctime": {
+					"name": "ctime",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"mtime": {
+					"name": "mtime",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {
+				"user_username_index": {
+					"name": "user_username_index",
+					"columns": [
+						{
+							"expression": "username",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"user_username_unique": {
+					"name": "user_username_unique",
+					"nullsNotDistinct": false,
+					"columns": [
+						"username"
+					]
+				}
+			},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.visible_repository": {
+			"name": "visible_repository",
+			"schema": "",
+			"columns": {
+				"user_id": {
+					"name": "user_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"repository_id": {
+					"name": "repository_id",
+					"type": "uuid",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"ctime": {
+					"name": "ctime",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				},
+				"mtime": {
+					"name": "mtime",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true,
+					"default": "now()"
+				}
+			},
+			"indexes": {
+				"visible_repository_repository_id_user_id_index": {
+					"name": "visible_repository_repository_id_user_id_index",
+					"columns": [
+						{
+							"expression": "repository_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "user_id",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": true,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {
+				"visible_repository_user_id_user_id_fk": {
+					"name": "visible_repository_user_id_user_id_fk",
+					"tableFrom": "visible_repository",
+					"tableTo": "user",
+					"columnsFrom": [
+						"user_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"visible_repository_repository_id_repository_id_fk": {
+					"name": "visible_repository_repository_id_repository_id_fk",
+					"tableFrom": "visible_repository",
+					"tableTo": "repository",
+					"columnsFrom": [
+						"repository_id"
+					],
+					"columnsTo": [
+						"id"
+					],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		}
+	},
+	"enums": {},
+	"schemas": {},
+	"sequences": {},
+	"roles": {},
+	"policies": {},
+	"views": {
+		"public.repository_creator_view": {
+			"columns": {},
+			"definition": "select \"user\".\"username\", \"user\".\"is_admin\", \"user\".\"is_deleted\", \"user\".\"id\" as \"user_id\", \"repository\".\"name\", \"repository\".\"linked_folder_id\", \"repository\".\"creator_id\", \"repository\".\"ctime\", \"repository\".\"mtime\", \"repository\".\"id\" as \"repository_id\" from \"user\" inner join \"repository\" on \"repository\".\"creator_id\" = \"user\".\"id\"",
+			"name": "repository_creator_view",
+			"schema": "public",
+			"isExisting": false,
+			"materialized": false
+		},
+		"public.user_visible_repository_view": {
+			"columns": {},
+			"definition": "select \"user\".\"username\", \"user\".\"is_admin\", \"user\".\"is_deleted\", \"user\".\"id\" as \"user_id\", \"repository\".\"name\", \"repository\".\"linked_folder_id\", \"repository\".\"creator_id\", \"repository\".\"ctime\", \"repository\".\"mtime\", \"repository\".\"id\" as \"repository_id\" from \"user\" inner join \"visible_repository\" on \"user\".\"id\" = \"visible_repository\".\"user_id\" inner join \"repository\" on \"repository\".\"id\" = \"visible_repository\".\"repository_id\"",
+			"name": "user_visible_repository_view",
+			"schema": "public",
+			"isExisting": false,
+			"materialized": false
+		}
+	},
+	"_meta": {
+		"columns": {},
+		"schemas": {},
+		"tables": {}
+	}
+}

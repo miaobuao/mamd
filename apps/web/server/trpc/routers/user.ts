@@ -1,12 +1,13 @@
-import { config } from '~~/server/utils/config'
-import { CreateUserInputValidator, DeleteUserInputValidator, EditUserInputValidator, UserLoginSubmitFormValidator, UserRegisterSubmitDataValidator } from '~/utils/validator'
+import { UserTable } from 'drizzle-client'
+import { eq } from 'drizzle-orm'
+import { isNil } from 'lodash-es'
 import { checkAdminAccountExists } from '../middleware/check-admin-user'
 import { adminProcedure, protectedProcedure, publicProcedure, router } from '../trpc'
 
 export const UserRouter = router({
 	auth: protectedProcedure.mutation(async ({ ctx: { userInfo } }) => {
 		return {
-			uuid: userInfo.uuid,
+			uuid: userInfo.id,
 			username: userInfo.username,
 			isAdmin: userInfo.isAdmin,
 		}
@@ -15,20 +16,24 @@ export const UserRouter = router({
 	login: publicProcedure
 		.input(UserLoginSubmitFormValidator)
 		.mutation(async ({ input, ctx: { db, event } }) => {
-			const user = await db.user
-				.findUniqueOrThrow({
-					where: { username: input.username },
-					select: { uuid: true, username: true, password: true, isAdmin: true },
-				})
-				.catch(() => {
-					throw new ForbiddenErrorWithI18n(i18n.error.loginFailed)
-				})
-			if (!user || !bcryptVerify(input.password, user.password))
+			const user = await db.query.UserTable.findFirst({
+				where: eq(UserTable.username, input.username),
+				columns: {
+					id: true,
+					isAdmin: true,
+					username: true,
+					password: true,
+				},
+			})
+			if (isNil(user)) {
+				throw new ForbiddenErrorWithI18n(i18n.error.loginFailed)
+			}
+			if (!user || !bcryptVerify(input.password, user.password)) {
 				throw new ForbiddenErrorWithI18n(i18n.error.invalidUsernameOrPassword)
-
+			}
 			const token = await signToken({
 				user: {
-					uuid: user.uuid,
+					id: user.id,
 				},
 				remember: input.remember,
 			})
@@ -45,7 +50,7 @@ export const UserRouter = router({
 				})
 			}
 			return {
-				uuid: user.uuid,
+				uuid: user.id,
 				username: user.username,
 				isAdmin: user.isAdmin,
 			}
@@ -69,105 +74,69 @@ export const UserRouter = router({
 			if (hasAdmin) {
 				throw new ForbiddenErrorWithI18n(i18n.error.adminAccountExists)
 			}
+			const hasSameUsername = await db.query.UserTable.findFirst({
+				where: eq(UserTable.username, input.username),
+			})
+			if (hasSameUsername) {
+				throw new ForbiddenErrorWithI18n(i18n.error.usernameHasBeenRegistered)
+			}
 			const hashPassword = await bcryptEncrypt(input.password)
-			await db.user
-				.create({
-					data: {
-						username: input.username,
-						password: hashPassword,
-						isAdmin: true,
-					},
+			await db
+				.insert(UserTable)
+				.values({
+					username: input.username,
+					password: hashPassword,
+					isAdmin: true,
 				})
-				.catch(
-					createPrismaErrorHandler({
-						UniqueConstraintError() {
-							throw new ForbiddenErrorWithI18n(
-								i18n.error.usernameHasBeenRegistered,
-							)
-						},
-						default() {
-							throw new ForbiddenErrorWithI18n(i18n.error.registerFailed)
-						},
-					}),
-				)
+				.catch(() => {
+					throw new ForbiddenErrorWithI18n(i18n.error.registerFailed)
+				})
 		}),
 
 	createUser: adminProcedure
 		.input(CreateUserInputValidator)
 		.mutation(async ({ input, ctx: { db } }) => {
+			const hasSameUsername = await db.query.UserTable.findFirst({
+				where: eq(UserTable.username, input.username),
+			})
+			if (hasSameUsername) {
+				throw new ForbiddenErrorWithI18n(i18n.error.usernameHasBeenRegistered)
+			}
 			const hashPassword = await bcryptEncrypt(input.password)
-			await db.user
-				.create({
-					data: {
-						username: input.username,
-						password: hashPassword,
-						isAdmin: input.isAdmin,
-						// isDeleted: false,
-					},
+			await db
+				.insert(UserTable)
+				.values({
+					username: input.username,
+					password: hashPassword,
+					isAdmin: input.isAdmin,
 				})
-				.catch(
-					createPrismaErrorHandler({
-						UniqueConstraintError() {
-							throw new ForbiddenErrorWithI18n(
-								i18n.error.usernameHasBeenRegistered,
-							)
-						},
-						default() {
-							throw new ForbiddenErrorWithI18n(i18n.error.registerFailed)
-						},
-					}),
-				)
+				.catch(() => {
+					throw new ForbiddenErrorWithI18n(i18n.error.registerFailed)
+				})
 		}),
 
 	listUsers: adminProcedure
 		.query(async ({ ctx: { db } }) => {
-			return await db.user.findMany({
-				where: {
-					isDeleted: false,
-				},
-			})
+			return await db.query.UserTable.findMany()
 		}),
 
 	deleteUser: adminProcedure
 		.input(DeleteUserInputValidator)
 		.mutation(async ({ input, ctx: { db } }) => {
-			await db.user.update({
-				where: {
-					uuid: input.uuid,
-				},
-				data: {
-					isDeleted: true,
-					username: input.uuid,
-				},
-			})
+			await db.update(UserTable)
+				.set({ isDeleted: true })
+				.where(eq(UserTable.id, input.uuid))
 		}),
 
 	editUser: adminProcedure
 		.input(EditUserInputValidator)
 		.mutation(async ({ input, ctx: { db } }) => {
-			if (input.password) {
-				const hashPassword = await bcryptEncrypt(input.password)
-				await db.user.update({
-					where: {
-						uuid: input.uuid,
-					},
-					data: {
-						username: input.username,
-						password: hashPassword,
-						isAdmin: input.isAdmin,
-					},
+			await db.update(UserTable)
+				.set({
+					username: input.username,
+					isAdmin: input.isAdmin,
+					...(input.password ? { password: await bcryptEncrypt(input.password) } : {}),
 				})
-			}
-			else {
-				await db.user.update({
-					where: {
-						uuid: input.uuid,
-					},
-					data: {
-						username: input.username,
-						isAdmin: input.isAdmin,
-					},
-				})
-			}
+				.where(eq(UserTable.id, input.uuid))
 		}),
 })

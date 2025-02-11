@@ -1,10 +1,9 @@
 import type { inferProcedureOutput } from '@trpc/server'
-import type { AppRouter } from '~~/server/trpc/routers'
 import type { TypeOf } from 'zod'
+import type { AppRouter } from '~~/server/trpc/routers'
 import { debounce } from 'lodash-es'
-import type { CreateRepositoryFormValidator } from '~/utils/validator'
 
-export type Repository = inferProcedureOutput<AppRouter['repository']['listVisible']>[number]
+export type Repository = inferProcedureOutput<AppRouter['repository']['listVisibleRepository']>[number]
 
 export const useRepositoryStore = defineStore('repository', () => {
 	const { $trpc } = useNuxtApp()
@@ -15,26 +14,26 @@ export const useRepositoryStore = defineStore('repository', () => {
 		repositories.splice(0, repositories.length)
 	})
 
-	$trpc.repository.listVisible.useQuery().then(({ data }) => {
+	$trpc.repository.listVisibleRepository.useQuery().then(({ data }) => {
 		if (data.value) {
 			repositories.splice(0, repositories.length, ...data.value)
 		}
 	})
 
 	async function queryRepository(uuid: string) {
-		const found = repositories.find(v => v.uuid === uuid)
+		const found = repositories.find((v) => v.uuid === uuid)
 		if (found) {
 			return found
 		}
 		const repository = await $trpc.repository.getRepository.useQuery({ uuid })
 		if (repository.data.value) {
-			appendRepository(repository.data.value.repository)
+			appendRepository(repository.data.value)
 		}
-		return repository.data.value?.repository
+		return repository.data.value
 	}
 
 	function removeRepository(uuid: string) {
-		const idx = repositories.findIndex(v => v.uuid === uuid)
+		const idx = repositories.findIndex((v) => v.uuid === uuid)
 		if (idx === -1) {
 			return
 		}
@@ -42,7 +41,7 @@ export const useRepositoryStore = defineStore('repository', () => {
 	}
 
 	function appendRepository(repository: Repository) {
-		const idx = repositories.findIndex(v => v.uuid === repository.uuid)
+		const idx = repositories.findIndex((v) => v.uuid === repository.uuid)
 		if (idx === -1) {
 			repositories.push(repository)
 		}
@@ -58,7 +57,7 @@ export const useRepositoryStore = defineStore('repository', () => {
 	}
 
 	const pullRepositories = debounce(() => {
-		return $trpc.repository.listVisible.query().then((res) => {
+		return $trpc.repository.listVisibleRepository.query().then((res) => {
 			repositories.splice(0, repositories.length, ...res)
 			return Array.from(repositories)
 		})

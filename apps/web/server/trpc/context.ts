@@ -1,6 +1,5 @@
 import type { H3Event } from 'h3'
 import { isNil } from 'lodash-es'
-import { config } from '../utils/config'
 
 export async function createContext(event: H3Event) {
 	const token = getCookie(event, 'auth-token')

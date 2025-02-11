@@ -6,12 +6,7 @@
 	// Auto fix
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": "explicit",
-		"source.organizeImports": "never"
-	},
-
-	"[prisma]": {
-		"editor.defaultFormatter": "Prisma.prisma",
-		"editor.formatOnSave": true
+		"source.removeUnusedImports": "explicit"
 	},
 
 	// Silent the stylistic rules in you IDE, but still auto fix them
@@ -21,7 +16,6 @@
 		{ "rule": "*-indent", "severity": "off", "fixable": true },
 		{ "rule": "*-spacing", "severity": "off", "fixable": true },
 		{ "rule": "*-spaces", "severity": "off", "fixable": true },
-		{ "rule": "*-order", "severity": "off", "fixable": true },
 		{ "rule": "*-dangle", "severity": "off", "fixable": true },
 		{ "rule": "*-newline", "severity": "off", "fixable": true },
 		{ "rule": "*quotes", "severity": "off", "fixable": true },
@@ -51,5 +45,11 @@
 		"pcss",
 		"postcss"
 	],
-	"vue.autoInsert.dotValue": false
+	"vue.autoInsert.dotValue": false,
+	"files.exclude": {
+		"**/.turbo": true,
+		"**/.husky": true,
+		"**/.nuxt": true,
+		"**/.pnpm-store": true
+	}
 }
