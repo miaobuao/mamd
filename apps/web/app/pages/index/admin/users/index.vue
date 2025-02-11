@@ -1,36 +1,43 @@
 <script setup lang="ts">
 import { MoreHorizontal } from 'lucide-vue-next'
-import CreateUserDialog from './CreateUserDialog.vue'
-import UpdateUserDialog from './UpdateUserDialog.vue'
 
 const { $trpc, $text } = useNuxtApp()
 // 查询模块 : 接收后端接口查询数据库结果
 const { data: users, status, refresh } = $trpc.user.listUsers.useQuery()
 
-const createUserDialog = ref()
-const updateUserDialog = ref()
-
-function openUpdateDialog(current_user_uuid: string) {
-	// 或者通过逻辑判断
-	const update_fit = updateUserDialog.value
-	update_fit.updateVisible = true
-	update_fit.uuid = current_user_uuid
+interface UserModel {
+	id: string
+	username: string
+	isAdmin: boolean
+	ctime: string
+	mtime: string
 }
 
-async function deleteUser(uuid: string) {
-	await $trpc.user.deleteUser.mutate({ uuid })
-	users.value = users.value?.filter(user => user.uuid !== uuid) || []
+const selectedUser = ref<UserModel>()
+
+const createUserDialogOpen = ref(false)
+const updateUserDialogOpen = ref(false)
+
+function openUpdateDialog(user: UserModel) {
+	updateUserDialogOpen.value = true
+	selectedUser.value = user
+}
+
+async function deleteUser(id: string) {
+	await $trpc.user.deleteUser.mutate({ id })
+	users.value = users.value?.filter((user) => user.id !== id) || []
 	refresh()
 }
 </script>
 
 <template>
-	<section class="flex flex-col min-h-screen gap-y-2 p-4 bg-muted/40 ml-6">
+	<AdminCreateUserDialog v-model:open="createUserDialogOpen" @after-created="refresh" />
+	<AdminUpdateUserDialog v-if="selectedUser" v-model:open="updateUserDialogOpen" :user="selectedUser" @after-updated="refresh" />
+	<section class="flex flex-col min-h-screen gap-y-2 p-4 bg-muted/40">
 		<section class="flex justify-end">
-			<CreateUserDialog ref="createUserDialog" />
-		</section>
-		<section class="flex justify-end">
-			<UpdateUserDialog ref="updateUserDialog" />
+			<Button variant="outline" @click="createUserDialogOpen = true">
+				{{ $text.createUser() }}
+			</Button>
 		</section>
 		<Card>
 			<!-- Title and SubTitle -->
@@ -59,7 +66,7 @@ async function deleteUser(uuid: string) {
 					</TableHeader>
 					<!-- content -->
 					<TableBody v-if="status === 'pending'">
-						<TableRow v-for="user_member in users" :key="user_member.uuid">
+						<TableRow v-for="user_member in users" :key="user_member.id">
 							<TableCell class="hidden sm:table-cell">
 								<Skeleton class="h-[70px] w-full rounded-xl" />
 							</TableCell>
@@ -78,18 +85,16 @@ async function deleteUser(uuid: string) {
 						</TableRow>
 					</TableBody>
 					<TableBody v-if="status === 'success'">
-						<TableRow v-for="user_member in users" :key="user_member.uuid">
+						<TableRow v-for="user_member in users" :key="user_member.id">
 							<TableCell class="hidden sm:table-cell">
-								<img
-									alt="{{$text.atavar()}}"
-									class="aspect-square rounded-md object-cover"
-									height="64"
-									src="https://images.kimbleex.top/THEME/anzhiyu/MainWebPage/Avatar.avif"
-									width="64"
-								>
+								<UserAvatar
+									:id="user_member.id"
+									:alt="user_member.username[0]?.toUpperCase()"
+									class="aspect-square rounded-md object-cover size-16 text-2xl"
+								/>
 							</TableCell>
 							<TableCell class="font-medium">
-								{{ user_member.uuid }}
+								{{ user_member.id }}
 							</TableCell>
 							<TableCell class="hidden md:table-cell">
 								{{ user_member.username }}
@@ -114,10 +119,10 @@ async function deleteUser(uuid: string) {
 									</DropdownMenuTrigger>
 									<DropdownMenuContent align="end">
 										<DropdownMenuLabel>{{ $text.action() }}</DropdownMenuLabel>
-										<DropdownMenuItem @click="openUpdateDialog(user_member.uuid)">
+										<DropdownMenuItem @click="openUpdateDialog(user_member)">
 											{{ $text.edit() }}
 										</DropdownMenuItem>
-										<DropdownMenuItem @click="deleteUser(user_member.uuid)">
+										<DropdownMenuItem @click="deleteUser(user_member.id)">
 											{{ $text.delete() }}
 										</DropdownMenuItem>
 									</DropdownMenuContent>

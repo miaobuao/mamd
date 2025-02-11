@@ -117,7 +117,19 @@ export const UserRouter = router({
 
 	listUsers: adminProcedure
 		.query(async ({ ctx: { db } }) => {
-			return await db.query.UserTable.findMany()
+			return await db
+				.query
+				.UserTable
+				.findMany({
+					where: eq(UserTable.isDeleted, false),
+					columns: {
+						id: true,
+						username: true,
+						isAdmin: true,
+						mtime: true,
+						ctime: true,
+					},
+				})
 		}),
 
 	deleteUser: adminProcedure

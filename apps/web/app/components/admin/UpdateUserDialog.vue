@@ -1,43 +1,53 @@
-<script setup>
+<script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod'
+import { useVModel } from '@vueuse/core'
 import { Loader2 } from 'lucide-vue-next'
 import { useForm } from 'vee-validate'
+import { toast } from 'vue-sonner'
+
+const props = defineProps<{
+	open: boolean
+	user: {
+		id: string
+		username: string
+		isAdmin: boolean
+		ctime: string
+		mtime: string
+	}
+}>()
+
+const emits = defineEmits<{
+	(e: 'update:open'): void
+}>()
+
+const { $trpc, $text } = useNuxtApp()
+const open = useVModel(props, 'open', emits)
 
 const editUserFormSchema = toTypedSchema(EditUserInputValidator)
 const formUpdateUser = useForm({ validationSchema: editUserFormSchema })
-
-const updateVisible = ref(false)
 const passwordExist = ref('')
 const loading = ref(false)
-const uuid = ref('')
 
 const onUpdate = formUpdateUser.handleSubmit(async (values) => { // 更新用户按钮逻辑
-	values.uuid = uuid.value
 	loading.value = true
 	try {
 		await $trpc.user.editUser.mutate(values)
 		nextTick(() => {
 			toast($text.successfullyUpdatedUser())
 		})
+		open.value = false
 	}
 	catch {
 		toast($text.error.updateUserFailed())
 	}
 	finally {
 		loading.value = false
-		updateVisible.value = false
-		refresh()
 	}
-})
-defineExpose({
-	updateVisible,
-	uuid,
-	onUpdate,
 })
 </script>
 
 <template>
-	<Dialog v-model:open="updateVisible">
+	<Dialog v-model:open="open">
 		<DialogContent class="sm:max-w-[425px]">
 			<DialogHeader>
 				<DialogTitle>{{ $text.updateUser() }}</DialogTitle>

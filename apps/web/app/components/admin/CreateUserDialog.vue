@@ -1,17 +1,32 @@
-<script setup>
+<script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod'
+import { useVModel } from '@vueuse/core'
+import { Loader2 } from 'lucide-vue-next'
 import { useForm } from 'vee-validate'
+import { toast } from 'vue-sonner'
+
+const props = defineProps<{
+	open: boolean
+}>()
+
+const emits = defineEmits<{
+	(e: 'afterCreated'): void
+	(e: 'update:open', value: boolean): void
+}>()
+
+const { $trpc, $text } = useNuxtApp()
+const open = useVModel(props, 'open', emits)
 
 const createUserFormSchema = toTypedSchema(CreateUserInputValidator)
 const formCreateUser = useForm({ validationSchema: createUserFormSchema })
 
 const loading = ref(false) // 添加用户界面按钮加载状态开关
-const createVisible = ref(false) // 添加用户界面开关
 
 const onSubmit = formCreateUser.handleSubmit(async (values) => { // 添加用户按钮逻辑
 	loading.value = true
 	try {
 		await $trpc.user.createUser.mutate(values)
+		open.value = false
 		nextTick(() => {
 			toast($text.successfullyCreatedUser())
 		})
@@ -21,22 +36,13 @@ const onSubmit = formCreateUser.handleSubmit(async (values) => { // 添加用户
 	}
 	finally {
 		loading.value = false
-		createVisible.value = false
-		refresh()
+		emits('afterCreated')
 	}
-})
-defineExpose({
-	onSubmit,
 })
 </script>
 
 <template>
-	<Dialog v-model:open="createVisible">
-		<DialogTrigger as-child>
-			<Button variant="outline">
-				{{ $text.createUser() }}
-			</Button>
-		</DialogTrigger>
+	<Dialog v-model:open="open">
 		<DialogContent class="sm:max-w-[425px]">
 			<DialogHeader>
 				<DialogTitle>{{ $text.createUser() }}</DialogTitle>
