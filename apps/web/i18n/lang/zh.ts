@@ -44,7 +44,7 @@ export default {
 	createUser: '创建用户',
 	true: '是',
 	false: '否',
-	createUserDescription: '创建一个用户来管理你的存储库',
+	createUserDescription: '创建一个用户',
 	updateUser: '更新用户',
 	updateUserDescription: '更新用户信息',
 	error: {
