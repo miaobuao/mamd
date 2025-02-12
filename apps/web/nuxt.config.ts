@@ -11,6 +11,8 @@ export default defineNuxtConfig({
 		compatibilityVersion: 4,
 	},
 
+	telemetry: false,
+
 	build: {
 		transpile: [ 'trpc-nuxt', 'rxjs' ],
 	},

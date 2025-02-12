@@ -117,16 +117,38 @@ export const UserRouter = router({
 
 	listUsers: adminProcedure
 		.query(async ({ ctx: { db } }) => {
-			return await db.query.UserTable.findMany()
+			return await db
+				.query
+				.UserTable
+				.findMany({
+					where: eq(UserTable.isDeleted, false),
+					columns: {
+						id: true,
+						username: true,
+						isAdmin: true,
+						mtime: true,
+						ctime: true,
+					},
+				})
 		}),
 
-	// deleteUser: adminProcedure
-	// 	.mutation(async ({ id, ctx: { db } }) => {
-	// 		await db.user
-	// 			.delete({
-	// 				where: {
-	// 					uuid: id,
-	// 				},
-	// 			})
-	// 	}),
+	deleteUser: adminProcedure
+		.input(DeleteUserInputValidator)
+		.mutation(async ({ input, ctx: { db } }) => {
+			await db.update(UserTable)
+				.set({ isDeleted: true })
+				.where(eq(UserTable.id, input.id))
+		}),
+
+	editUser: adminProcedure
+		.input(EditUserInputValidator)
+		.mutation(async ({ input, ctx: { db } }) => {
+			await db.update(UserTable)
+				.set({
+					username: input.username,
+					isAdmin: input.isAdmin,
+					...(input.password ? { password: await bcryptEncrypt(input.password) } : {}),
+				})
+				.where(eq(UserTable.id, input.id))
+		}),
 })

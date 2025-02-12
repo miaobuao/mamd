@@ -17,7 +17,7 @@ const { $text } = useNuxtApp()
 				</template>
 			</NavRouteButton>
 			<template v-if="auth.userInfo?.isAdmin">
-				<NavRouteButton path="/user">
+				<NavRouteButton path="/admin/users">
 					<template #icon>
 						<Users2 class="h-5 w-5" />
 					</template>

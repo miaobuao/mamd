@@ -1,5 +1,6 @@
 import { UserTable } from 'drizzle-client'
 import { eq } from 'drizzle-orm'
+import { isNotNil } from 'ramda'
 import { t } from '../trpc'
 
 export const checkAdminAccountExists = t.middleware(async ({ ctx, next }) => {
@@ -8,9 +9,7 @@ export const checkAdminAccountExists = t.middleware(async ({ ctx, next }) => {
 		columns: {
 			id: true,
 		},
-	}).then((user) => {
-		return !!user
-	})
+	}).then(isNotNil)
 	return next({
 		ctx: {
 			...ctx,
