@@ -52,15 +52,19 @@ async function deleteUser(id: string) {
 					<!-- table title and action -->
 					<TableHeader>
 						<TableRow>
-							<TableHead class="hidden w-[100px] sm:table-cell">
+							<TableHead>
 								<span class="sr-only">{{ $text.avatar() }}</span>
 							</TableHead>
-							<TableHead>{{ $text.id() }}</TableHead>
+							<!-- <TableHead>{{ $text.id() }}</TableHead> -->
 							<TableHead>{{ $text.username() }}</TableHead>
-							<TableHead>{{ $text.isManager() }}</TableHead>
-							<TableHead>{{ $text.createTime() }}</TableHead>
+							<TableHead class="hidden md:table-cell">
+								{{ $text.isManager() }}
+							</TableHead>
+							<TableHead class="hidden md:table-cell">
+								{{ $text.createTime() }}
+							</TableHead>
 							<TableHead>
-								<span class="sr-only">{{ $text.action() }}</span>
+								<span>{{ $text.action() }}</span>
 							</TableHead>
 						</TableRow>
 					</TableHeader>
@@ -86,20 +90,18 @@ async function deleteUser(id: string) {
 					</TableBody>
 					<TableBody v-if="status === 'success'">
 						<TableRow v-for="user_member in users" :key="user_member.id">
-							<TableCell class="hidden sm:table-cell">
+							<TableCell>
 								<UserAvatar
 									:id="user_member.id"
 									:alt="user_member.username[0]?.toUpperCase()"
-									class="aspect-square rounded-md object-cover size-16 text-2xl"
+									class="aspect-square rounded-md object-cover size-12 text-2xl"
 								/>
 							</TableCell>
-							<TableCell class="font-medium">
-								{{ user_member.id }}
-							</TableCell>
-							<TableCell class="hidden md:table-cell">
+
+							<TableCell>
 								{{ user_member.username }}
 							</TableCell>
-							<TableCell class="hidden md:table-cell">
+							<TableCell>
 								{{ user_member.isAdmin }}
 							</TableCell>
 							<TableCell class="hidden md:table-cell">
