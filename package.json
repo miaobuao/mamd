@@ -25,15 +25,15 @@
 		"clean:all": "turbo clean",
 		"clean:root": "rimraf node_modules"
 	},
-	"dependencies": {
-		"@types/lodash-es": "^4.17.12",
-		"consola": "^3.4.0",
-		"lodash-es": "^4.17.21",
-		"rxjs": "^7.8.1"
-	},
 	"devDependencies": {
 		"@antfu/eslint-config": "^4.1.1",
+		"@graphql-codegen/cli": "^5.0.5",
+		"@graphql-codegen/client-preset": "^4.6.2",
+		"@parcel/watcher": "^2.5.1",
+		"@types/lodash-es": "^4.17.12",
 		"bun": "^1.2.2",
+		"consola": "^3.4.0",
+		"dotenv": "^16.4.7",
 		"dotenv-cli": "^8.0.0",
 		"drizzle-kit": "^0.30.4",
 		"drizzle-orm": "^0.39.2",
@@ -41,9 +41,12 @@
 		"eslint-plugin-format": "^1.0.1",
 		"husky": "^9.1.7",
 		"lint-staged": "^15.4.3",
+		"lodash-es": "^4.17.21",
 		"npm-run-all2": "^7.0.2",
 		"pm2": "^5.4.3",
 		"rimraf": "^6.0.1",
-		"turbo": "latest"
+		"rxjs": "^7.8.1",
+		"turbo": "latest",
+		"typescript": "^5.7.3"
 	}
 }
