@@ -48,6 +48,7 @@ export default {
 		adminAccountExists: 'Admin account already exists',
 		invalidUsernameOrPassword: 'Invalid username or password',
 		loginFailed: 'Login failed',
+		sessionInvalid: 'Invalid Session',
 		pathIsNotDirectory: 'Path is not a directory',
 		pathNotExists: 'Path not exists',
 		permissionDenied: 'Permission denied',

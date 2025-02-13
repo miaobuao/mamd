@@ -48,6 +48,7 @@ export default {
 		adminAccountExists: '管理员账户已存在',
 		invalidUsernameOrPassword: '用户名或密码错误',
 		loginFailed: '登录失败',
+		sessionInvalid: '会话失效',
 		pathIsNotDirectory: '路径不是目录',
 		pathNotExists: '路径不存在',
 		permissionDenied: '权限不足',
