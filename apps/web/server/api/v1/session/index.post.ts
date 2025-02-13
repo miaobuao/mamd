@@ -36,7 +36,7 @@ export default defineEventHandler<
 		remember: input.remember,
 	})
 	if (input.remember) {
-		const maxAge = secs(useRuntimeConfig().OAUTH_JWT_EXPIRES_IN)
+		const maxAge = secs(config.OAUTH_JWT_EXPIRES_IN)
 		setCookie(event, 'auth-token', token, {
 			httpOnly: true,
 			maxAge,

@@ -14,7 +14,7 @@ export function secs(str: string) {
 	const matched = REGEX.exec(str)
 
 	if (!matched || (matched[4] && matched[1]))
-		throw new TypeError('Invalid time period format')
+		throw new TypeError(`Invalid time period format: ${str}`)
 
 	const value = Number.parseFloat(matched[2]!)
 	const unit = matched[3]!.toLowerCase()

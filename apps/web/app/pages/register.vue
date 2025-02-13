@@ -4,7 +4,8 @@ import { Loader2 } from 'lucide-vue-next'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 
-const { $text, $trpc } = useNuxtApp()
+const { $text } = useNuxtApp()
+const $api = useApi()
 const route = useRoute()
 const loading = ref(false)
 
@@ -19,20 +20,23 @@ const onSubmit = form.handleSubmit(async ({ confirmPassword, password, username 
 		return
 	}
 	loading.value = true
-	$trpc.user.createAdminUser
-		.mutate({
+	const { status } = await $api('/api/v1/admin/init', {
+		method: 'post',
+		body: {
 			username,
 			password,
+		},
+	})
+	loading.value = false
+	if (status.value === 'success') {
+		toast($text.successfullyRegistered(), {
+			description: $text.pleaseLogInWithYourUsernameAndPassword(),
 		})
-		.then(() => {
-			toast($text.successfullyRegistered(), {
-				description: $text.pleaseLogInWithYourUsernameAndPassword(),
-			})
-			navigateTo({ path: '/login', query: route.query })
-		})
-		.finally(() => {
-			loading.value = false
-		})
+		navigateTo({ path: '/login', query: route.query })
+	}
+	else {
+		toast($text.error.registerFailed())
+	}
 })
 </script>
 

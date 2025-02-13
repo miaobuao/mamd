@@ -1,8 +1,9 @@
+import type { TypeOf } from 'zod'
 import { isClient } from '@vueuse/core'
 import { Subject } from 'rxjs'
 
 export interface UserInfo {
-	uuid: string
+	id: string
 	username: string
 	isAdmin: boolean
 }
@@ -10,7 +11,7 @@ export interface UserInfo {
 export const LogoutSubject = new Subject<void>()
 
 export const useAuthStore = defineStore('auth', () => {
-	const { $trpc } = useNuxtApp()
+	const $api = useApi()
 
 	const userInfo = ref<UserInfo>()
 
@@ -18,14 +19,25 @@ export const useAuthStore = defineStore('auth', () => {
 		userInfo.value = info
 	}
 
-	function auth() {
-		return $trpc.user.auth
-			.mutate()
-			.then((info) => {
-				updateUserInfo(info)
-				return info
-			})
-			.catch(() => null)
+	async function auth() {
+		const res = await $api('/api/v1/session')
+		if (res.data.value) {
+			updateUserInfo(res.data.value)
+			return res.data.value
+		}
+		return null
+	}
+
+	async function login(form: TypeOf<typeof UserLoginSubmitFormValidator>) {
+		const { data } = await $api('/api/v1/session', {
+			method: 'post',
+			body: form,
+		})
+		if (data.value) {
+			updateUserInfo(data.value)
+			return true
+		}
+		return false
 	}
 
 	function logout() {
@@ -35,7 +47,9 @@ export const useAuthStore = defineStore('auth', () => {
 			sessionStorage.clear()
 			localStorage.clear()
 		}
-		return $trpc.user.logout.mutate().then(() => {
+		return $api('/api/v1/session', {
+			method: 'delete',
+		}).then(() => {
 			if (isClient) {
 				window.open('/')
 				window.close()
@@ -50,6 +64,7 @@ export const useAuthStore = defineStore('auth', () => {
 		updateUserInfo,
 		isAuth,
 		auth,
+		login,
 		logout,
 	}
 })
