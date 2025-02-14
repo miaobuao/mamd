@@ -1,4 +1,9 @@
-import urql, { cacheExchange, fetchExchange, ssrExchange } from '@urql/vue'
+import urql, {
+	cacheExchange,
+	fetchExchange,
+	ssrExchange,
+} from '@urql/vue'
+import { process } from 'std-env'
 
 export default defineNuxtPlugin((nuxtApp) => {
 	const ssr = ssrExchange({
@@ -7,7 +12,8 @@ export default defineNuxtPlugin((nuxtApp) => {
 
 	if (import.meta.server) {
 		nuxtApp.hook('app:rendered', () => {
-			nuxtApp.payload?.data && (nuxtApp.payload.data.urql = ssr.extractData())
+			const extractData = ssr.extractData()
+			nuxtApp.payload?.data && (nuxtApp.payload.data.urql = extractData)
 		})
 	}
 
@@ -18,8 +24,14 @@ export default defineNuxtPlugin((nuxtApp) => {
 	}
 
 	const exchanges = [ cacheExchange, ssr, fetchExchange ]
+	const GQL_SUFFIX = '/api/gql'
 	nuxtApp.vueApp.use(urql, {
-		url: '/api/gql',
+		url: import.meta.client ? GQL_SUFFIX : `http://localhost:${process.env.NITRO_PORT}${GQL_SUFFIX}`,
 		exchanges,
+		fetchOptions: () => ({
+			headers: {
+				cookie: nuxtApp.ssrContext?.event.node.req.headers.cookie ?? '',
+			},
+		}),
 	})
 })

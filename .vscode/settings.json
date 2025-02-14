@@ -51,5 +51,8 @@
 		"**/.husky": true,
 		"**/.nuxt": true,
 		"**/.pnpm-store": true
-	}
+	},
+	"cSpell.words": [
+		"urql"
+	]
 }
