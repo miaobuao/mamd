@@ -1,4 +1,4 @@
-import { User } from 'drizzle-client'
+import { UserTable } from 'drizzle-client'
 import { eq } from 'drizzle-orm'
 
 export const AUTH_TOKEN_KEY = 'auth-token'
@@ -19,8 +19,8 @@ export default defineEventHandler<{}, Promise<{
 		deleteCookie(event, AUTH_TOKEN_KEY)
 		throw new BadRequestErrorWithI18n(i18n.error.sessionInvalid)
 	}
-	const user = await event.context.db.query.User.findFirst({
-		where: eq(User.id, payload.data.user.id),
+	const user = await event.context.db.query.UserTable.findFirst({
+		where: eq(UserTable.id, payload.data.user.id),
 		columns: {
 			id: true,
 			isAdmin: true,

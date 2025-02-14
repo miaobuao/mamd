@@ -1,5 +1,5 @@
 import type { TypeOf } from 'zod'
-import { User } from 'drizzle-client'
+import { UserTable } from 'drizzle-client'
 import { eq } from 'drizzle-orm'
 import { isNil } from 'lodash-es'
 
@@ -14,8 +14,8 @@ export default defineEventHandler<
 	}>
 >(async (event) => {
 	const input = await readBody(event)
-	const user = await event.context.db.query.User.findFirst({
-		where: eq(User.username, input.username),
+	const user = await event.context.db.query.UserTable.findFirst({
+		where: eq(UserTable.username, input.username),
 		columns: {
 			id: true,
 			isAdmin: true,
