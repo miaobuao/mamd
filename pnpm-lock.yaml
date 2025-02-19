@@ -98,6 +98,9 @@ importers:
       '@pinia/nuxt':
         specifier: ^0.9.0
         version: 0.9.0(magicast@0.3.5)(pinia@2.2.6(typescript@5.7.3)(vue@3.5.13(typescript@5.7.3)))(rollup@4.25.0)(webpack-sources@3.2.3)
+      '@repo/graphql-server':
+        specifier: 'workspace: *'
+        version: link:../../packages/graphql-server
       '@repo/workers':
         specifier: workspace:*
         version: link:../../packages/workers
@@ -146,15 +149,6 @@ importers:
       drizzle-client:
         specifier: 'workspace: *'
         version: link:../../packages/drizzle-client
-      drizzle-graphql:
-        specifier: ^0.8.5
-        version: 0.8.5(drizzle-orm@0.39.2(@prisma/client@5.22.0(prisma@5.22.0))(postgres@3.4.5)(prisma@5.22.0)(react@18.3.1))(graphql@16.10.0)
-      graphql:
-        specifier: ^16.10.0
-        version: 16.10.0
-      graphql-yoga:
-        specifier: ^5.11.0
-        version: 5.11.0(graphql@16.10.0)
       hash-wasm:
         specifier: ^4.12.0
         version: 4.12.0
@@ -224,6 +218,21 @@ importers:
       tsx:
         specifier: ^4.19.2
         version: 4.19.2
+
+  packages/graphql-server:
+    devDependencies:
+      drizzle-client:
+        specifier: 'workspace: *'
+        version: link:../drizzle-client
+      drizzle-graphql:
+        specifier: ^0.8.5
+        version: 0.8.5(drizzle-orm@0.39.2(@prisma/client@5.22.0(prisma@5.22.0))(postgres@3.4.5)(prisma@5.22.0)(react@18.3.1))(graphql@16.10.0)
+      graphql:
+        specifier: ^16.10.0
+        version: 16.10.0
+      graphql-yoga:
+        specifier: ^5.11.0
+        version: 5.11.0(graphql@16.10.0)
 
   packages/workers:
     devDependencies:
@@ -9573,7 +9582,7 @@ snapshots:
 
   '@swc/helpers@0.5.13':
     dependencies:
-      tslib: 2.8.0
+      tslib: 2.8.1
 
   '@tanstack/virtual-core@3.10.8': {}
 
@@ -11883,7 +11892,7 @@ snapshots:
     dependencies:
       debug: 4.4.0(supports-color@9.4.0)
       graphql: 16.10.0
-      tslib: 2.8.0
+      tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
 
@@ -14692,7 +14701,7 @@ snapshots:
 
   synckit@0.6.2:
     dependencies:
-      tslib: 2.8.0
+      tslib: 2.8.1
 
   synckit@0.9.2:
     dependencies:

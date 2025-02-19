@@ -1,4 +1,4 @@
-import type { DrizzleCilent } from 'drizzle-client'
+import type { DrizzleClient } from 'drizzle-client'
 import * as fs from 'node:fs/promises'
 import { basename } from 'node:path'
 import { scannerTask } from '@repo/workers'
@@ -156,7 +156,7 @@ export const RepositoryRouter = router({
 	}),
 })
 
-export async function repositoryExists(db: DrizzleCilent, path: string) {
+export async function repositoryExists(db: DrizzleClient, path: string) {
 	const res = await db
 		.select()
 		.from(RepositoryTable)

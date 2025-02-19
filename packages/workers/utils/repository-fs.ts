@@ -1,11 +1,11 @@
-import type { DrizzleCilent } from 'drizzle-client'
+import type { DrizzleClient } from 'drizzle-client'
 import { basename } from 'node:path'
 import { FileTable, FolderTable } from 'drizzle-client'
 import { and, eq } from 'drizzle-orm'
 
 export class RepositoryFileSytem {
 	constructor(
-		public readonly db: DrizzleCilent,
+		public readonly db: DrizzleClient,
 		public readonly id: string,
 	) {}
 

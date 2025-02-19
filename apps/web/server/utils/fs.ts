@@ -1,9 +1,9 @@
-import type { DrizzleCilent } from 'drizzle-client'
+import type { DrizzleClient } from 'drizzle-client'
 import { FolderTable } from 'drizzle-client'
 import { and, eq } from 'drizzle-orm'
 import { isNil } from 'lodash-es'
 
-export type DB = DrizzleCilent
+export type DB = DrizzleClient
 
 export async function getFolderAbsolutePath(db: DB, repositoryId: string, folderId: string) {
 	const repository = await db.query.FolderTable.findFirst({

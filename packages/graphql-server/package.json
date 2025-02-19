@@ -1,0 +1,10 @@
+{
+	"name": "@repo/graphql-server",
+	"main": "index.ts",
+	"devDependencies": {
+		"drizzle-client": "workspace: *",
+		"drizzle-graphql": "^0.8.5",
+		"graphql": "^16.10.0",
+		"graphql-yoga": "^5.11.0"
+	}
+}

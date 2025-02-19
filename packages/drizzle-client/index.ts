@@ -9,7 +9,7 @@ import * as userSchema from './schema/user'
 import * as userVisibleRepositoryView from './schema/userVisibleRepositoryView'
 import * as visibleRepositorySchema from './schema/visibleRepository'
 
-const clients: Record<string, DrizzleCilent> = {}
+const clients: Record<string, DrizzleClient> = {}
 
 function createDrizzleClient(databaseUrl: string) {
 	const client = postgres(databaseUrl)
@@ -36,7 +36,7 @@ export function useDrizzleClient(databaseUrl: string) {
 	return client
 }
 
-export type DrizzleCilent = Awaited<ReturnType<typeof createDrizzleClient>>
+export type DrizzleClient = Awaited<ReturnType<typeof createDrizzleClient>>
 
 export * from './schema/file'
 export * from './schema/fileMetadata'
