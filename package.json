@@ -29,15 +29,15 @@
 		"@types/lodash-es": "^4.17.12",
 		"consola": "^3.4.0",
 		"lodash-es": "^4.17.21",
-		"rxjs": "^7.8.1"
+		"rxjs": "^7.8.2"
 	},
 	"devDependencies": {
-		"@antfu/eslint-config": "^4.1.1",
-		"bun": "^1.2.2",
+		"@antfu/eslint-config": "^4.3.0",
+		"bun": "^1.2.3",
 		"dotenv-cli": "^8.0.0",
 		"drizzle-kit": "^0.30.4",
-		"drizzle-orm": "^0.39.2",
-		"eslint": "9.19.0",
+		"drizzle-orm": "^0.39.3",
+		"eslint": "9.21.0",
 		"eslint-plugin-format": "^1.0.1",
 		"husky": "^9.1.7",
 		"lint-staged": "^15.4.3",
