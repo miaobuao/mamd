@@ -18,8 +18,8 @@
 		"isbinaryfile": "^5.0.4",
 		"junk": "^4.0.1",
 		"mime-types": "^2.1.35",
-		"nats": "^2.29.1",
+		"nats": "^2.29.2",
 		"repository-fs": "workspace: *",
-		"rxjs": "^7.8.1"
+		"rxjs": "^7.8.2"
 	}
 }
